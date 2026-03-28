@@ -1,0 +1,129 @@
+[
+	{
+		"name": "Steam",
+		"executableNames": ["steam.exe"],
+		"displayNames": ["Steam"],
+		"pathMarkers": ["\\Steam\\"],
+		"knownRelativePaths": [
+			"Steam\\steam.exe",
+			"Program Files (x86)\\Steam\\steam.exe",
+			"Program Files\\Steam\\steam.exe"
+		]
+	},
+	{
+		"name": "Epic Games Launcher",
+		"executableNames": ["EpicGamesLauncher.exe"],
+		"displayNames": ["Epic Games Launcher"],
+		"pathMarkers": ["\\Epic Games\\Launcher\\"],
+		"knownRelativePaths": [
+			"Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win32\\EpicGamesLauncher.exe",
+			"Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe",
+			"Program Files\\Epic Games\\Launcher\\Portal\\Binaries\\Win32\\EpicGamesLauncher.exe",
+			"Program Files\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe"
+		]
+	},
+	{
+		"name": "GOG Galaxy",
+		"executableNames": ["GalaxyClient.exe"],
+		"displayNames": ["GOG Galaxy", "GOG GALAXY"],
+		"pathMarkers": ["\\GOG Galaxy\\"],
+		"knownRelativePaths": [
+			"Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe",
+			"Program Files\\GOG Galaxy\\GalaxyClient.exe"
+		]
+	},
+	{
+		"name": "Ubisoft Connect",
+		"executableNames": ["UbisoftConnect.exe", "upc.exe"],
+		"displayNames": ["Ubisoft Connect", "Ubisoft Game Launcher"],
+		"pathMarkers": ["\\Ubisoft Game Launcher\\"],
+		"knownRelativePaths": [
+			"Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+			"Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\upc.exe",
+			"Program Files\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+			"Program Files\\Ubisoft\\Ubisoft Game Launcher\\upc.exe"
+		]
+	},
+	{
+		"name": "EA app",
+		"executableNames": ["EADesktop.exe"],
+		"displayNames": ["EA app", "EA Desktop"],
+		"pathMarkers": ["\\EA Desktop\\"],
+		"knownRelativePaths": [
+			"Program Files\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
+			"Program Files (x86)\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe"
+		]
+	},
+	{
+		"name": "Battle.net",
+		"executableNames": ["Battle.net.exe", "Battle.net Launcher.exe"],
+		"displayNames": ["Battle.net"],
+		"pathMarkers": ["\\Battle.net\\"],
+		"knownRelativePaths": [
+			"Program Files (x86)\\Battle.net\\Battle.net Launcher.exe",
+			"Program Files (x86)\\Battle.net\\Battle.net.exe",
+			"Program Files\\Battle.net\\Battle.net Launcher.exe",
+			"Program Files\\Battle.net\\Battle.net.exe"
+		]
+	},
+	{
+		"name": "Rockstar Games Launcher",
+		"executableNames": ["Launcher.exe"],
+		"displayNames": ["Rockstar Games Launcher"],
+		"pathMarkers": ["\\Rockstar Games\\Launcher\\", "\\RockstarLauncher\\"],
+		"knownRelativePaths": [
+			"Program Files\\Rockstar Games\\Launcher\\Launcher.exe",
+			"Program Files (x86)\\Rockstar Games\\Launcher\\Launcher.exe"
+		]
+	},
+	{
+		"name": "Minecraft Launcher",
+		"executableNames": ["MinecraftLauncher.exe"],
+		"displayNames": ["Minecraft Launcher"],
+		"pathMarkers": ["\\Minecraft Launcher\\"],
+		"knownRelativePaths": [
+			"XboxGames\\Minecraft Launcher\\Content\\MinecraftLauncher.exe",
+			"Program Files\\Minecraft Launcher\\MinecraftLauncher.exe"
+		]
+	},
+	{
+		"name": "Riot Client",
+		"executableNames": ["RiotClientServices.exe"],
+		"displayNames": ["Riot Client"],
+		"pathMarkers": ["\\Riot Client\\"],
+		"knownRelativePaths": [
+			"Riot Games\\Riot Client\\RiotClientServices.exe",
+			"Program Files\\Riot Games\\Riot Client\\RiotClientServices.exe",
+			"Program Files (x86)\\Riot Games\\Riot Client\\RiotClientServices.exe"
+		]
+	},
+	{
+		"name": "Xbox",
+		"executableNames": ["XboxPcApp.exe"],
+		"displayNames": ["Xbox"],
+		"pathMarkers": ["\\Xbox\\"],
+		"knownRelativePaths": [
+			"Program Files\\Xbox\\XboxPcApp.exe",
+			"Xbox\\XboxPcApp.exe"
+		]
+	},
+	{
+		"name": "Amazon Games",
+		"executableNames": ["Amazon Games.exe"],
+		"displayNames": ["Amazon Games"],
+		"pathMarkers": ["\\Amazon Games\\"],
+		"knownRelativePaths": [
+			"Users\\Default\\AppData\\Local\\Amazon Games\\App\\Amazon Games.exe",
+			"Program Files\\Amazon Games\\Amazon Games.exe"
+		]
+	},
+	{
+		"name": "itch.io",
+		"executableNames": ["itch.exe"],
+		"displayNames": ["itch.io", "itch"],
+		"pathMarkers": ["\\itch\\"],
+		"knownRelativePaths": [
+			"Users\\Default\\AppData\\Local\\itch\\app-25.6.1\\itch.exe"
+		]
+	}
+]
