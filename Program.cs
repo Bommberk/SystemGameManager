@@ -11,14 +11,21 @@ internal static class Program
         GetInfoAsync();
     }
 
+    private static void writeHeadline()
+    {
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine("==============================");
+        Console.WriteLine("        INFORMATIONEN!        ");
+        Console.WriteLine("==============================");
+        Console.ResetColor();
+    }
+
     private static void GetInfoAsync()
     {
         var pcInfo = new PcInfo();
         var gameInfo2 = new GameInfo2();
         var gameInfo = new GameInfo();
-        Console.WriteLine("==============================");
-        Console.WriteLine("         INFORMATIONEN        ");
-        Console.WriteLine("==============================");
+        writeHeadline();
         // pcInfo.Write();
         gameInfo.Write();
         // gameInfo2.Write();

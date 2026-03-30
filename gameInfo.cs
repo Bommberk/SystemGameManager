@@ -14,11 +14,19 @@ class GameInfo
         
     }
 
-    public void Write()
+    private void writeHeadline()
     {
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("==============================");
         Console.WriteLine("      Game-Informationen      ");
         Console.WriteLine("==============================");
+        Console.ResetColor();
+    }
+
+    public void Write()
+    {
+
+        writeHeadline();
 
         Console.WriteLine("Launchers:");
         if (installedLaunchers != null)
