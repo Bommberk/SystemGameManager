@@ -1,4 +1,4 @@
-namespace Krassheiten.Game;
+namespace Krassheiten.Game.Controller;
 
 using Krassheiten.Game.Service;
 using Krassheiten.Game.Entity;

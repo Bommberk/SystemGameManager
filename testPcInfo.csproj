@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="knownLaunchersWithPath.json">
+    <None Update="assets\game\knownLaunchersWithPath.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Game\knownLaunchers.json">
+    <None Update="assets\game\knownLaunchers.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
