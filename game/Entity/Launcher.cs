@@ -18,6 +18,12 @@ class Launcher
         string InstallPath,
         string GameFoldersPath,
         string LibraryFolderPath,
+        string LibraryFolderFilePath,
         string? DirectRegistryKey = null
+    );
+    public record LibraryFolderFileRecord
+    (
+        string LibraryFolderPath,
+        string LibraryFolderFilePath
     );
 }

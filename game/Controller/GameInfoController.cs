@@ -24,6 +24,8 @@ class GameInfoController
 
     public void Write()
     {
+        // GameService.GetInstalledGames();
+        // return;
         Launcher.Record[]? InstalledLaunchers = Launcher.InstalledLaunchers;
         Game.Record[]? InstalledGames = Game.InstalledGames;
         
@@ -34,7 +36,9 @@ class GameInfoController
         {
             foreach (var launcher in InstalledLaunchers)
             {
-                Console.WriteLine($"- {launcher.DisplayName} -> Installationspfad: {launcher.InstallPath}");
+                Console.WriteLine($"- {launcher.DisplayName}:");
+                Console.WriteLine($"  -> Installationspfad: {launcher.InstallPath}");
+                Console.WriteLine($"  -> Spielordnerpfad: {launcher.LibraryFolderPath}");
             }
         }
         else

@@ -6,6 +6,7 @@
         "InstallPath": "",
         "GameFoldersPath": "steamapps\\common",
         "LibraryFolderPath": "",
+        "LibraryFolderFilePath": "steamapps\\libraryfolders.vdf",
         "DirectRegistryKey": "SOFTWARE\\WOW6432Node\\Valve\\Steam"
     },
     {

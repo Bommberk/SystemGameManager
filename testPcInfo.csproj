@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
     <PackageReference Include="System.Management" Version="10.0.5" />
   </ItemGroup>
 

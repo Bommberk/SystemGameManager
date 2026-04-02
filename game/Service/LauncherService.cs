@@ -3,6 +3,8 @@ namespace Krassheiten.Game.Service;
 using Microsoft.Win32;
 using System.Text.Json;
 using Krassheiten.Game.Entity;
+using Gameloop.Vdf;
+using Gameloop.Vdf.Linq;
 
 class LauncherService
 {
@@ -84,12 +86,10 @@ class LauncherService
                     if (!string.IsNullOrEmpty(displayName) &&
                         displayName.Contains(knownLauncher.SearchName, StringComparison.OrdinalIgnoreCase))
                     {
-                        Console.WriteLine($"{knownLauncher.DisplayName} Launcher gefunden!");
                         foundInRegistry = true;
-                        string? installPath = GetInstallPath(knownLauncher);
-                        if(installPath == null)
-                            installPath = "nothing found";
-                        launchers = launchers.Append(knownLauncher with { InstallPath = installPath }).ToArray();
+                        string? installPath = GetInstallPath(knownLauncher) ?? "nothing found";
+                        string? libraryFolderPath = GetLibraryFolderPath(knownLauncher, installPath) ?? "nothing found";
+                        launchers = launchers.Append(knownLauncher with { InstallPath = installPath, LibraryFolderPath = libraryFolderPath }).ToArray();
                         break;
                     }
                 }
@@ -98,5 +98,41 @@ class LauncherService
             }
         }
         Launcher.InstalledLaunchers = launchers;
+    }
+
+    private static string? GetLibraryFolderPath(Launcher.Record launcher, string installPath)
+    {
+        if (string.IsNullOrEmpty(installPath))
+            return null;
+        if (string.IsNullOrEmpty(launcher.LibraryFolderFilePath))
+            return null;
+        
+        var vdfPath = Path.Combine(installPath, launcher.LibraryFolderFilePath);
+        if (!File.Exists(vdfPath))
+            return null;
+
+        var vdf = VdfConvert.Deserialize(File.ReadAllText(vdfPath));
+        var root = vdf.Value as VObject;
+        if (root == null)
+            return null;
+            
+
+        var libraryFolders = root["libraryfolders"] as VObject;
+        if (libraryFolders == null)
+            return null;
+
+        foreach (var property in libraryFolders)
+        {
+            Console.WriteLine($"Prüfe Library-Ordner: ");
+            var folder = property.Value as VObject;
+            if (folder == null)
+                continue;
+
+            var path = folder["path"]?.ToString();
+            if (!string.IsNullOrEmpty(path))
+                Console.WriteLine($"Library-Ordner gefunden: {path}");
+                return path;
+        }
+        return null;
     }
 }
