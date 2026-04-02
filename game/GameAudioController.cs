@@ -1,0 +1,6 @@
+namespace Control;
+
+class GameAudioController
+{
+    
+}

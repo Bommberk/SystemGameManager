@@ -2,9 +2,9 @@ using System.Management;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-namespace Infos;
+namespace Krassheiten.PC;
 
-public class PcInfo
+public class PcInfoController
 {
     private const long Gigabyte = 1024L * 1024 * 1024;
 

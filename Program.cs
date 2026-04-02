@@ -1,8 +1,10 @@
 ﻿using System.Management;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using Krassheiten.Game;
+using Krassheiten.PC;
 
-namespace Infos;
+namespace Krassheiten;
 
 internal static class Program
 {
@@ -23,12 +25,10 @@ internal static class Program
     private static void GetInfoAsync()
     {
         var pcInfo = new PcInfo();
-        var gameInfo2 = new GameInfo2();
         var gameInfo = new GameInfo();
         writeHeadline();
         // pcInfo.Write();
         gameInfo.Write();
-        // gameInfo2.Write();
     }
 
 }
