@@ -116,7 +116,6 @@ class LauncherService
         if (root == null)
             return null;
             
-
         var libraryFolders = root["libraryfolders"] as VObject;
         if (libraryFolders == null)
             return null;
