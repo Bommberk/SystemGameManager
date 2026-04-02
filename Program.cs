@@ -1,10 +1,7 @@
-﻿using System.Management;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using Krassheiten.Game;
-using Krassheiten.PC;
+﻿namespace Krassheiten;
 
-namespace Krassheiten;
+using Krassheiten.Game.Controller;
+using Krassheiten.PC.Controller;
 
 internal static class Program
 {
@@ -24,8 +21,8 @@ internal static class Program
 
     private static void GetInfoAsync()
     {
-        var pcInfo = new PcInfo();
-        var gameInfo = new GameInfo();
+        var pcInfo = new PcInfoController();
+        var gameInfo = new GameInfoController();
         writeHeadline();
         // pcInfo.Write();
         gameInfo.Write();

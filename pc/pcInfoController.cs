@@ -1,8 +1,8 @@
+namespace Krassheiten.PC.Controller;
+
 using System.Management;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-
-namespace Krassheiten.PC;
 
 public class PcInfoController
 {
