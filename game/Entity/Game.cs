@@ -6,12 +6,7 @@ class Game
 
     public record Record
     (
-        string DisplayName,
-        string SearchName,
-        string StdPath,
-        string InstallPath,
-        string GameFoldersPath,
-        string LibraryFolderPath,
-        string? DirectRegistryKey = null
+        string Name,
+        string InstallPath
     );
 }

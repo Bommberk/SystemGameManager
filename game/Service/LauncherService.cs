@@ -3,8 +3,6 @@ namespace Krassheiten.Game.Service;
 using Microsoft.Win32;
 using System.Text.Json;
 using Krassheiten.Game.Entity;
-using Gameloop.Vdf;
-using Gameloop.Vdf.Linq;
 
 class LauncherService
 {
@@ -16,7 +14,69 @@ class LauncherService
         Launcher.KnownLaunchers = launchers;
     }
 
-    public static string? GetInstallPath(Launcher.Record launcher)
+    public void SetInstalledLaunchers()
+    {
+        Launcher.Record[]? knownLaunchers = Launcher.KnownLaunchers;
+        if (knownLaunchers == null)
+        {
+            Launcher.InstalledLaunchers = null;
+            return;
+        }
+
+        List<Launcher.Record> installedLaunchers = [];
+        foreach (var knownLauncher in knownLaunchers)
+        {
+            if (!IsInstalledLauncher(knownLauncher))
+                continue;
+
+            installedLaunchers.Add(knownLauncher);
+        }
+
+        Launcher.InstalledLaunchers = installedLaunchers.ToArray();
+        SetInstallPath();
+        SetLibraryFolderPath();
+    }
+
+    private static bool IsInstalledLauncher(Launcher.Record knownLauncher)
+    {
+        foreach (var regPath in Launcher.RegistryUninstallPaths)
+        {
+            using var key = Registry.LocalMachine.OpenSubKey(regPath);
+            if (key == null) continue;
+
+            foreach (var subKeyName in key.GetSubKeyNames())
+            {
+                using var subKey = key.OpenSubKey(subKeyName);
+                if (subKey == null) continue;
+
+                string? displayName = subKey.GetValue("DisplayName") as string;
+                if (!string.IsNullOrEmpty(displayName) &&
+                    displayName.Contains(knownLauncher.SearchName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static void SetInstallPath()
+    {
+        Launcher.Record[]? installedLaunchers = Launcher.InstalledLaunchers;
+        if (installedLaunchers == null)
+            return;
+
+        for (int i = 0; i < installedLaunchers.Length; i++)
+        {
+            string installPath = ResolveInstallPath(installedLaunchers[i]) ?? "nothing found";
+            installedLaunchers[i] = installedLaunchers[i] with { InstallPath = installPath };
+        }
+
+        Launcher.InstalledLaunchers = installedLaunchers;
+    }
+
+    private static string? ResolveInstallPath(Launcher.Record launcher)
     {
         // 1. Direkter Registry-Key, falls im JSON angegeben (z. B. Steam)
         if (!string.IsNullOrEmpty(launcher.DirectRegistryKey))
@@ -50,8 +110,8 @@ class LauncherService
             }
         }
 
-        // 3. Fallback: übergeordnetes Verzeichnis des stdPath prüfen
-        string stdDir = Path.GetDirectoryName(launcher.StdPath) ?? launcher.InstallPath;
+        // 3. Fallback: übergeordnetes Verzeichnis des Standard-Installationspfads prüfen
+        string stdDir = Path.GetDirectoryName(launcher.StdInstallPath) ?? launcher.InstallPath;
         if (Directory.Exists(stdDir))
             return stdDir;
 
@@ -59,78 +119,37 @@ class LauncherService
         return null;
     }
 
-    public void SetInstalledLaunchers(Launcher.Record[]? knownLaunchers = null)
+    private static void SetLibraryFolderPath()
     {
-        knownLaunchers ??= Launcher.KnownLaunchers;
-        if (knownLaunchers == null)
-        {
-            Launcher.InstalledLaunchers = [];
+        Launcher.Record[]? installedLaunchers = Launcher.InstalledLaunchers;
+        if (installedLaunchers == null)
             return;
-        }
 
-        Launcher.Record[] launchers = [];
-        foreach (var knownLauncher in knownLaunchers)
+        for (int i = 0; i < installedLaunchers.Length; i++)
         {
-            bool foundInRegistry = false;
-            foreach (var regPath in Launcher.RegistryUninstallPaths)
-            {
-                using var key = Registry.LocalMachine.OpenSubKey(regPath);
-                if (key == null) continue;
-
-                foreach (var subKeyName in key.GetSubKeyNames())
-                {
-                    using var subKey = key.OpenSubKey(subKeyName);
-                    if (subKey == null) continue;
-
-                    string? displayName = subKey.GetValue("DisplayName") as string;
-                    if (!string.IsNullOrEmpty(displayName) &&
-                        displayName.Contains(knownLauncher.SearchName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        foundInRegistry = true;
-                        string? installPath = GetInstallPath(knownLauncher) ?? "nothing found";
-                        string? libraryFolderPath = GetLibraryFolderPath(knownLauncher, installPath) ?? "nothing found";
-                        launchers = launchers.Append(knownLauncher with { InstallPath = installPath, LibraryFolderPath = libraryFolderPath }).ToArray();
-                        break;
-                    }
-                }
-                if (foundInRegistry)
-                    break;
-            }
+            string installPath = installedLaunchers[i].InstallPath;
+            string libraryFolderPath = ResolveLibraryFolderPath(installedLaunchers[i], installPath) ?? "nothing found";
+            libraryFolderPath = Path.Combine(libraryFolderPath, installedLaunchers[i].StdGameFoldersPath);
+            installedLaunchers[i] = installedLaunchers[i] with { GameFolderPath = libraryFolderPath };
         }
-        Launcher.InstalledLaunchers = launchers;
+
+        Launcher.InstalledLaunchers = installedLaunchers;
     }
 
-    private static string? GetLibraryFolderPath(Launcher.Record launcher, string installPath)
+    private static string? ResolveLibraryFolderPath(Launcher.Record launcher, string installPath)
     {
         if (string.IsNullOrEmpty(installPath))
             return null;
-        if (string.IsNullOrEmpty(launcher.LibraryFolderFilePath))
+        if (string.IsNullOrEmpty(launcher.StdLibraryFilePath))
             return null;
         
-        var vdfPath = Path.Combine(installPath, launcher.LibraryFolderFilePath);
+        var vdfPath = Path.Combine(installPath, launcher.StdLibraryFilePath);
         if (!File.Exists(vdfPath))
             return null;
 
-        var vdf = VdfConvert.Deserialize(File.ReadAllText(vdfPath));
-        var root = vdf.Value as VObject;
-        if (root == null)
-            return null;
-            
-        var libraryFolders = root["libraryfolders"] as VObject;
-        if (libraryFolders == null)
-            return null;
-
-        foreach (var property in libraryFolders)
-        {
-            Console.WriteLine($"Prüfe Library-Ordner: ");
-            var folder = property.Value as VObject;
-            if (folder == null)
-                continue;
-
-            var path = folder["path"]?.ToString();
-            if (!string.IsNullOrEmpty(path))
-                Console.WriteLine($"Library-Ordner gefunden: {path}");
-                return path;
+        var vdfData = LauncherVdfService.LoadVdfAsArray(vdfPath);
+        if (vdfData != null)        {
+            return LauncherVdfService.GetLibraryFolderPathFromVdf(vdfData);
         }
         return null;
     }

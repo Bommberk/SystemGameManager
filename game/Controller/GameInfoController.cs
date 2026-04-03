@@ -6,11 +6,13 @@ using Krassheiten.Game.Entity;
 class GameInfoController
 {
     private readonly LauncherService launcherService = new();
+    private readonly GameService gameService = new();
 
     public GameInfoController()
     {
         launcherService.SetKnownLaunchers();
         launcherService.SetInstalledLaunchers();
+        gameService.SetInstalledGames();
     }
 
     private void WriteHeadline()
@@ -38,7 +40,7 @@ class GameInfoController
             {
                 Console.WriteLine($"- {launcher.DisplayName}:");
                 Console.WriteLine($"  -> Installationspfad: {launcher.InstallPath}");
-                Console.WriteLine($"  -> Spielordnerpfad: {launcher.LibraryFolderPath}");
+                Console.WriteLine($"  -> Spielordnerpfad: {launcher.GameFolderPath}");
             }
         }
         else
@@ -51,7 +53,7 @@ class GameInfoController
         {
             foreach (var game in InstalledGames)
             {
-                Console.WriteLine($"- {game}");
+                Console.WriteLine($"- {game.Name}");
             }
         }
         else

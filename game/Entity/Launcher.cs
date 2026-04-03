@@ -14,16 +14,11 @@ class Launcher
     (
         string DisplayName,
         string SearchName,
-        string StdPath,
+        string StdInstallPath,
         string InstallPath,
-        string GameFoldersPath,
-        string LibraryFolderPath,
-        string LibraryFolderFilePath,
+        string StdGameFoldersPath,
+        string StdLibraryFilePath,
+        string GameFolderPath,
         string? DirectRegistryKey = null
-    );
-    public record LibraryFolderFileRecord
-    (
-        string LibraryFolderPath,
-        string LibraryFolderFilePath
     );
 }

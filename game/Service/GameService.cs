@@ -4,34 +4,29 @@ using Krassheiten.Game.Entity;
 
 class GameService
 {
-    public static Games[]? GetInstalledGames()
+    public void SetInstalledGames()
     {
-        return GetSteamGames() ?? [];
+        SetGamesWithGameFolder();
     }
 
-    private static Games[]? GetSteamGames()
+    private void SetGamesWithGameFolder()
     {
-        string libraryFolderPath = string.Empty;
+        List<Game.Record> installedGames = [];
+
         foreach (var launcher in Launcher.InstalledLaunchers ?? [])
         {
-            Console.WriteLine($"Checking launcher: {launcher.DisplayName}");
-            if (launcher.DisplayName.Contains("steam", StringComparison.OrdinalIgnoreCase))
+            string gameFolder = launcher.GameFolderPath;
+            if (!Directory.Exists(gameFolder))
+                continue;
+            
+            string[] games = Directory.GetDirectories(gameFolder);
+            foreach (var game in games)
             {
-                Console.WriteLine("Steam launcher found!");
-                libraryFolderPath = launcher.LibraryFolderPath;
-                break;
+                string gameName = Path.GetFileName(game);
+                installedGames.Add(new Game.Record(gameName, game));
             }
         }
-        
-        Console.WriteLine($"Steam Library Folder Path: {libraryFolderPath}");
 
-        return [];
+        Game.InstalledGames = [.. installedGames.DistinctBy(game => game.InstallPath)];
     }
-    
-    public record Games
-    (
-        string Id,
-        string Name,
-        string InstallPath
-    );
 }

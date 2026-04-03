@@ -2,74 +2,83 @@
     {
         "DisplayName": "Steam",
         "SearchName": "steam",
-        "StdPath": "C:\\Program Files (x86)\\Steam\\steam.exe",
+        "DirectRegistryKey": "SOFTWARE\\WOW6432Node\\Valve\\Steam",
+        "StdInstallPath": "C:\\Program Files (x86)\\Steam\\steam.exe",
         "InstallPath": "",
-        "GameFoldersPath": "steamapps\\common",
-        "LibraryFolderPath": "",
-        "LibraryFolderFilePath": "steamapps\\libraryfolders.vdf",
-        "DirectRegistryKey": "SOFTWARE\\WOW6432Node\\Valve\\Steam"
+        "StdGameFoldersPath": "steamapps\\common",
+        "GameFolderPath": "",
+        "StdLibraryFilePath": "steamapps\\libraryfolders.vdf"
     },
     {
         "DisplayName": "Epic Games Launcher",
         "SearchName": "epic games launcher",
-        "StdPath": "C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe",
+        "StdInstallPath": "C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe",
         "InstallPath": "",
-        "GameFoldersPath": "Epic Games"
+        "StdGameFoldersPath": "Epic Games",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "GOG Galaxy",
         "SearchName": "gog galaxy",
-        "StdPath": "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe",
+        "StdInstallPath": "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe",
         "InstallPath": "",
-        "GameFoldersPath": "Games"
+        "StdGameFoldersPath": "Games",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "Ubisoft Connect",
         "SearchName": "ubisoft connect",
-        "StdPath": "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
+        "StdInstallPath": "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\UbisoftConnect.exe",
         "InstallPath": "",
-        "GameFoldersPath": "games"
+        "StdGameFoldersPath": "games",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "EA App",
         "SearchName": "ea app",
-        "StdPath": "C:\\Program Files\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
+        "StdInstallPath": "C:\\Program Files\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
         "InstallPath": "",
-        "GameFoldersPath": "EA Games"
+        "StdGameFoldersPath": "EA Games",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "Battle.net",
         "SearchName": "battle.net",
-        "StdPath": "C:\\Program Files (x86)\\Battle.net\\Battle.net Launcher.exe",
+        "StdInstallPath": "C:\\Program Files (x86)\\Battle.net\\Battle.net Launcher.exe",
         "InstallPath": "",
-        "GameFoldersPath": "_Retail_"
+        "StdGameFoldersPath": "_Retail_",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "Rockstar Games Launcher",
         "SearchName": "rockstar games launcher",
-        "StdPath": "C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe",
+        "StdInstallPath": "C:\\Program Files\\Rockstar Games\\Launcher\\Launcher.exe",
         "InstallPath": "",
-        "GameFoldersPath": "Games"
+        "StdGameFoldersPath": "Games",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "Origin",
         "SearchName": "origin",
-        "StdPath": "C:\\Program Files (x86)\\Origin\\Origin.exe",
+        "StdInstallPath": "C:\\Program Files (x86)\\Origin\\Origin.exe",
         "InstallPath": "",
-        "GameFoldersPath": "EA Games"
+        "StdGameFoldersPath": "EA Games",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "Minecraft Launcher",
         "SearchName": "minecraft launcher",
-        "StdPath": "C:\\Program Files (x86)\\Minecraft Launcher\\MinecraftLauncher.exe",
+        "StdInstallPath": "C:\\Program Files (x86)\\Minecraft Launcher\\MinecraftLauncher.exe",
         "InstallPath": "",
-        "GameFoldersPath": ".minecraft"
+        "StdGameFoldersPath": ".minecraft",
+        "GameFolderPath": ""
     },
     {
         "DisplayName": "CurseForge",
         "SearchName": "curseforge",
-        "StdPath": "C:\\Program Files\\Overwolf\\CurseForge\\CurseForge.exe",
+        "StdInstallPath": "C:\\Program Files\\Overwolf\\CurseForge\\CurseForge.exe",
         "InstallPath": "",
-        "GameFoldersPath": "CurseForge"
+        "StdGameFoldersPath": "CurseForge",
+        "GameFolderPath": ""
     }
 ]
