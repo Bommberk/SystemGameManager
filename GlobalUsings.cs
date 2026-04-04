@@ -1,0 +1,1 @@
+global using static Krassheiten.SystemGameManager.Functions.GlobalFunctions;
