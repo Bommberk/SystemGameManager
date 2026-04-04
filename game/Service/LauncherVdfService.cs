@@ -1,4 +1,4 @@
-namespace Krassheiten.Game.Service;
+namespace Krassheiten.SystemGameManager.Service;
 
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
@@ -46,7 +46,7 @@ class LauncherVdfService
         {
             if (item.Value is VValue value)
             {
-                dict[item.Key] = value.Value;
+                dict[item.Key] = value.Value ?? string.Empty;
             }
             else if (item.Value is VObject childObj)
             {

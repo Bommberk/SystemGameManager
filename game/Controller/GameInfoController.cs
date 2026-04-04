@@ -1,7 +1,7 @@
-namespace Krassheiten.Game.Controller;
+namespace Krassheiten.SystemGameManager.Controller;
 
-using Krassheiten.Game.Service;
-using Krassheiten.Game.Entity;
+using Krassheiten.SystemGameManager.Service;
+using Krassheiten.SystemGameManager.Entity;
 
 class GameInfoController
 {

@@ -1,4 +1,4 @@
-namespace Krassheiten.Game.Entity;
+namespace Krassheiten.SystemGameManager.Entity;
 
 class Launcher
 {

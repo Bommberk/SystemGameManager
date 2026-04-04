@@ -1,7 +1,7 @@
-﻿namespace Krassheiten;
+﻿namespace Krassheiten.SystemGameManager;
 
-using Krassheiten.Game.Controller;
-using Krassheiten.PC.Controller;
+using Krassheiten.SystemGameManager.Entity;
+using Krassheiten.SystemGameManager.Controller;
 
 internal static class Program
 {
@@ -25,7 +25,7 @@ internal static class Program
         var gameInfo = new GameInfoController();
         writeHeadline();
         // pcInfo.Write();
-        gameInfo.Write();
+        // gameInfo.Write();
     }
 
 }

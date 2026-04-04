@@ -1,6 +1,6 @@
-namespace Krassheiten.Game.Service;
+namespace Krassheiten.SystemGameManager.Service;
 
-using Krassheiten.Game.Entity;
+using Krassheiten.SystemGameManager.Entity;
 
 class GameService
 {

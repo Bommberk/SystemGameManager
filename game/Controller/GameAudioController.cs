@@ -1,4 +1,4 @@
-namespace Krassheiten.Game.Controller;
+namespace Krassheiten.SystemGameManager.Controller;
 
 class GameAudioController
 {

@@ -1,4 +1,4 @@
-namespace Krassheiten.PC.Controller;
+namespace Krassheiten.SystemGameManager.Controller;
 
 using System.Management;
 using System.Net.NetworkInformation;
