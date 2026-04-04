@@ -17,8 +17,8 @@ class Launcher
         string StdInstallPath,
         string InstallPath,
         string StdGameFoldersPath,
-        string StdLibraryFilePath,
         string GameFolderPath,
+        string? StdLibraryFilePath = null,
         string? DirectRegistryKey = null
     );
 }

@@ -6,6 +6,7 @@ using System.Reflection;
 
 class GlobalFunctions
 {
+    private static int clogCount = 0;
     public static void ConsoleLog(string message)
     {
         Console.WriteLine(message);
@@ -25,6 +26,37 @@ class GlobalFunctions
             ConsoleError(message);
         }
         Environment.Exit(0);
+    }
+
+    /// <summary>
+    /// Gibt eine Trennlinie in der Konsole aus, um Debug-Logs oder wichtige Informationen hervorzuheben.
+    /// Nützlich, um die Übersicht in der Konsole zu verbessern und wichtige Abschnitte zu markieren.
+    /// "S" steht hierbei  für short, da es nur eine einfache Trennlinie ohne zusätzliche Informationen ist.
+    /// </summary>
+    public static void slog()
+    {
+        Console.WriteLine("======== Debug Log ============");
+    }
+
+    /// <summary>
+    /// Zählt die Anzahl der Aufrufe dieser Funktion und gibt sie in der Konsole aus.
+    /// Nützlich für Debugging-Zwecke, um zu sehen, wie oft eine Funktion aufgerufen wird.
+    /// "c" steht hierbei für count, da es die Anzahl der Aufrufe zählt und anzeigt.
+    /// </summary>
+    public static void clog()
+    {
+        clogCount++;
+        Console.WriteLine($"======== Debug Log: {clogCount} ============");
+    }
+
+    /// <summary>
+    /// Gibt eine benutzerdefinierte Nachricht zusammen mit einem Debug-Log aus.
+    /// Nützlich, um spezifische Informationen oder Kontext in den Debug-Logs zu haben.
+    /// "m" steht hierbei für message, da es eine benutzerdefinierte Nachricht in den Debug-Log integriert.
+    /// </summary>
+    public static void mlog(string message)
+    {
+        Console.WriteLine($"======== Debug Log: {message} ============");
     }
 
     public static void dump(object? obj, int indent = 0)

@@ -49,7 +49,7 @@ class GameInfoController
         }
 
         Console.WriteLine("\nGames:");
-        if (InstalledGames != null)
+        if (InstalledGames != null && InstalledGames.Length > 0)
         {
             foreach (var game in InstalledGames)
             {

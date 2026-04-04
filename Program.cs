@@ -25,7 +25,6 @@ internal static class Program
         var gameInfo = new GameInfoController();
         writeHeadline();
         // pcInfo.Write();
-        // gameInfo.Write();
+        gameInfo.Write();
     }
-
 }
