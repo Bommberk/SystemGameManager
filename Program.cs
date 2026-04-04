@@ -2,14 +2,18 @@
 
 using Krassheiten.SystemGameManager.Entity;
 using Krassheiten.SystemGameManager.Controller;
+using System;
+using System.Windows.Forms;
 
 internal static class Program
 {
+
+    [STAThread]
     private static void Main(string[] args)
     {
-        GetInfoAsync();
+        ApplicationConfiguration.Initialize();
+        Application.Run(new MainForm());
     }
-
     private static void writeHeadline()
     {
         Console.ForegroundColor = ConsoleColor.Blue;
