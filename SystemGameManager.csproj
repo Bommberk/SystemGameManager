@@ -15,6 +15,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Update="assets\bild.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="assets\game\knownLaunchersWithPath.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
