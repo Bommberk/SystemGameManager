@@ -7,6 +7,9 @@ class Game
     public record Record
     (
         string Name,
-        string InstallPath
+        string InstallFolderPath,
+        string ExePath,
+        int GameVolume = 100,
+        int MusicVolume = 50
     );
 }

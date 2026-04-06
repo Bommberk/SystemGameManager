@@ -54,7 +54,8 @@ class GameInfoController
             foreach (var game in InstalledGames)
             {
                 Console.WriteLine($"- {game.Name}");
-                Console.WriteLine($"  -> Installationspfad: {game.InstallPath}");
+                Console.WriteLine($"  -> Installationspfad: {game.InstallFolderPath}");
+                Console.WriteLine($"  -> Exe-Pfad: {game.ExePath}");
             }
         }
         else

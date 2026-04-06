@@ -9,7 +9,7 @@ class GameService
     {
         SetGamesWithGameFolder();
         SetGamesWithRegistry();
-        Game.InstalledGames = [.. (Game.InstalledGames ?? []).DistinctBy(game => game.InstallPath)];
+        Game.InstalledGames = [.. (Game.InstalledGames ?? []).DistinctBy(game => game.InstallFolderPath)];
     }
 
     private void SetGamesWithGameFolder()
@@ -26,11 +26,12 @@ class GameService
             foreach (var game in games)
             {
                 string gameName = Path.GetFileName(game);
-                installedGames.Add(new Game.Record(gameName, game));
+                string exePath = GetGameExe(game);
+                installedGames.Add(new Game.Record(gameName, game, exePath));
             }
         }
 
-        Game.InstalledGames = [.. installedGames.DistinctBy(game => game.InstallPath)];
+        Game.InstalledGames = [.. installedGames.DistinctBy(game => game.InstallFolderPath)];
     }
 
     private void SetGamesWithRegistry()
@@ -66,11 +67,27 @@ class GameService
                         ? pathName
                         : gameName;
 
-                    installedGames.Add(new Game.Record(resolvedGameName, installPath));
+                    string? exePath = GetGameExe(installPath);
+                    installedGames.Add(new Game.Record(resolvedGameName, installPath, exePath));
                 }
             }
         }
-        Game.InstalledGames = [.. installedGames.DistinctBy(game => game.InstallPath)];
+        Game.InstalledGames = [.. installedGames.DistinctBy(game => game.InstallFolderPath)];
+    }
+
+    private string GetGameExe(string installPath)
+    {
+        if (!Directory.Exists(installPath))
+            return string.Empty;
+
+        var exeFiles = Directory.GetFiles(installPath, "*.exe", SearchOption.TopDirectoryOnly);
+        if(exeFiles.Length == 0)
+        {
+            var firstSubDir = Directory.GetDirectories(installPath).FirstOrDefault();
+            if (firstSubDir != null)
+                exeFiles = Directory.GetFiles(firstSubDir, "*.exe", SearchOption.TopDirectoryOnly);
+        }
+        return exeFiles.FirstOrDefault() ?? string.Empty;
     }
 
     private static readonly string[] RegistryInstallKeyNames =

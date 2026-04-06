@@ -26,9 +26,9 @@ internal sealed class GameViewService : IDisposable
             .OrderBy(game => game.Name)
             .Select(game => new GameCardItem(
                 game.Name,
-                string.IsNullOrWhiteSpace(game.InstallPath)
+                string.IsNullOrWhiteSpace(game.InstallFolderPath)
                     ? "Pfad nicht verfügbar"
-                    : game.InstallPath))
+                    : game.InstallFolderPath))
             .ToArray();
 
         var summaryText = $"{games.Length} Spiele • {launchers.Length} Launcher erkannt";
