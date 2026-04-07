@@ -1,55 +1,52 @@
-namespace Krassheiten.SystemGameManager.Service;
-
 using System.Diagnostics;
 using Krassheiten.SystemGameManager.Entity;
 using NAudio.CoreAudioApi;
 
+namespace Krassheiten.SystemGameManager.Service;
+
 class GameAudioService
 {
     protected const string DEFAULT_MUSIC_APP_NAME = "Spotify";
-    protected const int DEFAULT_MUSIC_VOLUME_PERCENT = 50;
 
-    public void SetGameAudioSettings(int gameVolumePercent = 100, int musicVolumePercent = 50, Game.Record? selectedGame = null)
+    public void SetAudioSettings(Game.Record? game = null, int gameVolume = Game.DEFAULT_GAME_VOLUME_PERCENT,string musicAppName = DEFAULT_MUSIC_APP_NAME, int musicVolume = Game.DEFAULT_MUSIC_VOLUME_PERCENT)
     {
-        if (selectedGame is not null)
-        {
-            SetMusicAudioForGame(selectedGame, musicVolumePercent);
-        }
-        else
-        {
-            SetMusicAudioForAllGames(musicVolumePercent);
+        if(game is not null){
+            SetMusicValueForOneGame(game, musicVolume);
+            SetGameValueForOneGame(game, gameVolume);
+        }else{
+            SetMusicValueForAllGames(musicVolume);
+            SetGameValueForAllGames(gameVolume);
         }
     }
 
-    private void SetMusicAudioForGame(Game.Record game, int musicVolumePercent)
+    private void SetMusicValueForAllGames(int musicVolume)
     {
-        if (Game.InstalledGames == null) return;
-
-        int clampedMusicVolume = Math.Clamp(musicVolumePercent, 0, 100);
-
-        Game.InstalledGames =
-        [
-            .. Game.InstalledGames.Select(installedGame =>
-                string.Equals(installedGame.InstallFolderPath, game.InstallFolderPath, StringComparison.OrdinalIgnoreCase)
-                    ? installedGame with { MusicVolume = clampedMusicVolume }
-                    : installedGame)
-        ];
-    }
-
-    private void SetMusicAudioForAllGames(int musicVolumePercent)
-    {
-        if (Game.InstalledGames == null) return;
-
-        foreach (var game in Game.InstalledGames)
+        if(Game.InstalledGames is null) return;
+        foreach(var game in Game.InstalledGames)
         {
-            SetMusicAudioForGame(game, musicVolumePercent);
+            SetMusicValueForOneGame(game, musicVolume);
         }
     }
-
-    protected static void SetMusicAudio(string musicAppName = DEFAULT_MUSIC_APP_NAME, int musicVolumePercent = 50)
+    private void SetMusicValueForOneGame(Game.Record game, int musicVolume)
     {
-        int clampedMusicVolume = Math.Clamp(musicVolumePercent, 0, 100);
+        game.MusicVolumePercent = musicVolume;
+    }
 
+    private void SetGameValueForAllGames(int gameVolume)
+    {
+        if(Game.InstalledGames is null) return;
+        foreach(var game in Game.InstalledGames)
+        {
+            SetGameValueForOneGame(game, gameVolume);
+        }
+    }
+    private void SetGameValueForOneGame(Game.Record game, int gameVolume)
+    {
+        game.GameVolumePercent = gameVolume;
+    }
+
+    private static void SetMusicAudio(string musicAppName, int musicVolumePercent)
+    {
         using var enumerator = new MMDeviceEnumerator();
         var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
 
@@ -62,7 +59,27 @@ class GameAudioService
                 var processName = GetProcessName(session.GetProcessID);
                 if (!string.IsNullOrWhiteSpace(processName) && processName.Equals(musicAppName, StringComparison.OrdinalIgnoreCase))
                 {
-                    session.SimpleAudioVolume.Volume = clampedMusicVolume / 100f;
+                    session.SimpleAudioVolume.Volume = musicVolumePercent / 100f;
+                }
+            }
+        }
+    }
+
+    private static void SetGameAudio(string gameName, int gameVolumePercent)
+    {
+        using var enumerator = new MMDeviceEnumerator();
+        var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+
+        foreach (var device in devices)
+        {
+            var sessions = device.AudioSessionManager.Sessions;
+            for (int i = 0; i < sessions.Count; i++)
+            {
+                var session = sessions[i];
+                var processName = GetProcessName(session.GetProcessID);
+                if (!string.IsNullOrWhiteSpace(processName) && processName.Equals(gameName, StringComparison.OrdinalIgnoreCase))
+                {
+                    session.SimpleAudioVolume.Volume = gameVolumePercent / 100f;
                 }
             }
         }
@@ -86,4 +103,12 @@ class GameAudioService
         }
     }
 
+    protected static void SetAudio(string? gameName = null, int gameVolume = Game.DEFAULT_GAME_VOLUME_PERCENT,string musicAppName = DEFAULT_MUSIC_APP_NAME, int musicVolume = Game.DEFAULT_MUSIC_VOLUME_PERCENT)
+    {
+        SetMusicAudio(musicAppName, musicVolume);
+        if(!string.IsNullOrWhiteSpace(gameName))
+        {
+            SetGameAudio(gameName, gameVolume);
+        }
+    }
 }

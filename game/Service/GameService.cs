@@ -10,13 +10,15 @@ class GameService
         SetGamesWithGameFolder();
         SetGamesWithRegistry();
         Game.InstalledGames = [.. (Game.InstalledGames ?? []).DistinctBy(game => game.InstallFolderPath)];
+        var databaseController = new DatabaseController();
+        databaseController.GetDatabaseService().SaveNewRecord(Game.InstalledGames);
     }
 
     private void SetGamesWithGameFolder()
     {
         List<Game.Record> installedGames = [.. Game.InstalledGames ?? []];
-
-        foreach (var launcher in Launcher.InstalledLaunchers ?? [])
+        if(Launcher.InstalledLaunchers is null) return;
+        foreach (var launcher in Launcher.InstalledLaunchers)
         {
             string gameFolder = launcher.GameFolderPath;
             if (!Directory.Exists(gameFolder))
@@ -27,6 +29,7 @@ class GameService
             {
                 string gameName = Path.GetFileName(game);
                 string exePath = GetGameExe(game);
+                // string processName = GetProcessName(gameName, exePath);
                 installedGames.Add(new Game.Record(gameName, game, exePath));
             }
         }
@@ -37,8 +40,8 @@ class GameService
     private void SetGamesWithRegistry()
     {
         List<Game.Record> installedGames = [.. Game.InstalledGames ?? []];
-
-        foreach(var launcher in Launcher.InstalledLaunchers ?? [])
+        if(Launcher.InstalledLaunchers is null) return;
+        foreach(var launcher in Launcher.InstalledLaunchers)
         {
             string? registryKeyPath = launcher.DirectRegistryKey;
             if (string.IsNullOrEmpty(registryKeyPath))
@@ -67,8 +70,9 @@ class GameService
                         ? pathName
                         : gameName;
 
-                    string? exePath = GetGameExe(installPath);
-                    installedGames.Add(new Game.Record(resolvedGameName, installPath, exePath));
+                    string exePath = GetGameExe(installPath);
+                    string processName = GetProcessName(resolvedGameName, exePath);
+                    installedGames.Add(new Game.Record(resolvedGameName, installPath, exePath, processName));
                 }
             }
         }
@@ -88,6 +92,18 @@ class GameService
                 exeFiles = Directory.GetFiles(firstSubDir, "*.exe", SearchOption.TopDirectoryOnly);
         }
         return exeFiles.FirstOrDefault() ?? string.Empty;
+    }
+
+    private static string GetProcessName(string fallbackName, string exePath)
+    {
+        if (!string.IsNullOrWhiteSpace(exePath))
+        {
+            string processName = Path.GetFileNameWithoutExtension(exePath);
+            if (!string.IsNullOrWhiteSpace(processName))
+                return processName;
+        }
+
+        return fallbackName;
     }
 
     private static readonly string[] RegistryInstallKeyNames =

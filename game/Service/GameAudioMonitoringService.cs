@@ -3,15 +3,16 @@ namespace Krassheiten.SystemGameManager.Service;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using Krassheiten.SystemGameManager.Entity;
 using NAudio.CoreAudioApi;
 
 class GameAudioMonitoringService
-: GameAudioService
+: GameAudioService, IDisposable
 {
     private const int AUDIO_CHECK_INTERVAL_MS = 2000;
-    
+
     private System.Threading.Timer? audioMonitorTimer;
     private int isCheckingAudio;
     private string? lastAppliedGamePath;
@@ -54,11 +55,11 @@ class GameAudioMonitoringService
                 {
                     previousMusicAppVolume = currentMusicAppVolume;
                     isGameMusicOverrideActive = true;
-                    mlog($"Merke vorherige Musiklautstärke: {previousMusicAppVolume ?? DEFAULT_MUSIC_VOLUME_PERCENT}%");
+                    mlog($"Merke vorherige Musiklautstärke: {previousMusicAppVolume ?? Game.DEFAULT_MUSIC_VOLUME_PERCENT}%");
                 }
 
                 string? currentGamePath = runningGame.InstallFolderPath;
-                int targetMusicVolume = runningGame.MusicVolume;
+                int targetMusicVolume = runningGame.MusicVolumePercent;
 
                 if (string.Equals(lastAppliedGamePath, currentGamePath, StringComparison.OrdinalIgnoreCase)
                     && lastAppliedMusicVolume == targetMusicVolume
@@ -67,7 +68,7 @@ class GameAudioMonitoringService
                     return;
                 }
 
-                SetMusicAudio(musicVolumePercent: targetMusicVolume);
+                SetAudio(musicVolume: targetMusicVolume);
                 lastAppliedGamePath = currentGamePath;
                 lastAppliedMusicVolume = targetMusicVolume;
                 return;
@@ -78,9 +79,9 @@ class GameAudioMonitoringService
                 return;
             }
 
-            int restoreMusicVolume = previousMusicAppVolume ?? DEFAULT_MUSIC_VOLUME_PERCENT;
+            int restoreMusicVolume = previousMusicAppVolume ?? Game.DEFAULT_MUSIC_VOLUME_PERCENT;
             mlog($"Kein Spiel mehr offen. Musiklautstärke wird auf {restoreMusicVolume}% zurückgesetzt.");
-            SetMusicAudio(musicVolumePercent: restoreMusicVolume);
+            SetAudio(musicVolume: restoreMusicVolume);
 
             lastAppliedGamePath = null;
             lastAppliedMusicVolume = restoreMusicVolume;
@@ -93,6 +94,17 @@ class GameAudioMonitoringService
         }
     }
 
+    public void StopAudioMonitoring()
+    {
+        audioMonitorTimer?.Dispose();
+        audioMonitorTimer = null;
+    }
+
+    public void Dispose()
+    {
+        StopAudioMonitoring();
+    }
+
     private static Game.Record? GetRunningOpenGame()
     {
         if (Game.InstalledGames == null || Game.InstalledGames.Length == 0)
@@ -100,6 +112,11 @@ class GameAudioMonitoringService
             return null;
         }
 
+        return TryGetForegroundGame(Game.InstalledGames);
+    }
+
+    private static Game.Record? TryGetForegroundGame(IEnumerable<Game.Record> installedGames)
+    {
         uint? foregroundProcessId = GetForegroundProcessId();
         if (foregroundProcessId is null || foregroundProcessId == 0)
         {
@@ -109,28 +126,41 @@ class GameAudioMonitoringService
         try
         {
             using var foregroundProcess = Process.GetProcessById((int)foregroundProcessId.Value);
-            if (foregroundProcess.HasExited || string.IsNullOrWhiteSpace(foregroundProcess.MainWindowTitle))
+            var match = TryGetGameFromProcess(foregroundProcess, installedGames);
+            if (match is not null)
+            {
+                mlog($"Spiel im Vordergrund erkannt: {match.Name} | Prozess: {foregroundProcess.ProcessName} | Fenster: {foregroundProcess.MainWindowTitle}");
+            }
+
+            return match;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static Game.Record? TryGetGameFromProcess(Process process, IEnumerable<Game.Record> installedGames)
+    {
+        try
+        {
+            if (process.HasExited)
             {
                 return null;
             }
 
-            string? processPath = TryGetProcessPath(foregroundProcess);
+            string? processPath = TryGetProcessPath(process);
             if (string.IsNullOrWhiteSpace(processPath))
             {
                 return null;
             }
 
-            foreach (var game in Game.InstalledGames)
-            {
-                if (string.IsNullOrWhiteSpace(game.InstallFolderPath))
-                {
-                    continue;
-                }
+            string normalizedProcessPath = Path.GetFullPath(processPath);
 
-                string installFolderPath = Path.GetFullPath(game.InstallFolderPath);
-                if (processPath.StartsWith(installFolderPath, StringComparison.OrdinalIgnoreCase))
+            foreach (var game in installedGames)
+            {
+                if (MatchesGamePath(game, normalizedProcessPath))
                 {
-                    mlog($"Spiel im Vordergrund erkannt: {game.Name} | Prozess: {foregroundProcess.ProcessName} | Fenster: {foregroundProcess.MainWindowTitle}");
                     return game;
                 }
             }
@@ -143,6 +173,42 @@ class GameAudioMonitoringService
         return null;
     }
 
+    private static bool MatchesGamePath(Game.Record game, string processPath)
+    {
+        if (!string.IsNullOrWhiteSpace(game.ExePath))
+        {
+            try
+            {
+                string normalizedExePath = Path.GetFullPath(game.ExePath);
+                if (string.Equals(processPath, normalizedExePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(game.InstallFolderPath))
+        {
+            return false;
+        }
+
+        try
+        {
+            string normalizedInstallFolder = Path.GetFullPath(game.InstallFolderPath)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            return processPath.StartsWith(normalizedInstallFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(Path.GetDirectoryName(processPath), normalizedInstallFolder, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private static string? TryGetProcessPath(Process process)
     {
         try
@@ -151,7 +217,18 @@ class GameAudioMonitoringService
         }
         catch
         {
-            return null;
+            try
+            {
+                var builder = new StringBuilder(1024);
+                uint size = (uint)builder.Capacity;
+                return QueryFullProcessImageName(process.Handle, 0, builder, ref size)
+                    ? builder.ToString()
+                    : null;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 
@@ -172,6 +249,9 @@ class GameAudioMonitoringService
 
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool QueryFullProcessImageName(IntPtr hProcess, int dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
 
     private int? GetMusicAppVolume(string musicAppName = DEFAULT_MUSIC_APP_NAME)
     {

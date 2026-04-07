@@ -3,6 +3,7 @@ namespace Krassheiten.SystemGameManager.Functions;
 using System;
 using System.Collections;
 using System.Reflection;
+using Microsoft.Data.Sqlite;
 
 class GlobalFunctions
 {

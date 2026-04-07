@@ -53,11 +53,13 @@ internal static class Program
 
     private static void GetInfoAsync()
     {
+        var dbController = new DatabaseController();
+        die();
         var pcInfo = new PcInfoController();
         var gameInfo = new GameInfoController();
-        var gameAudio = new GameAudioController();
+        // var gameAudio = new GameAudioController();
         writeHeadline();
         // pcInfo.Write();
-        // gameInfo.Write();
+        gameInfo.Write();
     }
 }

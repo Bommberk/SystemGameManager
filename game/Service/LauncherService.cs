@@ -10,31 +10,29 @@ class LauncherService
     {
         string path = "assets/game/knownLaunchers.json";
         string json = File.ReadAllText(path);
-        Launcher.Record[]? launchers = JsonSerializer.Deserialize<Launcher.Record[]>(json);
-        Launcher.KnownLaunchers = launchers;
+        Launcher.KnownLaunchers = JsonSerializer.Deserialize<Launcher.Record[]>(json);
     }
 
     public void SetInstalledLaunchers()
     {
-        Launcher.Record[]? knownLaunchers = Launcher.KnownLaunchers;
-        if (knownLaunchers == null)
-        {
+        if(Launcher.KnownLaunchers is null){
             Launcher.InstalledLaunchers = null;
             return;
         }
-
-        List<Launcher.Record> installedLaunchers = [];
-        foreach (var knownLauncher in knownLaunchers)
+    
+        List<Launcher.Record> installedLaunchers = new();
+        foreach (var knownLauncher in Launcher.KnownLaunchers)
         {
             if (!IsInstalledLauncher(knownLauncher))
                 continue;
-
             installedLaunchers.Add(knownLauncher);
         }
 
         Launcher.InstalledLaunchers = installedLaunchers.ToArray();
         SetInstallPath();
         SetLibraryFolderPath();
+        var databaseController = new DatabaseController();
+        databaseController.GetDatabaseService().SaveNewRecord(Launcher.InstalledLaunchers);
     }
 
     private static bool IsInstalledLauncher(Launcher.Record knownLauncher)
@@ -63,17 +61,12 @@ class LauncherService
 
     private static void SetInstallPath()
     {
-        Launcher.Record[]? installedLaunchers = Launcher.InstalledLaunchers;
-        if (installedLaunchers == null)
-            return;
-
-        for (int i = 0; i < installedLaunchers.Length; i++)
+        if(Launcher.InstalledLaunchers is null) return;
+        foreach(var installedLauncher in Launcher.InstalledLaunchers)
         {
-            string installPath = ResolveInstallPath(installedLaunchers[i]) ?? "nothing found";
-            installedLaunchers[i] = installedLaunchers[i] with { InstallPath = installPath };
+            string installPath = ResolveInstallPath(installedLauncher) ?? "nothing found";
+            installedLauncher.InstallPath = installPath;
         }
-
-        Launcher.InstalledLaunchers = installedLaunchers;
     }
 
     private static string? ResolveInstallPath(Launcher.Record launcher)
@@ -121,19 +114,14 @@ class LauncherService
 
     private static void SetLibraryFolderPath()
     {
-        Launcher.Record[]? installedLaunchers = Launcher.InstalledLaunchers;
-        if (installedLaunchers == null)
-            return;
-
-        for (int i = 0; i < installedLaunchers.Length; i++)
+        if(Launcher.InstalledLaunchers is null) return;
+        foreach(var launcher in Launcher.InstalledLaunchers)
         {
-            string installPath = installedLaunchers[i].InstallPath;
-            string libraryFolderPath = ResolveLibraryFolderPath(installedLaunchers[i], installPath) ?? "nothing found";
-            libraryFolderPath = Path.Combine(libraryFolderPath, installedLaunchers[i].StdGameFoldersPath);
-            installedLaunchers[i] = installedLaunchers[i] with { GameFolderPath = libraryFolderPath };
+            string installPath = launcher.InstallPath;
+            string libraryFolderPath = ResolveLibraryFolderPath(launcher, installPath) ?? "nothing found";
+            libraryFolderPath = Path.Combine(libraryFolderPath, launcher.StdGameFoldersPath);
+            launcher.GameFolderPath = libraryFolderPath;
         }
-
-        Launcher.InstalledLaunchers = installedLaunchers;
     }
 
     private static string? ResolveLibraryFolderPath(Launcher.Record launcher, string installPath)
