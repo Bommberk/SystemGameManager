@@ -2,6 +2,7 @@ namespace Krassheiten.SystemGameManager.Controller;
 
 using Microsoft.Data.Sqlite;
 using Krassheiten.SystemGameManager.Service;
+using Krassheiten.SystemGameManager.Entity;
 
 class DatabaseController
 {
@@ -10,30 +11,43 @@ class DatabaseController
     public DatabaseController()
     {
         dbConnection = GetSqlConnection();
-        InitializeDatabase();
+    }
+    public void ShowAllDatabases()
+    {
+        using var command = dbConnection.CreateCommand();
+        command.CommandText = "SELECT name FROM sqlite_master WHERE type='table';";
+        using var reader = command.ExecuteReader();
+        Console.WriteLine("Tables in the database:");
+        while (reader.Read())        {
+            Console.WriteLine($"- {reader.GetString(0)}");
+        }
     }
 
-    private void InitializeDatabase()
+    public void ShowTable(string tableName)
     {
-        using var connection = GetSqlConnection();
-        using var command = connection.CreateCommand();
+        using var command = dbConnection.CreateCommand();
+        command.CommandText = $"SELECT * FROM [{tableName}];";
+        using var reader = command.ExecuteReader();
 
-        command.CommandText = @"
-            CREATE TABLE IF NOT EXISTS Games (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Name TEXT NOT NULL,
-                InstallFolderPath TEXT NOT NULL UNIQUE,
-                ExePath TEXT NOT NULL,
-                GameVolumePercent INTEGER NOT NULL,
-                MusicVolumePercent INTEGER NOT NULL
-            );
-        ";
-        command.ExecuteNonQuery();
+        var rows = new List<Dictionary<string, object?>>();
+        while (reader.Read())
+        {
+            var row = new Dictionary<string, object?>();
+            for (var i = 0; i < reader.FieldCount; i++)
+            {
+                row[reader.GetName(i)] = reader.IsDBNull(i) ? null : reader.GetValue(i);
+            }
+
+            rows.Add(row);
+        }
+
+        Console.WriteLine($"{tableName} in the database:");
+        dump(rows);
     }
     
     protected static SqliteConnection GetSqlConnection()
     {
-        string dbPath = "Data Source=systemgamemanager.db";
+        string dbPath = "Data Source=database/systemgamemanager.db";
         var connection = new SqliteConnection(dbPath);
         connection.Open();
         return connection;

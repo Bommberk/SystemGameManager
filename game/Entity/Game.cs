@@ -6,7 +6,7 @@ class Game
 {
     public const int DEFAULT_MUSIC_VOLUME_PERCENT = 50;
     public const int DEFAULT_GAME_VOLUME_PERCENT = 100;
-    public const string DEFAULT_TABLE_NAME = "Games";
+    public const string DEFAULT_TABLE_NAME = "Game";
     public static Record[]? InstalledGames { get; set; }
 
     public class Record
@@ -27,5 +27,11 @@ class Game
             MusicVolumePercent = musicVolumePercent;
             GameVolumePercent = gameVolumePercent;
         }
+    }
+
+    public void WriteGamesFromDatabase()
+    {
+        var databaseController = new DatabaseController();
+        databaseController.ShowTable(DEFAULT_TABLE_NAME);
     }
 }

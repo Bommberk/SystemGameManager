@@ -4,7 +4,7 @@ namespace Krassheiten.SystemGameManager.Entity;
 
 class Launcher
 {
-    public const string DEFAULT_TABLE_NAME = "Launchers";
+    public const string DEFAULT_TABLE_NAME = "Launcher";
     public static readonly string[] RegistryUninstallPaths =
     [
         @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
@@ -15,7 +15,7 @@ class Launcher
 
     public class Record
     {
-        public string DisplayName { get; set; }
+        public string Name { get; set; }
         public string SearchName { get; set; }
         public string StdInstallPath { get; set; }
         public string InstallPath { get; set; }
@@ -24,9 +24,9 @@ class Launcher
         public string? StdLibraryFilePath { get; set; }
         public string? DirectRegistryKey { get; set; }
 
-        public Record(string displayName, string searchName, string stdInstallPath, string installPath, string stdGameFoldersPath, string gameFolderPath, string? stdLibraryFilePath = null, string? directRegistryKey = null)
+        public Record(string name, string searchName, string stdInstallPath, string installPath, string stdGameFoldersPath, string gameFolderPath, string? stdLibraryFilePath = null, string? directRegistryKey = null)
         {
-            DisplayName = displayName;
+            Name = name;
             SearchName = searchName;
             StdInstallPath = stdInstallPath;
             InstallPath = installPath;
@@ -35,5 +35,11 @@ class Launcher
             StdLibraryFilePath = stdLibraryFilePath;
             DirectRegistryKey = directRegistryKey;
         }
+    }
+    
+    public void WriteGamesFromDatabase()
+    {
+        var databaseController = new DatabaseController();
+        databaseController.ShowTable(DEFAULT_TABLE_NAME);
     }
 }

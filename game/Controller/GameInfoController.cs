@@ -38,7 +38,7 @@ class GameInfoController
         {
             foreach (var launcher in InstalledLaunchers)
             {
-                Console.WriteLine($"- {launcher.DisplayName}:");
+                Console.WriteLine($"- {launcher.Name}:");
                 Console.WriteLine($"  -> Installationspfad: {launcher.InstallPath}");
                 Console.WriteLine($"  -> Spielordnerpfad: {launcher.GameFolderPath}");
             }

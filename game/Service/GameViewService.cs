@@ -14,9 +14,9 @@ internal sealed class GameViewService : IDisposable
     public GameManagerViewData BuildViewData()
     {
         var launchers = (Launcher.InstalledLaunchers ?? Array.Empty<Launcher.Record>())
-            .OrderBy(launcher => launcher.DisplayName)
+            .OrderBy(launcher => launcher.Name)
             .Select(launcher => new LauncherBadgeItem(
-                launcher.DisplayName,
+                launcher.Name,
                 string.IsNullOrWhiteSpace(launcher.InstallPath) || launcher.InstallPath == "nothing found"
                     ? "Installationspfad nicht verfügbar"
                     : launcher.InstallPath))

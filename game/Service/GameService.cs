@@ -11,7 +11,7 @@ class GameService
         SetGamesWithRegistry();
         Game.InstalledGames = [.. (Game.InstalledGames ?? []).DistinctBy(game => game.InstallFolderPath)];
         var databaseController = new DatabaseController();
-        databaseController.GetDatabaseService().SaveNewRecord(Game.InstalledGames);
+        databaseController.GetDatabaseService().RecordManager(Game.InstalledGames);
     }
 
     private void SetGamesWithGameFolder()

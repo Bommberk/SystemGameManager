@@ -32,7 +32,7 @@ class LauncherService
         SetInstallPath();
         SetLibraryFolderPath();
         var databaseController = new DatabaseController();
-        databaseController.GetDatabaseService().SaveNewRecord(Launcher.InstalledLaunchers);
+        databaseController.GetDatabaseService().RecordManager(Launcher.InstalledLaunchers);
     }
 
     private static bool IsInstalledLauncher(Launcher.Record knownLauncher)
