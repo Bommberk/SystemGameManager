@@ -55,7 +55,7 @@ class GameAudioMonitoringService
                 {
                     previousMusicAppVolume = currentMusicAppVolume;
                     isGameMusicOverrideActive = true;
-                    mlog($"Merke vorherige Musiklautstärke: {previousMusicAppVolume ?? Game.DEFAULT_MUSIC_VOLUME_PERCENT}%");
+                    mlog($"Merke vorherige Musiklautstärke: {previousMusicAppVolume ?? Game.MUSIC_VOLUME_PERCENT}%");
                 }
 
                 string? currentGamePath = runningGame.InstallFolderPath;
@@ -79,7 +79,7 @@ class GameAudioMonitoringService
                 return;
             }
 
-            int restoreMusicVolume = previousMusicAppVolume ?? Game.DEFAULT_MUSIC_VOLUME_PERCENT;
+            int restoreMusicVolume = previousMusicAppVolume ?? Game.MUSIC_VOLUME_PERCENT;
             mlog($"Kein Spiel mehr offen. Musiklautstärke wird auf {restoreMusicVolume}% zurückgesetzt.");
             SetAudio(musicVolume: restoreMusicVolume);
 

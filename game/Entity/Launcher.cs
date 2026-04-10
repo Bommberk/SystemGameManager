@@ -4,7 +4,7 @@ namespace Krassheiten.SystemGameManager.Entity;
 
 class Launcher
 {
-    public const string DEFAULT_TABLE_NAME = "Launcher";
+    public const string TABLE_NAME = "Launcher";
     public static readonly string[] RegistryUninstallPaths =
     [
         @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
@@ -37,9 +37,9 @@ class Launcher
         }
     }
     
-    public void WriteGamesFromDatabase()
+    public void WriteLaunchersFromDatabase()
     {
         var databaseController = new DatabaseController();
-        databaseController.ShowTable(DEFAULT_TABLE_NAME);
+        databaseController.ShowTable(TABLE_NAME);
     }
 }
