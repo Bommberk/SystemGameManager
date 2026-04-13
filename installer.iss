@@ -4,7 +4,7 @@ AppVersion=0.1.0
 DefaultDirName={autopf}\SystemGameManager
 DefaultGroupName=SystemGameManager
 OutputDir=Output
-OutputBaseFilename=setup
+OutputBaseFilename=systemgamemanager_setup
 Compression=lzma
 SolidCompression=yes
 
