@@ -10,8 +10,8 @@ class GameService
         SetGamesWithGameFolder();
         SetGamesWithRegistry();
         Game.InstalledGames = [.. (Game.InstalledGames ?? []).DistinctBy(game => game.InstallFolderPath)];
-        var databaseController = new DatabaseController();
-        databaseController.GetDatabaseService().RecordManager(Game.InstalledGames);
+        SetSettedValuesToNull();
+        Game.SaveGames();
     }
 
     private void SetGamesWithGameFolder()
@@ -104,6 +104,28 @@ class GameService
         }
 
         return fallbackName;
+    }
+
+    private static void SetSettedValuesToNull()
+    {
+        var gamesInDb = Game.GetGames();
+        foreach(var gameInDb in gamesInDb ?? [])
+        {
+            if(gameInDb.MusicVolumePercent != null)
+            {
+                var game = Game.InstalledGames?
+                    .FirstOrDefault(g => g.InstallFolderPath == gameInDb.InstallFolderPath);
+                if (game != null)
+                    game.MusicVolumePercent = gameInDb.MusicVolumePercent;
+            }
+            if(gameInDb.GameVolumePercent != null)
+            {
+                var game = Game.InstalledGames?
+                    .FirstOrDefault(g => g.InstallFolderPath == gameInDb.InstallFolderPath);
+                if (game != null)
+                    game.GameVolumePercent = gameInDb.GameVolumePercent;
+            }
+        }
     }
 
     private static readonly string[] RegistryInstallKeyNames =

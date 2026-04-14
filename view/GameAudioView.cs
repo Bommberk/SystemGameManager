@@ -7,11 +7,11 @@ namespace Krassheiten.SystemGameManager.View;
 
 internal sealed class GameAudioView
 {
-    private readonly GameAudioService gameAudioService = new();
     private readonly TrackBar allGameSlider = CreateSlider(100);
     private readonly TrackBar allMusicSlider = CreateSlider(50);
     private readonly Label allGameValueLabel = CreateValueLabel(100);
     private readonly Label allMusicValueLabel = CreateValueLabel(50);
+    private readonly Button saveButton = CreateSaveButton();
     private readonly TableLayoutPanel gameListTable = new()
     {
         Dock = DockStyle.Top,
@@ -31,6 +31,7 @@ internal sealed class GameAudioView
     };
 
     private bool isUpdatingControls;
+    private bool hasPendingChanges;
 
     public GameAudioView()
     {
@@ -39,6 +40,7 @@ internal sealed class GameAudioView
 
         allGameSlider.ValueChanged += (_, _) => ApplyGlobalVolumes();
         allMusicSlider.ValueChanged += (_, _) => ApplyGlobalVolumes();
+        saveButton.Click += (_, _) => SaveChanges();
     }
 
     public TabPage CreateTab()
@@ -63,14 +65,31 @@ internal sealed class GameAudioView
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
+        var header = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            RowCount = 1,
+            AutoSize = true,
+            Margin = new Padding(0, 0, 0, 12),
+            Padding = new Padding(0)
+        };
+
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
         var title = new Label()
         {
             Text = "Audio-Steuerung für Spiele und Musik",
             AutoSize = true,
             Font = new Font("Segoe UI", 11F, FontStyle.Bold),
             ForeColor = Color.FromArgb(31, 41, 55),
-            Margin = new Padding(0, 0, 0, 12)
+            Anchor = AnchorStyles.Left,
+            Margin = new Padding(0, 6, 0, 0)
         };
+
+        header.Controls.Add(title, 0, 0);
+        header.Controls.Add(saveButton, 1, 0);
 
         var globalPanel = CreateSectionPanel();
         var globalLayout = new TableLayoutPanel()
@@ -119,7 +138,7 @@ internal sealed class GameAudioView
             Margin = new Padding(0, 0, 0, 10)
         };
 
-        layout.Controls.Add(title, 0, 0);
+        layout.Controls.Add(header, 0, 0);
         layout.Controls.Add(globalPanel, 0, 1);
         layout.Controls.Add(separator, 0, 2);
         layout.Controls.Add(listTitle, 0, 3);
@@ -131,24 +150,26 @@ internal sealed class GameAudioView
 
     public void ShowLoadingState()
     {
-        SetGlobalControlsEnabled(false);
+        SetControlsEnabled(false);
+        SetHasPendingChanges(false);
         ShowMessageCard("Spiele werden geladen...", "Nach dem Laden kannst du hier globale und spielbezogene Audio-Werte anpassen.");
     }
 
     public void ShowErrorState(string message)
     {
-        SetGlobalControlsEnabled(false);
+        SetControlsEnabled(false);
+        SetHasPendingChanges(false);
         ShowMessageCard("Audio-Einstellungen konnten nicht geladen werden", message);
     }
 
     public void RefreshGames()
     {
-        var games = (Game.InstalledGames ?? Array.Empty<Game.Record>())
-            .OrderBy(game => game.Name)
-            .ToArray();
+        Game.InstalledGames = Game.GetGames();
+        var games = Game.InstalledGames ?? Array.Empty<Game.Record>();
 
         UpdateGlobalSliderSnapshot(games);
-        SetGlobalControlsEnabled(games.Length > 0);
+        SetControlsEnabled(games.Length > 0);
+        SetHasPendingChanges(false);
 
         gameListTable.SuspendLayout();
 
@@ -185,7 +206,7 @@ internal sealed class GameAudioView
             return;
         }
 
-        gameAudioService.SetAudioSettings(musicVolume: allMusicSlider.Value, gameVolume: allGameSlider.Value);
+        SetHasPendingChanges(true);
 
         isUpdatingControls = true;
         try
@@ -219,10 +240,7 @@ internal sealed class GameAudioView
             return;
         }
 
-        gameAudioService.SetAudioSettings(
-            game: game,
-            gameVolume: gameSlider.Value,
-            musicVolume: musicSlider.Value);
+        SetHasPendingChanges(true);
     }
 
     private void UpdateGlobalSliderSnapshot(IEnumerable<Game.Record> games)
@@ -232,8 +250,8 @@ internal sealed class GameAudioView
         isUpdatingControls = true;
         try
         {
-            allGameSlider.Value = GetAverageValue(snapshot.Select(game => game.GameVolumePercent), 100);
-            allMusicSlider.Value = GetAverageValue(snapshot.Select(game => game.MusicVolumePercent), 50);
+            allGameSlider.Value = GetAverageValue(snapshot.Select(game => game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT), 100);
+            allMusicSlider.Value = GetAverageValue(snapshot.Select(game => game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT), 50);
             UpdateValueLabel(allGameValueLabel, allGameSlider.Value);
             UpdateValueLabel(allMusicValueLabel, allMusicSlider.Value);
         }
@@ -293,10 +311,10 @@ internal sealed class GameAudioView
         sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60));
 
-        var gameSlider = CreateSlider(game.GameVolumePercent);
-        var musicSlider = CreateSlider(game.MusicVolumePercent);
-        var gameValueLabel = CreateValueLabel(game.GameVolumePercent);
-        var musicValueLabel = CreateValueLabel(game.MusicVolumePercent);
+        var gameSlider = CreateSlider(game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT);
+        var musicSlider = CreateSlider(game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT);
+        var gameValueLabel = CreateValueLabel(game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT);
+        var musicValueLabel = CreateValueLabel(game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT);
 
         gameSlider.ValueChanged += (_, _) => ApplyGameVolumes(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
         musicSlider.ValueChanged += (_, _) => ApplyGameVolumes(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
@@ -308,9 +326,27 @@ internal sealed class GameAudioView
         layout.Controls.Add(pathLabel, 0, 1);
         layout.Controls.Add(sliderLayout, 0, 2);
 
-        card.Tag = new SliderBinding(gameSlider, gameValueLabel, musicSlider, musicValueLabel);
+        card.Tag = new SliderBinding(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
         card.Controls.Add(layout);
         return card;
+    }
+
+    private void SaveChanges()
+    {
+        if (!hasPendingChanges || Game.InstalledGames is null)
+        {
+            return;
+        }
+
+        foreach (var binding in gameListTable.Controls.OfType<Panel>().Select(control => control.Tag).OfType<SliderBinding>())
+        {
+            binding.Game.GameVolumePercent = binding.GameSlider.Value;
+            binding.Game.MusicVolumePercent = binding.MusicSlider.Value;
+        }
+
+        Game.SaveGames();
+        UpdateGlobalSliderSnapshot(Game.InstalledGames);
+        SetHasPendingChanges(false);
     }
 
     private void ShowMessageCard(string title, string message)
@@ -400,10 +436,18 @@ internal sealed class GameAudioView
         return card;
     }
 
-    private void SetGlobalControlsEnabled(bool enabled)
+    private void SetControlsEnabled(bool enabled)
     {
         allGameSlider.Enabled = enabled;
         allMusicSlider.Enabled = enabled;
+        saveButton.Enabled = enabled && hasPendingChanges;
+    }
+
+    private void SetHasPendingChanges(bool value)
+    {
+        hasPendingChanges = value;
+        saveButton.Enabled = hasPendingChanges && allGameSlider.Enabled;
+        saveButton.Text = hasPendingChanges ? "Save*" : "Save";
     }
 
     private static TrackBar CreateSlider(int value)
@@ -435,6 +479,28 @@ internal sealed class GameAudioView
         };
     }
 
+    private static Button CreateSaveButton()
+    {
+        var button = new Button()
+        {
+            Text = "Save",
+            Width = 100,
+            Height = 34,
+            Anchor = AnchorStyles.Right,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = Color.FromArgb(37, 99, 235),
+            ForeColor = Color.White,
+            Cursor = Cursors.Hand,
+            Enabled = false,
+            Margin = new Padding(12, 0, 0, 0)
+        };
+
+        button.FlatAppearance.BorderSize = 0;
+        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(29, 78, 216);
+        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(59, 130, 246);
+        return button;
+    }
+
     private static void UpdateValueLabel(Label label, int value)
     {
         label.Text = $"{value}%";
@@ -448,5 +514,5 @@ internal sealed class GameAudioView
             : (int)Math.Round(snapshot.Average());
     }
 
-    private sealed record SliderBinding(TrackBar GameSlider, Label GameValueLabel, TrackBar MusicSlider, Label MusicValueLabel);
+    private sealed record SliderBinding(Game.Record Game, TrackBar GameSlider, Label GameValueLabel, TrackBar MusicSlider, Label MusicValueLabel);
 }

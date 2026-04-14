@@ -59,7 +59,7 @@ class GameAudioMonitoringService
                 }
 
                 string? currentGamePath = runningGame.InstallFolderPath;
-                int targetMusicVolume = runningGame.MusicVolumePercent;
+                int targetMusicVolume = runningGame.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT;
 
                 if (string.Equals(lastAppliedGamePath, currentGamePath, StringComparison.OrdinalIgnoreCase)
                     && lastAppliedMusicVolume == targetMusicVolume

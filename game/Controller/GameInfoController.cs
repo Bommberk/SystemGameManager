@@ -26,8 +26,8 @@ class GameInfoController
 
     public void Write()
     {
-        // GameService.GetInstalledGames();
-        // return;
+        Game.GetGames();
+        return;
         Launcher.Record[]? InstalledLaunchers = Launcher.InstalledLaunchers;
         Game.Record[]? InstalledGames = Game.InstalledGames;
         

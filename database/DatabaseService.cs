@@ -115,6 +115,48 @@ class DatabaseService
         command.ExecuteNonQuery();
     }
 
+    public string[] GetTableColumns<T>(string tableName)
+    {
+        using var command = dbConnection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info([{tableName}]);";
+        using var reader = command.ExecuteReader();
+
+        var columns = new List<string>();
+        while (reader.Read())
+        {
+            columns.Add(reader.GetString(1)); // Column name is in the second column (index 1)
+        }
+
+        return columns.ToArray();
+    }
+
+    public T[] GetTableRecords<T>(string tableName)
+    {
+        if (!TableExists(tableName)) return [];
+
+        using var command = dbConnection.CreateCommand();
+        command.CommandText = $"SELECT * FROM [{tableName}];";
+        using var reader = command.ExecuteReader();
+
+        var records = new List<T>();
+        while (reader.Read())
+        {
+            var values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+            for (var i = 0; i < reader.FieldCount; i++)
+            {
+                values[reader.GetName(i)] = reader.IsDBNull(i) ? null : reader.GetValue(i);
+            }
+
+            var record = CreateRecord<T>(values);
+            if (record is not null)
+            {
+                records.Add(record);
+            }
+        }
+
+        return [.. records];
+    }
+
     private void AddParametersFromCurrentRecord(SqliteCommand command, bool skipName = false)
     {
         if (currentRecord is null) return;
@@ -152,6 +194,98 @@ class DatabaseService
         }
 
         return existingRecords;
+    }
+
+    private bool TableExists(string tableName)
+    {
+        using var command = dbConnection.CreateCommand();
+        command.CommandText = "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = @TableName LIMIT 1;";
+        command.Parameters.AddWithValue("@TableName", tableName);
+        return command.ExecuteScalar() is not null;
+    }
+
+    private static T? CreateRecord<T>(IReadOnlyDictionary<string, object?> values)
+    {
+        var recordType = typeof(T);
+        var constructors = recordType.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+            .OrderByDescending(constructor => constructor.GetParameters().Length)
+            .ToArray();
+
+        object? instance = null;
+        foreach (var constructor in constructors)
+        {
+            try
+            {
+                var parameters = constructor.GetParameters()
+                    .Select(parameter =>
+                    {
+                        values.TryGetValue(parameter.Name ?? string.Empty, out var value);
+                        return ConvertValue(value, parameter.ParameterType);
+                    })
+                    .ToArray();
+
+                instance = constructor.Invoke(parameters);
+                break;
+            }
+            catch
+            {
+            }
+        }
+
+        instance ??= Activator.CreateInstance(recordType, nonPublic: true);
+        if (instance is not T record)
+        {
+            return default;
+        }
+
+        foreach (var property in GetPersistedProperties(recordType))
+        {
+            if (!values.TryGetValue(property.Name, out var value))
+            {
+                continue;
+            }
+
+            property.SetValue(record, ConvertValue(value, property.PropertyType));
+        }
+
+        return record;
+    }
+
+    private static object? ConvertValue(object? value, Type targetType)
+    {
+        var underlyingType = Nullable.GetUnderlyingType(targetType);
+        var effectiveType = underlyingType ?? targetType;
+
+        if (value is null or DBNull)
+        {
+            return underlyingType is not null || !effectiveType.IsValueType
+                ? null
+                : Activator.CreateInstance(effectiveType);
+        }
+
+        if (effectiveType == typeof(string))
+        {
+            return value.ToString() ?? string.Empty;
+        }
+
+        if (effectiveType == typeof(bool))
+        {
+            return value switch
+            {
+                bool boolValue => boolValue,
+                string text when bool.TryParse(text, out var parsedBool) => parsedBool,
+                _ => Convert.ToInt64(value) != 0
+            };
+        }
+
+        if (effectiveType.IsEnum)
+        {
+            return value is string text
+                ? Enum.Parse(effectiveType, text, ignoreCase: true)
+                : Enum.ToObject(effectiveType, value);
+        }
+
+        return Convert.ChangeType(value, effectiveType);
     }
 
     private static bool HasDifferentValues(IReadOnlyDictionary<string, object?> existingRecord, object newRecord, PropertyInfo[] properties)
@@ -287,12 +421,22 @@ class DatabaseService
 
         if (tableOwnerType is null) return null;
 
-        var tableNameField = tableOwnerType.GetField("DEFAULT_TABLE_NAME", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-        if (tableNameField is null || tableNameField.FieldType != typeof(string) || !tableNameField.IsLiteral) return null;
+        var fieldNames = new[] { "TABLE_NAME", "DEFAULT_TABLE_NAME" };
+        foreach (var fieldName in fieldNames)
+        {
+            var tableNameField = tableOwnerType.GetField(fieldName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if (tableNameField is null || tableNameField.FieldType != typeof(string) || !tableNameField.IsLiteral)
+            {
+                continue;
+            }
 
-        var tableNameValue = tableNameField.GetRawConstantValue() as string;
-        if (string.IsNullOrWhiteSpace(tableNameValue)) return null;
+            var tableNameValue = tableNameField.GetRawConstantValue() as string;
+            if (!string.IsNullOrWhiteSpace(tableNameValue))
+            {
+                return tableNameValue;
+            }
+        }
 
-        return tableNameValue;
+        return null;
     }
 }

@@ -17,6 +17,7 @@ class GameAudioService
             SetMusicValueForAllGames(musicVolume);
             SetGameValueForAllGames(gameVolume);
         }
+        Game.SaveGames();
     }
 
     private void SetMusicValueForAllGames(int musicVolume)

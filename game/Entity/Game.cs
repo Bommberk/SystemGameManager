@@ -1,6 +1,6 @@
-using Krassheiten.SystemGameManager.Service;
-
 namespace Krassheiten.SystemGameManager.Entity;
+
+using Krassheiten.SystemGameManager.Service;
 
 class Game
 {
@@ -9,21 +9,16 @@ class Game
     public const string TABLE_NAME = "Game";
     public static Record[]? InstalledGames { get; set; }
 
-    public Game()
-    {
-        // MUSIC_VOLUME_PERCENT = 50;
-    }
-
     public class Record
     {
         public string Name { get; set; }
         public string InstallFolderPath { get; set; }
         public string ExePath { get; set; }
         public string ProzessName { get; set; }
-        public int MusicVolumePercent { get; set; } = MUSIC_VOLUME_PERCENT;
-        public int GameVolumePercent { get; set; } = GAME_VOLUME_PERCENT;
+        public int? MusicVolumePercent { get; set; } = MUSIC_VOLUME_PERCENT;
+        public int? GameVolumePercent { get; set; } = GAME_VOLUME_PERCENT;
 
-        public Record(string name, string installFolderPath, string exePath, string? prozessName = null, int musicVolumePercent = MUSIC_VOLUME_PERCENT, int gameVolumePercent = GAME_VOLUME_PERCENT)
+        public Record(string name, string installFolderPath, string exePath, string? prozessName = null, int? musicVolumePercent = null, int? gameVolumePercent = null)
         {
             Name = name;
             InstallFolderPath = installFolderPath;
@@ -37,6 +32,17 @@ class Game
     public void WriteGamesFromDatabase()
     {
         var databaseController = new DatabaseController();
-        databaseController.ShowTable(TABLE_NAME);
+        // databaseController.ShowTable(TABLE_NAME);
+    }
+
+    public static void SaveGames()
+    {
+        var databaseController = new DatabaseController();
+        databaseController.GetDatabaseService().RecordManager(InstalledGames);
+    }
+    public static Record[]? GetGames()
+    {
+        var databaseController = new DatabaseController();
+        return databaseController.GetDatabaseService().GetTableRecords<Record>(TABLE_NAME);
     }
 }
