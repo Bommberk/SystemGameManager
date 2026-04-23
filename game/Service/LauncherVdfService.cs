@@ -5,25 +5,31 @@ using Gameloop.Vdf.Linq;
 
 class LauncherVdfService
 {
-    public static string? GetLibraryFolderPathFromVdf(Dictionary<string, object> vdfData)
+    public static string[] GetLibraryFolderPathFromVdf(Dictionary<string, object> vdfData)
+    {
+        var paths = new List<string>();
+        CollectLibraryFolderPaths(vdfData, paths);
+
+        return [.. paths
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Distinct(StringComparer.OrdinalIgnoreCase)];
+    }
+
+    private static void CollectLibraryFolderPaths(Dictionary<string, object> vdfData, List<string> paths)
     {
         foreach (var kvp in vdfData)
         {
-            if(kvp.Key == "0")
-                continue;
             if (kvp.Key.StartsWith("path", StringComparison.OrdinalIgnoreCase) && kvp.Value is string path)
             {
-                return path;
+                paths.Add(path);
             }
             else if (kvp.Value is Dictionary<string, object> nestedDict)
             {
-                string? result = GetLibraryFolderPathFromVdf(nestedDict);
-                if (!string.IsNullOrEmpty(result))
-                    return result;
+                CollectLibraryFolderPaths(nestedDict, paths);
             }
         }
-        return null;
     }
+
     public static Dictionary<string, object>? LoadVdfAsArray(string filePath)
     {
         if(!File.Exists(filePath))

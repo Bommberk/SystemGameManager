@@ -118,27 +118,29 @@ class LauncherService
         foreach(var launcher in Launcher.InstalledLaunchers)
         {
             string installPath = launcher.InstallPath;
-            string libraryFolderPath = ResolveLibraryFolderPath(launcher, installPath) ?? "nothing found";
-            libraryFolderPath = Path.Combine(libraryFolderPath, launcher.StdGameFoldersPath);
-            launcher.GameFolderPath = libraryFolderPath;
+            string[] libraryFolderPaths = ResolveLibraryFolderPath(launcher, installPath);
+            launcher.GameFolderPath = [.. libraryFolderPaths
+                .Select(path => Path.Combine(path, launcher.StdGameFoldersPath))
+                .Distinct(StringComparer.OrdinalIgnoreCase)];
         }
     }
 
-    private static string? ResolveLibraryFolderPath(Launcher.Record launcher, string installPath)
+    private static string[] ResolveLibraryFolderPath(Launcher.Record launcher, string installPath)
     {
         if (string.IsNullOrEmpty(installPath))
-            return null;
+            return [];
         if (string.IsNullOrEmpty(launcher.StdLibraryFilePath))
-            return null;
+            return [installPath];
         
         var vdfPath = Path.Combine(installPath, launcher.StdLibraryFilePath);
         if (!File.Exists(vdfPath))
-            return null;
+            return [installPath];
 
         var vdfData = LauncherVdfService.LoadVdfAsArray(vdfPath);
-        if (vdfData != null)        {
-            return LauncherVdfService.GetLibraryFolderPathFromVdf(vdfData);
-        }
-        return null;
+        if (vdfData == null)
+            return [installPath];
+
+        var folderPaths = LauncherVdfService.GetLibraryFolderPathFromVdf(vdfData);
+        return folderPaths.Length > 0 ? folderPaths : [installPath];
     }
 }

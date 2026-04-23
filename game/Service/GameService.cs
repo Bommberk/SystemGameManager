@@ -20,17 +20,22 @@ class GameService
         if(Launcher.InstalledLaunchers is null) return;
         foreach (var launcher in Launcher.InstalledLaunchers)
         {
-            string gameFolder = launcher.GameFolderPath;
-            if (!Directory.Exists(gameFolder))
+            if (launcher.GameFolderPath is null || launcher.GameFolderPath.Length == 0)
                 continue;
-            
-            string[] games = Directory.GetDirectories(gameFolder);
-            foreach (var game in games)
+
+            foreach (var gameFolder in launcher.GameFolderPath.Distinct(StringComparer.OrdinalIgnoreCase))
             {
-                string gameName = Path.GetFileName(game);
-                string exePath = GetGameExe(game);
-                // string processName = GetProcessName(gameName, exePath);
-                installedGames.Add(new Game.Record(gameName, game, exePath));
+                if (!Directory.Exists(gameFolder))
+                    continue;
+
+                string[] games = Directory.GetDirectories(gameFolder);
+                foreach (var game in games)
+                {
+                    string gameName = Path.GetFileName(game);
+                    string exePath = GetGameExe(game);
+                    // string processName = GetProcessName(gameName, exePath);
+                    installedGames.Add(new Game.Record(gameName, game, exePath));
+                }
             }
         }
 
