@@ -3,6 +3,7 @@ namespace Krassheiten.SystemGameManager.Service;
 using Microsoft.Data.Sqlite;
 using System.Collections;
 using System.Reflection;
+using System.Text.Json;
 
 class DatabaseService
 : DatabaseController
@@ -166,8 +167,20 @@ class DatabaseService
             if (skipName && property.Name.Equals("Name", StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            command.Parameters.AddWithValue($"@{property.Name}", property.GetValue(currentRecord) ?? DBNull.Value);
+            command.Parameters.AddWithValue($"@{property.Name}", SerializeForStorage(property.GetValue(currentRecord)));
         }
+    }
+
+    private static object SerializeForStorage(object? value)
+    {
+        if (value is null)
+        {
+            return DBNull.Value;
+        }
+
+        return value.GetType().IsArray
+            ? JsonSerializer.Serialize(value)
+            : value;
     }
 
     private Dictionary<string, Dictionary<string, object?>> GetExistingRecords(string tableName)
@@ -258,9 +271,31 @@ class DatabaseService
 
         if (value is null or DBNull)
         {
+            if (effectiveType.IsArray)
+            {
+                return CreateEmptyArray(effectiveType);
+            }
+
             return underlyingType is not null || !effectiveType.IsValueType
                 ? null
                 : Activator.CreateInstance(effectiveType);
+        }
+
+        if (effectiveType.IsArray)
+        {
+            if (value is string json)
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize(json, effectiveType) ?? CreateEmptyArray(effectiveType);
+                }
+                catch
+                {
+                    return CreateEmptyArray(effectiveType);
+                }
+            }
+
+            return CreateEmptyArray(effectiveType);
         }
 
         if (effectiveType == typeof(string))
@@ -288,6 +323,11 @@ class DatabaseService
         return Convert.ChangeType(value, effectiveType);
     }
 
+    private static Array CreateEmptyArray(Type arrayType)
+    {
+        return Array.CreateInstance(arrayType.GetElementType()!, 0);
+    }
+
     private static bool HasDifferentValues(IReadOnlyDictionary<string, object?> existingRecord, object newRecord, PropertyInfo[] properties)
     {
         foreach (var property in properties)
@@ -310,6 +350,7 @@ class DatabaseService
         {
             null => null,
             DBNull => null,
+            Array arrayValue => JsonSerializer.Serialize(arrayValue),
             bool boolValue => boolValue ? 1L : 0L,
             byte or sbyte or short or ushort or int or uint or long or ulong => Convert.ToInt64(value),
             float or double or decimal => Convert.ToDouble(value),
