@@ -4,7 +4,7 @@ namespace Krassheiten.SystemGameManager;
 
 async static Task CheckForUpdates()
 {
-    var mgr = new UpdateManager("https://github.com/");
+    var mgr = new UpdateManager();
 
     var update = await mgr.CheckForUpdatesAsync();
 
