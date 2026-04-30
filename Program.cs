@@ -6,14 +6,17 @@ using System;
 using System.Threading;
 using System.Windows.Forms;
 using Velopack;
+using System.Threading.Tasks;
+using Krassheiten.SystemGameManager.Service;
 
 internal static class Program
 {
     [STAThread]
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
 
         VelopackApp.Build().Run();
+        await new Updater().AutoUpdate();
 
         if (args.Length > 0 && args[0] == "--console")
         {
