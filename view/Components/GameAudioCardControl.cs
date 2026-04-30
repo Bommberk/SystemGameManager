@@ -7,7 +7,7 @@ namespace Krassheiten.SystemGameManager.View.Components;
 
 internal static class GameAudioCardControl
 {
-    public static Panel Create(Game.Record game, out CheckBox selectionCheckBox, out Label volumeLabel, out ComboBox outputDeviceComboBox)
+    public static Panel Create(Game.Record game, out CheckBox selectionCheckBox, out Label volumeLabel, out Label outputDeviceLabel)
     {
         var card = new Panel()
         {
@@ -79,32 +79,26 @@ internal static class GameAudioCardControl
             Padding = new Padding(0)
         };
 
-        var outputDeviceLabel = new Label()
+        var outputDeviceCaption = new Label()
         {
-            Text = "Audioausgabe",
+            Text = "Audioausgabe:",
             AutoSize = true,
             Anchor = AnchorStyles.Left,
             ForeColor = Color.FromArgb(55, 65, 81),
             Margin = new Padding(0, 4, 8, 0)
         };
 
-        outputDeviceComboBox = new ComboBox()
+        outputDeviceLabel = new Label()
         {
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Width = 250,
-            FlatStyle = FlatStyle.Flat,
-            Margin = new Padding(0, 0, 0, 0)
+            Text = "(Standard-Gerät)",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            ForeColor = Color.FromArgb(55, 65, 81),
+            Margin = new Padding(0, 4, 0, 0)
         };
 
-        outputDeviceComboBox.Items.Add("(Standard-Gerät)");
-        foreach (var deviceName in GetAudioOutputDeviceNames())
-        {
-            outputDeviceComboBox.Items.Add(deviceName);
-        }
-        outputDeviceComboBox.SelectedIndex = 0;
-
+        outputDeviceRow.Controls.Add(outputDeviceCaption);
         outputDeviceRow.Controls.Add(outputDeviceLabel);
-        outputDeviceRow.Controls.Add(outputDeviceComboBox);
 
         layout.Controls.Add(selectionCheckBox, 0, 0);
         layout.SetRowSpan(selectionCheckBox, 4);
@@ -125,6 +119,7 @@ internal static class GameAudioCardControl
         title.Click += toggle;
         pathLabel.Click += toggle;
         volumeLabel.Click += toggle;
+        outputDeviceCaption.Click += toggle;
         outputDeviceLabel.Click += toggle;
 
         return card;

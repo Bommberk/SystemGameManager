@@ -265,8 +265,8 @@ internal sealed class GameAudioView
 
     private Control CreateGameCard(Game.Record game)
     {
-        var card = GameAudioCardControl.Create(game, out var checkBox, out var volumeLabel, out var outputDeviceComboBox);
-        card.Tag = new GameCheckBinding(game, checkBox, volumeLabel, outputDeviceComboBox);
+        var card = GameAudioCardControl.Create(game, out var checkBox, out var volumeLabel, out var outputDeviceLabel);
+        card.Tag = new GameCheckBinding(game, checkBox, volumeLabel, outputDeviceLabel);
         checkBox.CheckedChanged += (_, _) => UpdateSelectAllButton();
         return card;
     }
@@ -321,11 +321,7 @@ internal sealed class GameAudioView
                 continue;
             }
 
-            var idx = binding.OutputDeviceComboBox.Items.IndexOf(selectedDevice);
-            if (idx >= 0)
-            {
-                binding.OutputDeviceComboBox.SelectedIndex = idx;
-            }
+            binding.OutputDeviceLabel.Text = selectedDevice;
         }
     }
 
@@ -516,5 +512,5 @@ internal sealed class GameAudioView
             : (int)Math.Round(snapshot.Average());
     }
 
-    private sealed record GameCheckBinding(Game.Record Game, CheckBox CheckBox, Label VolumeLabel, ComboBox OutputDeviceComboBox);
+    private sealed record GameCheckBinding(Game.Record Game, CheckBox CheckBox, Label VolumeLabel, Label OutputDeviceLabel);
 }
