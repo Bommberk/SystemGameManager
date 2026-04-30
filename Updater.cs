@@ -4,7 +4,7 @@ namespace Krassheiten.SystemGameManager;
 
 async static Task CheckForUpdates()
 {
-    var mgr = new UpdateManager();
+    var mgr = new UpdateManager(GlobalConfig.GetSettings().AppConfig.RepositoryUrl);
 
     var update = await mgr.CheckForUpdatesAsync();
 
