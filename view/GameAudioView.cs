@@ -225,6 +225,14 @@ internal sealed class GameAudioView
         UpdateValueLabel(allGameValueLabel, allGameSlider.Value);
         UpdateValueLabel(allMusicValueLabel, allMusicSlider.Value);
 
+        foreach (var binding in GetGameBindings())
+        {
+            if (binding.CheckBox.Checked)
+            {
+                binding.VolumeLabel.Text = $"Game: {allGameSlider.Value}%  |  Music: {allMusicSlider.Value}%";
+            }
+        }
+
         if (isUpdatingSliders)
         {
             return;
@@ -255,6 +263,7 @@ internal sealed class GameAudioView
     {
         var card = GameAudioCardControl.Create(game, out var checkBox, out var volumeLabel);
         card.Tag = new GameCheckBinding(game, checkBox, volumeLabel);
+        checkBox.CheckedChanged += (_, _) => UpdateSelectAllButton();
         return card;
     }
 
@@ -283,10 +292,19 @@ internal sealed class GameAudioView
 
     private void SelectAll()
     {
-        foreach (var binding in GetGameBindings())
+        var bindings = GetGameBindings().ToArray();
+        bool allChecked = bindings.Length > 0 && bindings.All(b => b.CheckBox.Checked);
+        foreach (var binding in bindings)
         {
-            binding.CheckBox.Checked = true;
+            binding.CheckBox.Checked = !allChecked;
         }
+    }
+
+    private void UpdateSelectAllButton()
+    {
+        var bindings = GetGameBindings().ToArray();
+        bool allChecked = bindings.Length > 0 && bindings.All(b => b.CheckBox.Checked);
+        selectAllButton.Text = allChecked ? "Alle abwählen" : "Alle auswählen";
     }
 
     private void ToggleSelection()
