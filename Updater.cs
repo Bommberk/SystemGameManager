@@ -2,15 +2,18 @@ using Velopack;
 
 namespace Krassheiten.SystemGameManager;
 
-async static Task CheckForUpdates()
+public static class Updater
 {
-    var mgr = new UpdateManager(GlobalConfig.GetSettings().AppConfig.RepositoryUrl);
-
-    var update = await mgr.CheckForUpdatesAsync();
-
-    if (update != null)
+    public static async Task CheckForUpdates()
     {
-        await mgr.DownloadUpdatesAsync(update);
-        mgr.ApplyUpdatesAndRestart(update);
+        var mgr = new UpdateManager(GlobalConfig.GetSettings().AppConfig.RepositoryUrl);
+
+        var update = await mgr.CheckForUpdatesAsync();
+
+        if (update != null)
+        {
+            await mgr.DownloadUpdatesAsync(update);
+            mgr.ApplyUpdatesAndRestart(update);
+        }
     }
 }
