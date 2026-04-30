@@ -15,6 +15,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
     <PackageReference Include="NAudio" Version="2.3.0" />
     <PackageReference Include="System.Management" Version="10.0.5" />
+    <PackageReference Include="Velopack" Version="0.0.1298" />
   </ItemGroup>
   
   <ItemGroup>

@@ -5,12 +5,16 @@ using Krassheiten.SystemGameManager.Controller;
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using Velopack;
 
 internal static class Program
 {
     [STAThread]
     private static void Main(string[] args)
     {
+
+        VelopackApp.Build().Run();
+
         if (args.Length > 0 && args[0] == "--console")
         {
             runConsole();
