@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType Condition="'$(Configuration)'=='Release'">WinExe</OutputType>
@@ -15,10 +15,14 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
     <PackageReference Include="NAudio" Version="2.3.0" />
     <PackageReference Include="System.Management" Version="10.0.5" />
+    <PackageReference Include="Velopack" Version="0.0.1298" />
   </ItemGroup>
   
   <ItemGroup>
     <None Update="assets\bild.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="config\appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="assets\game\knownLaunchersWithPath.json">

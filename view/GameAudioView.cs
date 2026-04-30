@@ -13,6 +13,8 @@ internal sealed class GameAudioView
     private readonly Label allGameValueLabel = CreateValueLabel(100);
     private readonly Label allMusicValueLabel = CreateValueLabel(50);
     private readonly Button saveButton = CreateSaveButton();
+    private readonly Button selectAllButton = CreateActionButton("Alle auswählen");
+    private readonly Button toggleSelectionButton = CreateActionButton("Auswahl umkehren");
     private readonly TableLayoutPanel gameListTable = new()
     {
         Dock = DockStyle.Top,
@@ -31,7 +33,7 @@ internal sealed class GameAudioView
         BackColor = Color.FromArgb(245, 247, 250)
     };
 
-    private bool isUpdatingControls;
+    private bool isUpdatingSliders;
     private bool hasPendingChanges;
 
     public GameAudioView()
@@ -42,6 +44,8 @@ internal sealed class GameAudioView
         allGameSlider.ValueChanged += (_, _) => ApplyGlobalVolumes();
         allMusicSlider.ValueChanged += (_, _) => ApplyGlobalVolumes();
         saveButton.Click += (_, _) => SaveChanges();
+        selectAllButton.Click += (_, _) => SelectAll();
+        toggleSelectionButton.Click += (_, _) => ToggleSelection();
     }
 
     public TabPage CreateTab()
@@ -109,7 +113,7 @@ internal sealed class GameAudioView
 
         var globalTitle = new Label()
         {
-            Text = "Globale Werte für alle Spiele",
+            Text = "Lautstärke für ausgewählte Spiele",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
             ForeColor = Color.FromArgb(17, 24, 39),
@@ -130,19 +134,38 @@ internal sealed class GameAudioView
             Margin = new Padding(0, 6, 0, 10)
         };
 
+        var listHeader = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 3,
+            RowCount = 1,
+            AutoSize = true,
+            Margin = new Padding(0, 0, 0, 10),
+            Padding = new Padding(0)
+        };
+
+        listHeader.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        listHeader.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        listHeader.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
         var listTitle = new Label()
         {
-            Text = "Pro Spiel",
+            Text = "Spiele auswählen",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
             ForeColor = Color.FromArgb(31, 41, 55),
-            Margin = new Padding(0, 0, 0, 10)
+            Anchor = AnchorStyles.Left | AnchorStyles.Top,
+            Margin = new Padding(0, 6, 0, 0)
         };
+
+        listHeader.Controls.Add(listTitle, 0, 0);
+        listHeader.Controls.Add(selectAllButton, 1, 0);
+        listHeader.Controls.Add(toggleSelectionButton, 2, 0);
 
         layout.Controls.Add(header, 0, 0);
         layout.Controls.Add(globalPanel, 0, 1);
         layout.Controls.Add(separator, 0, 2);
-        layout.Controls.Add(listTitle, 0, 3);
+        layout.Controls.Add(listHeader, 0, 3);
         layout.Controls.Add(gameListHost, 0, 4);
 
         tab.Controls.Add(layout);
@@ -202,41 +225,15 @@ internal sealed class GameAudioView
         UpdateValueLabel(allGameValueLabel, allGameSlider.Value);
         UpdateValueLabel(allMusicValueLabel, allMusicSlider.Value);
 
-        if (isUpdatingControls)
+        foreach (var binding in GetGameBindings())
         {
-            return;
-        }
-
-        SetHasPendingChanges(true);
-
-        isUpdatingControls = true;
-        try
-        {
-            foreach (var control in gameListTable.Controls.OfType<Panel>())
+            if (binding.CheckBox.Checked)
             {
-                if (control.Tag is not SliderBinding binding)
-                {
-                    continue;
-                }
-
-                binding.GameSlider.Value = allGameSlider.Value;
-                binding.MusicSlider.Value = allMusicSlider.Value;
-                UpdateValueLabel(binding.GameValueLabel, binding.GameSlider.Value);
-                UpdateValueLabel(binding.MusicValueLabel, binding.MusicSlider.Value);
+                binding.VolumeLabel.Text = $"Game: {allGameSlider.Value}%  |  Music: {allMusicSlider.Value}%";
             }
         }
-        finally
-        {
-            isUpdatingControls = false;
-        }
-    }
 
-    private void ApplyGameVolumes(Game.Record game, TrackBar gameSlider, Label gameValueLabel, TrackBar musicSlider, Label musicValueLabel)
-    {
-        UpdateValueLabel(gameValueLabel, gameSlider.Value);
-        UpdateValueLabel(musicValueLabel, musicSlider.Value);
-
-        if (isUpdatingControls)
+        if (isUpdatingSliders)
         {
             return;
         }
@@ -248,7 +245,7 @@ internal sealed class GameAudioView
     {
         var snapshot = games.ToArray();
 
-        isUpdatingControls = true;
+        isUpdatingSliders = true;
         try
         {
             allGameSlider.Value = GetAverageValue(snapshot.Select(game => game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT), 100);
@@ -258,18 +255,15 @@ internal sealed class GameAudioView
         }
         finally
         {
-            isUpdatingControls = false;
+            isUpdatingSliders = false;
         }
     }
 
     private Control CreateGameCard(Game.Record game)
     {
-        var card = GameAudioCardControl.Create(game, out var gameSlider, out var musicSlider, out var gameValueLabel, out var musicValueLabel);
-        
-        gameSlider.ValueChanged += (_, _) => ApplyGameVolumes(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
-        musicSlider.ValueChanged += (_, _) => ApplyGameVolumes(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
-
-        card.Tag = new SliderBinding(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
+        var card = GameAudioCardControl.Create(game, out var checkBox, out var volumeLabel);
+        card.Tag = new GameCheckBinding(game, checkBox, volumeLabel);
+        checkBox.CheckedChanged += (_, _) => UpdateSelectAllButton();
         return card;
     }
 
@@ -280,16 +274,49 @@ internal sealed class GameAudioView
             return;
         }
 
-        foreach (var binding in gameListTable.Controls.OfType<Panel>().Select(control => control.Tag).OfType<SliderBinding>())
+        foreach (var binding in GetGameBindings())
         {
-            binding.Game.GameVolumePercent = binding.GameSlider.Value;
-            binding.Game.MusicVolumePercent = binding.MusicSlider.Value;
+            if (!binding.CheckBox.Checked)
+            {
+                continue;
+            }
+
+            binding.Game.GameVolumePercent = allGameSlider.Value;
+            binding.Game.MusicVolumePercent = allMusicSlider.Value;
+            binding.VolumeLabel.Text = $"Game: {allGameSlider.Value}%  |  Music: {allMusicSlider.Value}%";
         }
 
         Game.SaveGames();
-        UpdateGlobalSliderSnapshot(Game.InstalledGames);
         SetHasPendingChanges(false);
     }
+
+    private void SelectAll()
+    {
+        var bindings = GetGameBindings().ToArray();
+        bool allChecked = bindings.Length > 0 && bindings.All(b => b.CheckBox.Checked);
+        foreach (var binding in bindings)
+        {
+            binding.CheckBox.Checked = !allChecked;
+        }
+    }
+
+    private void UpdateSelectAllButton()
+    {
+        var bindings = GetGameBindings().ToArray();
+        bool allChecked = bindings.Length > 0 && bindings.All(b => b.CheckBox.Checked);
+        selectAllButton.Text = allChecked ? "Alle abwählen" : "Alle auswählen";
+    }
+
+    private void ToggleSelection()
+    {
+        foreach (var binding in GetGameBindings())
+        {
+            binding.CheckBox.Checked = !binding.CheckBox.Checked;
+        }
+    }
+
+    private IEnumerable<GameCheckBinding> GetGameBindings()
+        => gameListTable.Controls.OfType<Panel>().Select(c => c.Tag).OfType<GameCheckBinding>();
 
     private void ShowMessageCard(string title, string message)
     {
@@ -346,6 +373,8 @@ internal sealed class GameAudioView
     {
         allGameSlider.Enabled = enabled;
         allMusicSlider.Enabled = enabled;
+        selectAllButton.Enabled = enabled;
+        toggleSelectionButton.Enabled = enabled;
         saveButton.Enabled = enabled && hasPendingChanges;
     }
 
@@ -407,6 +436,30 @@ internal sealed class GameAudioView
         return button;
     }
 
+    private static Button CreateActionButton(string text)
+    {
+        var button = new Button()
+        {
+            Text = text,
+            AutoSize = true,
+            Height = 30,
+            Anchor = AnchorStyles.Right,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = Color.FromArgb(243, 244, 246),
+            ForeColor = Color.FromArgb(31, 41, 55),
+            Cursor = Cursors.Hand,
+            Enabled = false,
+            Margin = new Padding(6, 0, 0, 0),
+            Padding = new Padding(10, 0, 10, 0)
+        };
+
+        button.FlatAppearance.BorderColor = Color.FromArgb(209, 213, 219);
+        button.FlatAppearance.BorderSize = 1;
+        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(229, 231, 235);
+        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(249, 250, 251);
+        return button;
+    }
+
     private static void UpdateValueLabel(Label label, int value)
     {
         label.Text = $"{value}%";
@@ -420,5 +473,5 @@ internal sealed class GameAudioView
             : (int)Math.Round(snapshot.Average());
     }
 
-    private sealed record SliderBinding(Game.Record Game, TrackBar GameSlider, Label GameValueLabel, TrackBar MusicSlider, Label MusicValueLabel);
+    private sealed record GameCheckBinding(Game.Record Game, CheckBox CheckBox, Label VolumeLabel);
 }

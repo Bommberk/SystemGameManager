@@ -1,13 +1,12 @@
 using System.Drawing;
 using System.Windows.Forms;
 using Krassheiten.SystemGameManager.Entity;
-using NAudio.CoreAudioApi;
 
 namespace Krassheiten.SystemGameManager.View.Components;
 
 internal static class GameAudioCardControl
 {
-    public static Panel Create(Game.Record game, out TrackBar gameSlider, out TrackBar musicSlider, out Label gameValueLabel, out Label musicValueLabel)
+    public static Panel Create(Game.Record game, out CheckBox selectionCheckBox, out Label volumeLabel)
     {
         var card = new Panel()
         {
@@ -21,17 +20,26 @@ internal static class GameAudioCardControl
         var layout = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
-            ColumnCount = 1,
-            RowCount = 4,
+            ColumnCount = 2,
+            RowCount = 3,
             AutoSize = true,
             Margin = new Padding(0),
             Padding = new Padding(0)
         };
 
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+        selectionCheckBox = new CheckBox()
+        {
+            Checked = false,
+            AutoSize = true,
+            Anchor = AnchorStyles.Left | AnchorStyles.Top,
+            Margin = new Padding(0, 4, 12, 0)
+        };
 
         var title = new Label()
         {
@@ -47,152 +55,37 @@ internal static class GameAudioCardControl
             Text = string.IsNullOrWhiteSpace(game.InstallFolderPath) ? "Pfad nicht verfügbar" : game.InstallFolderPath,
             AutoSize = true,
             ForeColor = Color.FromArgb(107, 114, 128),
-            Margin = new Padding(0, 0, 0, 10)
+            Margin = new Padding(0, 0, 0, 4)
         };
 
-        var sliderLayout = new TableLayoutPanel()
+        volumeLabel = new Label()
         {
-            Dock = DockStyle.Fill,
-            ColumnCount = 3,
-            RowCount = 2,
+            Text = $"Game: {game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT}%  |  Music: {game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT}%",
             AutoSize = true,
-            Margin = new Padding(0),
-            Padding = new Padding(0)
-        };
-
-        sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140));
-        sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60));
-
-        gameSlider = CreateSlider(game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT);
-        musicSlider = CreateSlider(game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT);
-        gameValueLabel = CreateValueLabel(game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT);
-        musicValueLabel = CreateValueLabel(game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT);
-
-        AddSliderRow(sliderLayout, 0, "Game", gameSlider, gameValueLabel);
-        AddSliderRow(sliderLayout, 1, "Music", musicSlider, musicValueLabel);
-
-        var outputDeviceRow = CreateOutputDeviceRow();
-
-        layout.Controls.Add(title, 0, 0);
-        layout.Controls.Add(pathLabel, 0, 1);
-        layout.Controls.Add(sliderLayout, 0, 2);
-        layout.Controls.Add(outputDeviceRow, 0, 3);
-
-        card.Controls.Add(layout);
-        return card;
-    }
-
-    private static Panel CreateOutputDeviceRow()
-    {
-        var row = new Panel()
-        {
-            Dock = DockStyle.Fill,
-            AutoSize = true,
-            Margin = new Padding(0, 10, 0, 0)
-        };
-
-        var rowLayout = new TableLayoutPanel()
-        {
-            Dock = DockStyle.Fill,
-            ColumnCount = 2,
-            RowCount = 1,
-            AutoSize = true,
-            Margin = new Padding(0),
-            Padding = new Padding(0)
-        };
-
-        rowLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140));
-        rowLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-
-        var label = new Label()
-        {
-            Text = "Audioausgabe",
-            AutoSize = true,
-            Anchor = AnchorStyles.Left,
-            ForeColor = Color.FromArgb(55, 65, 81),
-            Margin = new Padding(0, 6, 0, 0)
-        };
-
-        var comboBox = new ComboBox()
-        {
-            Dock = DockStyle.Fill,
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Margin = new Padding(0, 4, 0, 0),
-            FlatStyle = FlatStyle.Flat
-        };
-
-        comboBox.Items.Add("(Standard-Gerät)");
-        foreach (var deviceName in GetAudioOutputDeviceNames())
-        {
-            comboBox.Items.Add(deviceName);
-        }
-        comboBox.SelectedIndex = 0;
-
-        rowLayout.Controls.Add(label, 0, 0);
-        rowLayout.Controls.Add(comboBox, 1, 0);
-
-        row.Controls.Add(rowLayout);
-        return row;
-    }
-
-    private static IEnumerable<string> GetAudioOutputDeviceNames()
-    {
-        try
-        {
-            using var enumerator = new MMDeviceEnumerator();
-            return enumerator
-                .EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
-                .Select(device => device.FriendlyName)
-                .ToList();
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
-    private static TrackBar CreateSlider(int value)
-    {
-        return new TrackBar()
-        {
-            Minimum = 0,
-            Maximum = 100,
-            Value = Math.Clamp(value, 0, 100),
-            TickFrequency = 10,
-            TickStyle = TickStyle.None,
-            SmallChange = 5,
-            LargeChange = 10,
-            Dock = DockStyle.Fill,
-            Margin = new Padding(0)
-        };
-    }
-
-    private static Label CreateValueLabel(int value)
-    {
-        return new Label()
-        {
-            Text = $"{value}%",
-            AutoSize = true,
-            Anchor = AnchorStyles.Left,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
             ForeColor = Color.FromArgb(67, 56, 202),
-            Margin = new Padding(8, 6, 0, 0)
+            Margin = new Padding(0, 0, 0, 0)
         };
-    }
 
-    private static void AddSliderRow(TableLayoutPanel layout, int rowIndex, string title, TrackBar slider, Label valueLabel)
-    {
-        layout.Controls.Add(new Label
-        {
-            Text = title,
-            AutoSize = true,
-            Anchor = AnchorStyles.Left,
-            ForeColor = Color.FromArgb(55, 65, 81),
-            Margin = new Padding(0, 6, 0, 0)
-        }, 0, rowIndex);
+        layout.Controls.Add(selectionCheckBox, 0, 0);
+        layout.SetRowSpan(selectionCheckBox, 3);
+        layout.Controls.Add(title, 1, 0);
+        layout.Controls.Add(pathLabel, 1, 1);
+        layout.Controls.Add(volumeLabel, 1, 2);
 
-        layout.Controls.Add(slider, 1, rowIndex);
-        layout.Controls.Add(valueLabel, 2, rowIndex);
+        card.Controls.Add(layout);
+
+        card.Cursor = Cursors.Hand;
+        layout.Cursor = Cursors.Hand;
+
+        var checkBox = selectionCheckBox;
+        EventHandler toggle = (_, _) => checkBox.Checked = !checkBox.Checked;
+        card.Click += toggle;
+        layout.Click += toggle;
+        title.Click += toggle;
+        pathLabel.Click += toggle;
+        volumeLabel.Click += toggle;
+
+        return card;
     }
 }
