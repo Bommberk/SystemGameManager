@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using Krassheiten.SystemGameManager.Entity;
+using NAudio.CoreAudioApi;
 
 namespace Krassheiten.SystemGameManager.View.Components;
 
@@ -21,7 +22,7 @@ internal static class GameAudioCardControl
         {
             Dock = DockStyle.Fill,
             ColumnCount = 2,
-            RowCount = 3,
+            RowCount = 4,
             AutoSize = true,
             Margin = new Padding(0),
             Padding = new Padding(0)
@@ -29,6 +30,7 @@ internal static class GameAudioCardControl
 
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -67,11 +69,49 @@ internal static class GameAudioCardControl
             Margin = new Padding(0, 0, 0, 0)
         };
 
+        var outputDeviceRow = new FlowLayoutPanel()
+        {
+            AutoSize = true,
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = false,
+            Margin = new Padding(0, 4, 0, 0),
+            Padding = new Padding(0)
+        };
+
+        var outputDeviceLabel = new Label()
+        {
+            Text = "Audioausgabe",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            ForeColor = Color.FromArgb(55, 65, 81),
+            Margin = new Padding(0, 4, 8, 0)
+        };
+
+        var outputDeviceComboBox = new ComboBox()
+        {
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Width = 250,
+            FlatStyle = FlatStyle.Flat,
+            Margin = new Padding(0, 0, 0, 0)
+        };
+
+        outputDeviceComboBox.Items.Add("(Standard-Gerät)");
+        foreach (var deviceName in GetAudioOutputDeviceNames())
+        {
+            outputDeviceComboBox.Items.Add(deviceName);
+        }
+        outputDeviceComboBox.SelectedIndex = 0;
+
+        outputDeviceRow.Controls.Add(outputDeviceLabel);
+        outputDeviceRow.Controls.Add(outputDeviceComboBox);
+
         layout.Controls.Add(selectionCheckBox, 0, 0);
-        layout.SetRowSpan(selectionCheckBox, 3);
+        layout.SetRowSpan(selectionCheckBox, 4);
         layout.Controls.Add(title, 1, 0);
         layout.Controls.Add(pathLabel, 1, 1);
         layout.Controls.Add(volumeLabel, 1, 2);
+        layout.Controls.Add(outputDeviceRow, 1, 3);
 
         card.Controls.Add(layout);
 
@@ -85,7 +125,24 @@ internal static class GameAudioCardControl
         title.Click += toggle;
         pathLabel.Click += toggle;
         volumeLabel.Click += toggle;
+        outputDeviceLabel.Click += toggle;
 
         return card;
+    }
+
+    private static IEnumerable<string> GetAudioOutputDeviceNames()
+    {
+        try
+        {
+            using var enumerator = new MMDeviceEnumerator();
+            return enumerator
+                .EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
+                .Select(device => device.FriendlyName)
+                .ToList();
+        }
+        catch
+        {
+            return [];
+        }
     }
 }
