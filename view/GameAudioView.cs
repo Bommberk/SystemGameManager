@@ -15,6 +15,7 @@ internal sealed class GameAudioView
     private readonly Button saveButton = CreateSaveButton();
     private readonly Button selectAllButton = CreateActionButton("Alle auswählen");
     private readonly Button toggleSelectionButton = CreateActionButton("Auswahl umkehren");
+    private readonly ComboBox globalOutputDeviceComboBox = CreateGlobalOutputDeviceComboBox();
     private readonly TableLayoutPanel gameListTable = new()
     {
         Dock = DockStyle.Top,
@@ -46,6 +47,7 @@ internal sealed class GameAudioView
         saveButton.Click += (_, _) => SaveChanges();
         selectAllButton.Click += (_, _) => SelectAll();
         toggleSelectionButton.Click += (_, _) => ToggleSelection();
+        globalOutputDeviceComboBox.SelectedIndexChanged += (_, _) => ApplyGlobalOutputDevice();
     }
 
     public TabPage CreateTab()
@@ -137,7 +139,7 @@ internal sealed class GameAudioView
         var listHeader = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
-            ColumnCount = 3,
+            ColumnCount = 4,
             RowCount = 1,
             AutoSize = true,
             Margin = new Padding(0, 0, 0, 10),
@@ -145,6 +147,7 @@ internal sealed class GameAudioView
         };
 
         listHeader.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        listHeader.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         listHeader.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         listHeader.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
@@ -159,8 +162,9 @@ internal sealed class GameAudioView
         };
 
         listHeader.Controls.Add(listTitle, 0, 0);
-        listHeader.Controls.Add(selectAllButton, 1, 0);
-        listHeader.Controls.Add(toggleSelectionButton, 2, 0);
+        listHeader.Controls.Add(globalOutputDeviceComboBox, 1, 0);
+        listHeader.Controls.Add(selectAllButton, 2, 0);
+        listHeader.Controls.Add(toggleSelectionButton, 3, 0);
 
         layout.Controls.Add(header, 0, 0);
         layout.Controls.Add(globalPanel, 0, 1);
@@ -261,8 +265,8 @@ internal sealed class GameAudioView
 
     private Control CreateGameCard(Game.Record game)
     {
-        var card = GameAudioCardControl.Create(game, out var checkBox, out var volumeLabel);
-        card.Tag = new GameCheckBinding(game, checkBox, volumeLabel);
+        var card = GameAudioCardControl.Create(game, out var checkBox, out var volumeLabel, out var outputDeviceComboBox);
+        card.Tag = new GameCheckBinding(game, checkBox, volumeLabel, outputDeviceComboBox);
         checkBox.CheckedChanged += (_, _) => UpdateSelectAllButton();
         return card;
     }
@@ -305,6 +309,24 @@ internal sealed class GameAudioView
         var bindings = GetGameBindings().ToArray();
         bool allChecked = bindings.Length > 0 && bindings.All(b => b.CheckBox.Checked);
         selectAllButton.Text = allChecked ? "Alle abwählen" : "Alle auswählen";
+    }
+
+    private void ApplyGlobalOutputDevice()
+    {
+        var selectedDevice = globalOutputDeviceComboBox.SelectedItem?.ToString() ?? "(Standard-Gerät)";
+        foreach (var binding in GetGameBindings())
+        {
+            if (!binding.CheckBox.Checked)
+            {
+                continue;
+            }
+
+            var idx = binding.OutputDeviceComboBox.Items.IndexOf(selectedDevice);
+            if (idx >= 0)
+            {
+                binding.OutputDeviceComboBox.SelectedIndex = idx;
+            }
+        }
     }
 
     private void ToggleSelection()
@@ -375,6 +397,7 @@ internal sealed class GameAudioView
         allMusicSlider.Enabled = enabled;
         selectAllButton.Enabled = enabled;
         toggleSelectionButton.Enabled = enabled;
+        globalOutputDeviceComboBox.Enabled = enabled;
         saveButton.Enabled = enabled && hasPendingChanges;
     }
 
@@ -460,6 +483,26 @@ internal sealed class GameAudioView
         return button;
     }
 
+    private static ComboBox CreateGlobalOutputDeviceComboBox()
+    {
+        var combo = new ComboBox()
+        {
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Width = 220,
+            FlatStyle = FlatStyle.Flat,
+            Enabled = false,
+            Margin = new Padding(6, 0, 0, 0)
+        };
+
+        combo.Items.Add("(Standard-Gerät)");
+        foreach (var deviceName in GameAudioCardControl.GetAudioOutputDeviceNames())
+        {
+            combo.Items.Add(deviceName);
+        }
+        combo.SelectedIndex = 0;
+        return combo;
+    }
+
     private static void UpdateValueLabel(Label label, int value)
     {
         label.Text = $"{value}%";
@@ -473,5 +516,5 @@ internal sealed class GameAudioView
             : (int)Math.Round(snapshot.Average());
     }
 
-    private sealed record GameCheckBinding(Game.Record Game, CheckBox CheckBox, Label VolumeLabel);
+    private sealed record GameCheckBinding(Game.Record Game, CheckBox CheckBox, Label VolumeLabel, ComboBox OutputDeviceComboBox);
 }

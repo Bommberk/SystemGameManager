@@ -7,7 +7,7 @@ namespace Krassheiten.SystemGameManager.View.Components;
 
 internal static class GameAudioCardControl
 {
-    public static Panel Create(Game.Record game, out CheckBox selectionCheckBox, out Label volumeLabel)
+    public static Panel Create(Game.Record game, out CheckBox selectionCheckBox, out Label volumeLabel, out ComboBox outputDeviceComboBox)
     {
         var card = new Panel()
         {
@@ -88,7 +88,7 @@ internal static class GameAudioCardControl
             Margin = new Padding(0, 4, 8, 0)
         };
 
-        var outputDeviceComboBox = new ComboBox()
+        outputDeviceComboBox = new ComboBox()
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
             Width = 250,
@@ -130,7 +130,7 @@ internal static class GameAudioCardControl
         return card;
     }
 
-    private static IEnumerable<string> GetAudioOutputDeviceNames()
+    internal static IEnumerable<string> GetAudioOutputDeviceNames()
     {
         try
         {
