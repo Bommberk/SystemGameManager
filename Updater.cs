@@ -9,6 +9,9 @@ public class Updater
         var repoUrl = GlobalConfig.Settings.AppConfig.RepositoryUrl;
         var mgr = new UpdateManager(repoUrl);
 
+        if (!mgr.IsInstalled)
+            return;
+
         var update = await mgr.CheckForUpdatesAsync();
 
         if (update == null)
