@@ -36,10 +36,10 @@ git commit -m "Release $Version; $Message"
 git tag v$Version
 
 # 4. Push Code + Tag
-# git push
-# git push origin "v$Version"
+git push
+git push origin "v$Version"
 
 # 5. OPTIONAL: GitHub Release Upload
-# vpk upload github --repoUrl $RepoUrl
+vpk upload github --repoUrl $RepoUrl
 
 Write-Host "[DONE] Release $Version komplett fertig!"
