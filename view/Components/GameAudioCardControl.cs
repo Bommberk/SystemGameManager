@@ -74,6 +74,18 @@ internal static class GameAudioCardControl
         layout.Controls.Add(volumeLabel, 1, 2);
 
         card.Controls.Add(layout);
+
+        card.Cursor = Cursors.Hand;
+        layout.Cursor = Cursors.Hand;
+
+        var checkBox = selectionCheckBox;
+        EventHandler toggle = (_, _) => checkBox.Checked = !checkBox.Checked;
+        card.Click += toggle;
+        layout.Click += toggle;
+        title.Click += toggle;
+        pathLabel.Click += toggle;
+        volumeLabel.Click += toggle;
+
         return card;
     }
 }
