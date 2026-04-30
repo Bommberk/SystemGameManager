@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using Krassheiten.SystemGameManager.Entity;
+using NAudio.CoreAudioApi;
 
 namespace Krassheiten.SystemGameManager.View.Components;
 
@@ -21,12 +22,13 @@ internal static class GameAudioCardControl
         {
             Dock = DockStyle.Fill,
             ColumnCount = 1,
-            RowCount = 3,
+            RowCount = 4,
             AutoSize = true,
             Margin = new Padding(0),
             Padding = new Padding(0)
         };
 
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -70,12 +72,84 @@ internal static class GameAudioCardControl
         AddSliderRow(sliderLayout, 0, "Game", gameSlider, gameValueLabel);
         AddSliderRow(sliderLayout, 1, "Music", musicSlider, musicValueLabel);
 
+        var outputDeviceRow = CreateOutputDeviceRow();
+
         layout.Controls.Add(title, 0, 0);
         layout.Controls.Add(pathLabel, 0, 1);
         layout.Controls.Add(sliderLayout, 0, 2);
+        layout.Controls.Add(outputDeviceRow, 0, 3);
 
         card.Controls.Add(layout);
         return card;
+    }
+
+    private static Panel CreateOutputDeviceRow()
+    {
+        var row = new Panel()
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            Margin = new Padding(0, 10, 0, 0)
+        };
+
+        var rowLayout = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            RowCount = 1,
+            AutoSize = true,
+            Margin = new Padding(0),
+            Padding = new Padding(0)
+        };
+
+        rowLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140));
+        rowLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        var label = new Label()
+        {
+            Text = "Audioausgabe",
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            ForeColor = Color.FromArgb(55, 65, 81),
+            Margin = new Padding(0, 6, 0, 0)
+        };
+
+        var comboBox = new ComboBox()
+        {
+            Dock = DockStyle.Fill,
+            DropDownStyle = ComboBoxStyle.DropDownList,
+            Margin = new Padding(0, 4, 0, 0),
+            FlatStyle = FlatStyle.Flat
+        };
+
+        comboBox.Items.Add("(Standard-Gerät)");
+        foreach (var deviceName in GetAudioOutputDeviceNames())
+        {
+            comboBox.Items.Add(deviceName);
+        }
+        comboBox.SelectedIndex = 0;
+
+        rowLayout.Controls.Add(label, 0, 0);
+        rowLayout.Controls.Add(comboBox, 1, 0);
+
+        row.Controls.Add(rowLayout);
+        return row;
+    }
+
+    private static IEnumerable<string> GetAudioOutputDeviceNames()
+    {
+        try
+        {
+            using var enumerator = new MMDeviceEnumerator();
+            return enumerator
+                .EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
+                .Select(device => device.FriendlyName)
+                .ToList();
+        }
+        catch
+        {
+            return [];
+        }
     }
 
     private static TrackBar CreateSlider(int value)
