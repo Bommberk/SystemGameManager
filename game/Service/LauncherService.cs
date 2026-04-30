@@ -31,8 +31,6 @@ class LauncherService
         Launcher.InstalledLaunchers = installedLaunchers.ToArray();
         SetInstallPath();
         SetLibraryFolderPath();
-        var databaseController = new DatabaseController();
-        databaseController.GetDatabaseService().RecordManager(Launcher.InstalledLaunchers);
     }
 
     private static bool IsInstalledLauncher(Launcher.Record knownLauncher)

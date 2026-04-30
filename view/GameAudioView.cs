@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using Krassheiten.SystemGameManager.Entity;
 using Krassheiten.SystemGameManager.Service;
+using Krassheiten.SystemGameManager.View.Components;
 
 namespace Krassheiten.SystemGameManager.View;
 
@@ -181,7 +182,7 @@ internal sealed class GameAudioView
 
             if (games.Length == 0)
             {
-                AddGameListControl(CreateMessageCard("Keine Spiele gefunden", "Lade zuerst die Spielebibliothek, damit hier Audio-Regler angezeigt werden."));
+                AddGameListControl(MessageCardControl.Create("Keine Spiele gefunden", "Lade zuerst die Spielebibliothek, damit hier Audio-Regler angezeigt werden."));
                 return;
             }
 
@@ -263,71 +264,12 @@ internal sealed class GameAudioView
 
     private Control CreateGameCard(Game.Record game)
     {
-        var card = CreateSectionPanel();
-        card.Margin = new Padding(0, 0, 0, 12);
-
-        var layout = new TableLayoutPanel()
-        {
-            Dock = DockStyle.Fill,
-            ColumnCount = 1,
-            RowCount = 3,
-            AutoSize = true,
-            Margin = new Padding(0),
-            Padding = new Padding(0)
-        };
-
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
-        var title = new Label()
-        {
-            Text = game.Name,
-            AutoSize = true,
-            Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
-            Margin = new Padding(0, 0, 0, 4)
-        };
-
-        var pathLabel = new Label()
-        {
-            Text = string.IsNullOrWhiteSpace(game.InstallFolderPath) ? "Pfad nicht verfügbar" : game.InstallFolderPath,
-            AutoSize = true,
-            ForeColor = Color.FromArgb(107, 114, 128),
-            Margin = new Padding(0, 0, 0, 10)
-        };
-
-        var sliderLayout = new TableLayoutPanel()
-        {
-            Dock = DockStyle.Fill,
-            ColumnCount = 3,
-            RowCount = 2,
-            AutoSize = true,
-            Margin = new Padding(0),
-            Padding = new Padding(0)
-        };
-
-        sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140));
-        sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        sliderLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60));
-
-        var gameSlider = CreateSlider(game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT);
-        var musicSlider = CreateSlider(game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT);
-        var gameValueLabel = CreateValueLabel(game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT);
-        var musicValueLabel = CreateValueLabel(game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT);
-
+        var card = GameAudioCardControl.Create(game, out var gameSlider, out var musicSlider, out var gameValueLabel, out var musicValueLabel);
+        
         gameSlider.ValueChanged += (_, _) => ApplyGameVolumes(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
         musicSlider.ValueChanged += (_, _) => ApplyGameVolumes(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
 
-        AddSliderRow(sliderLayout, 0, "Game", gameSlider, gameValueLabel);
-        AddSliderRow(sliderLayout, 1, "Music", musicSlider, musicValueLabel);
-
-        layout.Controls.Add(title, 0, 0);
-        layout.Controls.Add(pathLabel, 0, 1);
-        layout.Controls.Add(sliderLayout, 0, 2);
-
         card.Tag = new SliderBinding(game, gameSlider, gameValueLabel, musicSlider, musicValueLabel);
-        card.Controls.Add(layout);
         return card;
     }
 
@@ -359,7 +301,7 @@ internal sealed class GameAudioView
             gameListTable.Controls.Clear();
             gameListTable.RowStyles.Clear();
             gameListTable.RowCount = 0;
-            AddGameListControl(CreateMessageCard(title, message));
+            AddGameListControl(MessageCardControl.Create(title, message));
         }
         finally
         {
@@ -398,42 +340,6 @@ internal sealed class GameAudioView
             Padding = new Padding(14),
             BackColor = Color.White
         };
-    }
-
-    private static Control CreateMessageCard(string title, string message)
-    {
-        var card = CreateSectionPanel();
-
-        var layout = new FlowLayoutPanel()
-        {
-            Dock = DockStyle.Fill,
-            FlowDirection = FlowDirection.TopDown,
-            WrapContents = false,
-            AutoSize = true,
-            Margin = new Padding(0),
-            Padding = new Padding(0),
-            BackColor = Color.Transparent
-        };
-
-        layout.Controls.Add(new Label
-        {
-            Text = title,
-            AutoSize = true,
-            Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
-            Margin = new Padding(0, 0, 0, 8)
-        });
-
-        layout.Controls.Add(new Label
-        {
-            Text = message,
-            AutoSize = true,
-            MaximumSize = new Size(900, 0),
-            ForeColor = Color.FromArgb(107, 114, 128)
-        });
-
-        card.Controls.Add(layout);
-        return card;
     }
 
     private void SetControlsEnabled(bool enabled)

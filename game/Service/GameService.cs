@@ -7,17 +7,23 @@ class GameService
 {
     public void SetInstalledGames()
     {
-        SetGamesWithGameFolder();
-        SetGamesWithRegistry();
-        Game.InstalledGames = [.. (Game.InstalledGames ?? []).DistinctBy(game => game.InstallFolderPath)];
-        SetSettedValuesToNull();
+        var gamesFromFolders = GetGamesWithGameFolder();
+        var gamesFromRegistry = GetGamesWithRegistry();
+        
+        var allGames = gamesFromFolders.Concat(gamesFromRegistry)
+                                       .DistinctBy(game => game.InstallFolderPath)
+                                       .ToArray();
+                                       
+        Game.InstalledGames = allGames;
+        ApplySavedSettings();
         Game.SaveGames();
     }
 
-    private void SetGamesWithGameFolder()
+    private IEnumerable<Game.Record> GetGamesWithGameFolder()
     {
-        List<Game.Record> installedGames = [.. Game.InstalledGames ?? []];
-        if(Launcher.InstalledLaunchers is null) return;
+        List<Game.Record> games = new();
+        if(Launcher.InstalledLaunchers is null) return games;
+        
         foreach (var launcher in Launcher.InstalledLaunchers)
         {
             if (launcher.GameFolderPath is null || launcher.GameFolderPath.Length == 0)
@@ -28,24 +34,23 @@ class GameService
                 if (!Directory.Exists(gameFolder))
                     continue;
 
-                string[] games = Directory.GetDirectories(gameFolder);
-                foreach (var game in games)
+                string[] gameDirs = Directory.GetDirectories(gameFolder);
+                foreach (var gameDir in gameDirs)
                 {
-                    string gameName = Path.GetFileName(game);
-                    string exePath = GetGameExe(game);
-                    // string processName = GetProcessName(gameName, exePath);
-                    installedGames.Add(new Game.Record(gameName, game, exePath));
+                    string gameName = Path.GetFileName(gameDir);
+                    string exePath = GetGameExe(gameDir);
+                    games.Add(new Game.Record(gameName, gameDir, exePath));
                 }
             }
         }
-
-        Game.InstalledGames = [.. installedGames.DistinctBy(game => game.InstallFolderPath)];
+        return games;
     }
 
-    private void SetGamesWithRegistry()
+    private IEnumerable<Game.Record> GetGamesWithRegistry()
     {
-        List<Game.Record> installedGames = [.. Game.InstalledGames ?? []];
-        if(Launcher.InstalledLaunchers is null) return;
+        List<Game.Record> games = new();
+        if(Launcher.InstalledLaunchers is null) return games;
+        
         foreach(var launcher in Launcher.InstalledLaunchers)
         {
             string? registryKeyPath = launcher.DirectRegistryKey;
@@ -77,11 +82,11 @@ class GameService
 
                     string exePath = GetGameExe(installPath);
                     string processName = GetProcessName(resolvedGameName, exePath);
-                    installedGames.Add(new Game.Record(resolvedGameName, installPath, exePath, processName));
+                    games.Add(new Game.Record(resolvedGameName, installPath, exePath, processName));
                 }
             }
         }
-        Game.InstalledGames = [.. installedGames.DistinctBy(game => game.InstallFolderPath)];
+        return games;
     }
 
     private string GetGameExe(string installPath)
@@ -111,7 +116,7 @@ class GameService
         return fallbackName;
     }
 
-    private static void SetSettedValuesToNull()
+    private static void ApplySavedSettings()
     {
         var gamesInDb = Game.GetGames();
         foreach(var gameInDb in gamesInDb ?? [])

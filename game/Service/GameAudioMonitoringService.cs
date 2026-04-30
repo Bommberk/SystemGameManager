@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using Krassheiten.SystemGameManager.Entity;
-using NAudio.CoreAudioApi;
 
 class GameAudioMonitoringService
 : GameAudioService, IDisposable
@@ -47,7 +46,7 @@ class GameAudioMonitoringService
         try
         {
             Game.Record? runningGame = GetRunningOpenGame();
-            int? currentMusicAppVolume = GetMusicAppVolume();
+            int? currentMusicAppVolume = systemAudioService.GetMusicAppVolume(DEFAULT_MUSIC_APP_NAME);
 
             if (runningGame is not null)
             {
@@ -253,25 +252,4 @@ class GameAudioMonitoringService
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern bool QueryFullProcessImageName(IntPtr hProcess, int dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
 
-    private int? GetMusicAppVolume(string musicAppName = DEFAULT_MUSIC_APP_NAME)
-    {
-        using var enumerator = new MMDeviceEnumerator();
-        var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-
-        foreach (var device in devices)
-        {
-            var sessions = device.AudioSessionManager.Sessions;
-            for (int i = 0; i < sessions.Count; i++)
-            {
-                var session = sessions[i];
-                var processName = GetProcessName(session.GetProcessID);
-                if (!string.IsNullOrWhiteSpace(processName) && processName.Equals(musicAppName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return (int)Math.Round(session.SimpleAudioVolume.Volume * 100f);
-                }
-            }
-        }
-
-        return null;
-    }
 }
