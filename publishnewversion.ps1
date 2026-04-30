@@ -1,6 +1,10 @@
 param (
     [Parameter(Position=0)]
-    [string]$Version
+    [string]$Version,
+    
+    [Parameter(Mandatory=$false)]
+    [Alias("m")]
+    [string]$Message
 )
 
 $AppName = "SystemGameManager"
@@ -8,6 +12,7 @@ $ProjectDir = "."
 $PublishDir = ".\bin\Release\net8.0-windows\win-x64\publish"
 $OutputDir = ".\releases"
 $RepoUrl = "https://github.com/Krassheiten/SystemGameManager"
+
 
 if ([string]::IsNullOrWhiteSpace($Version)) {
     Write-Host "[X] Bitte Version angeben: .\publishnewversion.ps1 1.0.1"
@@ -27,7 +32,7 @@ vpk pack -u $AppName -v $Version -p $PublishDir -o $OutputDir
 # 3. Git Commit + Tag
 Write-Host "[GIT] Git Commit + Tag..."
 git add .
-git commit -m "Release $Version"
+git commit -m "Release $Version; $Message"
 git tag v$Version
 
 # 4. Push Code + Tag
