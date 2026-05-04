@@ -29,6 +29,7 @@ class DatabaseService
         if (properties.Length == 0) return;
 
         CreateTable(tableName, BuildColumnDefinitions(properties));
+        AddMissingColumns(tableName, properties);
 
         var incomingRecords = NormalizeToRecordList(record);
         var incomingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -114,6 +115,24 @@ class DatabaseService
                 {columnDefinitions}
             );";
         command.ExecuteNonQuery();
+    }
+
+    private void AddMissingColumns(string tableName, PropertyInfo[] properties)
+    {
+        var existingColumns = new HashSet<string>(GetTableColumns<object>(tableName), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var property in properties)
+        {
+            if (existingColumns.Contains(property.Name))
+            {
+                continue;
+            }
+
+            var columnType = GetSqlType(property.PropertyType);
+            using var command = dbConnection.CreateCommand();
+            command.CommandText = $"ALTER TABLE [{tableName}] ADD COLUMN [{property.Name}] {columnType};";
+            command.ExecuteNonQuery();
+        }
     }
 
     public string[] GetTableColumns<T>(string tableName)
