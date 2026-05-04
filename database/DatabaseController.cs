@@ -45,9 +45,25 @@ class DatabaseController
         dump(rows);
     }
     
+    private static readonly object _dbInitLock = new();
+
     protected static SqliteConnection GetSqlConnection()
     {
-        string dbPath = "Data Source=database/systemgamemanager.db";
+        const string dbFile = "database/systemgamemanager.db";
+        const string templateFile = "database/template-systemgamemanager.db";
+
+        lock (_dbInitLock)
+        {
+            if (!File.Exists(dbFile))
+            {
+                if (File.Exists(templateFile))
+                {
+                    File.Copy(templateFile, dbFile);
+                }
+            }
+        }
+
+        string dbPath = $"Data Source={dbFile}";
         var connection = new SqliteConnection(dbPath);
         connection.Open();
         return connection;
