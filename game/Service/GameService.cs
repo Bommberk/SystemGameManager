@@ -121,20 +121,19 @@ class GameService
         var gamesInDb = Game.GetGames();
         foreach(var gameInDb in gamesInDb ?? [])
         {
+            var game = Game.InstalledGames?
+                .FirstOrDefault(g => g.InstallFolderPath == gameInDb.InstallFolderPath);
+            if (game == null)
+                continue;
+
             if(gameInDb.MusicVolumePercent != null)
-            {
-                var game = Game.InstalledGames?
-                    .FirstOrDefault(g => g.InstallFolderPath == gameInDb.InstallFolderPath);
-                if (game != null)
-                    game.MusicVolumePercent = gameInDb.MusicVolumePercent;
-            }
+                game.MusicVolumePercent = gameInDb.MusicVolumePercent;
+
             if(gameInDb.GameVolumePercent != null)
-            {
-                var game = Game.InstalledGames?
-                    .FirstOrDefault(g => g.InstallFolderPath == gameInDb.InstallFolderPath);
-                if (game != null)
-                    game.GameVolumePercent = gameInDb.GameVolumePercent;
-            }
+                game.GameVolumePercent = gameInDb.GameVolumePercent;
+
+            if(gameInDb.AudioOutputDevice != null)
+                game.AudioOutputDevice = gameInDb.AudioOutputDevice;
         }
     }
 
