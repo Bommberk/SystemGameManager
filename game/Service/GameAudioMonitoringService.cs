@@ -18,6 +18,8 @@ class GameAudioMonitoringService
     private int? lastAppliedMusicVolume;
     private int? previousMusicAppVolume;
     private bool isGameMusicOverrideActive;
+    private string? previousAudioOutputDeviceId;
+    private string? lastAppliedAudioOutputDeviceId;
 
     public void StartAudioMonitoring(int intervalMs = AUDIO_CHECK_INTERVAL_MS)
     {
@@ -53,6 +55,7 @@ class GameAudioMonitoringService
                 if (!isGameMusicOverrideActive)
                 {
                     previousMusicAppVolume = currentMusicAppVolume;
+                    previousAudioOutputDeviceId = systemAudioService.GetDefaultAudioOutputDeviceId();
                     isGameMusicOverrideActive = true;
                     mlog($"Merke vorherige Musiklautstärke: {previousMusicAppVolume ?? Game.MUSIC_VOLUME_PERCENT}%");
                 }
@@ -60,14 +63,32 @@ class GameAudioMonitoringService
                 string? currentGamePath = runningGame.InstallFolderPath;
                 int targetMusicVolume = runningGame.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT;
 
+                string? targetAudioOutputDeviceId = null;
+                if (!string.IsNullOrWhiteSpace(runningGame.AudioOutputDevice))
+                {
+                    targetAudioOutputDeviceId = systemAudioService.GetAudioOutputDeviceIdByName(runningGame.AudioOutputDevice);
+                }
+
+                bool audioOutputChanged = !string.IsNullOrWhiteSpace(targetAudioOutputDeviceId)
+                    && !string.Equals(lastAppliedAudioOutputDeviceId, targetAudioOutputDeviceId, StringComparison.OrdinalIgnoreCase);
+
                 if (string.Equals(lastAppliedGamePath, currentGamePath, StringComparison.OrdinalIgnoreCase)
                     && lastAppliedMusicVolume == targetMusicVolume
-                    && currentMusicAppVolume == targetMusicVolume)
+                    && currentMusicAppVolume == targetMusicVolume
+                    && !audioOutputChanged)
                 {
                     return;
                 }
 
                 SetAudio(musicVolume: targetMusicVolume);
+
+                if (audioOutputChanged && !string.IsNullOrWhiteSpace(targetAudioOutputDeviceId))
+                {
+                    mlog($"Setze Audioausgabe für Spiel '{runningGame.Name}': {runningGame.AudioOutputDevice}");
+                    systemAudioService.SetDefaultAudioOutputDevice(targetAudioOutputDeviceId);
+                    lastAppliedAudioOutputDeviceId = targetAudioOutputDeviceId;
+                }
+
                 lastAppliedGamePath = currentGamePath;
                 lastAppliedMusicVolume = targetMusicVolume;
                 return;
@@ -82,9 +103,17 @@ class GameAudioMonitoringService
             mlog($"Kein Spiel mehr offen. Musiklautstärke wird auf {restoreMusicVolume}% zurückgesetzt.");
             SetAudio(musicVolume: restoreMusicVolume);
 
+            if (!string.IsNullOrWhiteSpace(previousAudioOutputDeviceId) && !string.IsNullOrWhiteSpace(lastAppliedAudioOutputDeviceId))
+            {
+                mlog($"Stelle Audioausgabe auf vorheriges Gerät zurück.");
+                systemAudioService.SetDefaultAudioOutputDevice(previousAudioOutputDeviceId);
+            }
+
             lastAppliedGamePath = null;
             lastAppliedMusicVolume = restoreMusicVolume;
+            lastAppliedAudioOutputDeviceId = null;
             previousMusicAppVolume = null;
+            previousAudioOutputDeviceId = null;
             isGameMusicOverrideActive = false;
         }
         finally

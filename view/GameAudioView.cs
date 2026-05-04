@@ -314,6 +314,8 @@ internal sealed class GameAudioView
     private void ApplyGlobalOutputDevice()
     {
         var selectedDevice = globalOutputDeviceComboBox.SelectedItem?.ToString() ?? "(Standard-Gerät)";
+        var deviceToSave = selectedDevice == "(Standard-Gerät)" ? null : selectedDevice;
+
         foreach (var binding in GetGameBindings())
         {
             if (!binding.CheckBox.Checked)
@@ -321,8 +323,11 @@ internal sealed class GameAudioView
                 continue;
             }
 
+            binding.Game.AudioOutputDevice = deviceToSave;
             binding.OutputDeviceLabel.Text = selectedDevice;
         }
+
+        SetHasPendingChanges(true);
     }
 
     private void ToggleSelection()

@@ -90,7 +90,7 @@ internal static class GameAudioCardControl
 
         outputDeviceLabel = new Label()
         {
-            Text = "(Standard-Gerät)",
+            Text = game.AudioOutputDevice ?? "(Standard-Gerät)",
             AutoSize = true,
             Anchor = AnchorStyles.Left,
             ForeColor = Color.FromArgb(55, 65, 81),

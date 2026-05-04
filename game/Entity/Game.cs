@@ -17,8 +17,9 @@ class Game
         public string ProzessName { get; set; }
         public int? MusicVolumePercent { get; set; } = MUSIC_VOLUME_PERCENT;
         public int? GameVolumePercent { get; set; } = GAME_VOLUME_PERCENT;
+        public string? AudioOutputDevice { get; set; }
 
-        public Record(string name, string installFolderPath, string exePath, string? prozessName = null, int? musicVolumePercent = null, int? gameVolumePercent = null)
+        public Record(string name, string installFolderPath, string exePath, string? prozessName = null, int? musicVolumePercent = null, int? gameVolumePercent = null, string? audioOutputDevice = null)
         {
             Name = name;
             InstallFolderPath = installFolderPath;
@@ -26,6 +27,7 @@ class Game
             ProzessName = prozessName ?? string.Empty;
             MusicVolumePercent = musicVolumePercent;
             GameVolumePercent = gameVolumePercent;
+            AudioOutputDevice = audioOutputDevice;
         }
     }
 
