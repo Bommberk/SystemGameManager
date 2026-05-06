@@ -126,11 +126,8 @@ class DatabaseController
 
             using (var cmd = conn.CreateCommand())
             {
-                var columnDefinitions = string.Join(",\r\n                ", columns);
-                cmd.CommandText = $@"
-                CREATE TABLE IF NOT EXISTS [{entity.TableName}] (
-                    {columnDefinitions}
-                );";
+                var columnDefinitions = string.Join(", ", columns);
+                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{entity.TableName}] ({columnDefinitions});";
                 cmd.ExecuteNonQuery();
             }
 
