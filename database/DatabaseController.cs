@@ -54,19 +54,65 @@ class DatabaseController
 
         lock (_dbInitLock)
         {
-            if (!File.Exists(dbFile))
+            if (!File.Exists(dbFile) && File.Exists(templateFile))
             {
-                if (File.Exists(templateFile))
-                {
-                    File.Copy(templateFile, dbFile);
-                }
+                File.Copy(templateFile, dbFile);
+            }
+            else if (File.Exists(dbFile) && File.Exists(templateFile))
+            {
+                SyncSchemaFromTemplate(dbFile, templateFile);
             }
         }
 
-        string dbPath = $"Data Source={dbFile}";
-        var connection = new SqliteConnection(dbPath);
+        var connection = new SqliteConnection($"Data Source={dbFile}");
         connection.Open();
+
+        using var pragma = connection.CreateCommand();
+        pragma.CommandText = "PRAGMA journal_mode=DELETE;";
+        pragma.ExecuteNonQuery();
+
         return connection;
+    }
+
+    private static void SyncSchemaFromTemplate(string dbFile, string templateFile)
+    {
+        var templateTables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        using (var templateConn = new SqliteConnection($"Data Source={templateFile};Mode=ReadOnly"))
+        {
+            templateConn.Open();
+            using var cmd = templateConn.CreateCommand();
+            cmd.CommandText = "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                templateTables[reader.GetString(0)] = reader.GetString(1);
+            }
+        }
+
+        if (templateTables.Count == 0) return;
+
+        using var mainConn = new SqliteConnection($"Data Source={dbFile}");
+        mainConn.Open();
+
+        var existingTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        using (var cmd = mainConn.CreateCommand())
+        {
+            cmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                existingTables.Add(reader.GetString(0));
+            }
+        }
+
+        foreach (var (tableName, createSql) in templateTables)
+        {
+            if (existingTables.Contains(tableName)) continue;
+
+            using var cmd = mainConn.CreateCommand();
+            cmd.CommandText = createSql;
+            cmd.ExecuteNonQuery();
+        }
     }
 
     public DatabaseService GetDatabaseService()
