@@ -1,5 +1,6 @@
 namespace Krassheiten.SystemGameManager.Controller;
 
+using System.Reflection;
 using Microsoft.Data.Sqlite;
 using Krassheiten.SystemGameManager.Service;
 using Krassheiten.SystemGameManager.Entity;
@@ -54,6 +55,11 @@ class DatabaseController
 
         lock (_dbInitLock)
         {
+            if (File.Exists(templateFile))
+            {
+                SyncEntitiesToTemplate(templateFile);
+            }
+
             if (!File.Exists(dbFile) && File.Exists(templateFile))
             {
                 File.Copy(templateFile, dbFile);
@@ -74,22 +80,136 @@ class DatabaseController
         return connection;
     }
 
+    private static void SyncEntitiesToTemplate(string templateFile)
+    {
+        var entityTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.Name == "Record" && t.IsClass && t.DeclaringType != null)
+            .Select(t => new
+            {
+                RecordType = t,
+                TableName = t.DeclaringType!
+                    .GetField("TABLE_NAME", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                    ?.GetRawConstantValue() as string
+            })
+            .Where(x => !string.IsNullOrWhiteSpace(x.TableName))
+            .ToList();
+
+        if (entityTypes.Count == 0) return;
+
+        using var conn = new SqliteConnection($"Data Source={templateFile}");
+        conn.Open();
+
+        using var pragma = conn.CreateCommand();
+        pragma.CommandText = "PRAGMA journal_mode=DELETE;";
+        pragma.ExecuteNonQuery();
+
+        foreach (var entity in entityTypes)
+        {
+            var properties = entity.RecordType
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanRead && p.CanWrite)
+                .OrderBy(p => p.MetadataToken)
+                .ToArray();
+
+            if (properties.Length == 0) continue;
+
+            var columns = new List<string> { "Id INTEGER PRIMARY KEY AUTOINCREMENT" };
+            foreach (var property in properties)
+            {
+                var colType = GetEntitySqlType(property.PropertyType);
+                var colDef = property.Name.Equals("Name", StringComparison.OrdinalIgnoreCase)
+                    ? $"[{property.Name}] {colType} NOT NULL UNIQUE"
+                    : $"[{property.Name}] {colType}";
+                columns.Add(colDef);
+            }
+
+            using (var cmd = conn.CreateCommand())
+            {
+                var columnDefinitions = string.Join(",\r\n                ", columns);
+                cmd.CommandText = $@"
+                CREATE TABLE IF NOT EXISTS [{entity.TableName}] (
+                    {columnDefinitions}
+                );";
+                cmd.ExecuteNonQuery();
+            }
+
+            var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = $"PRAGMA table_info([{entity.TableName}]);";
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    existingColumns.Add(reader.GetString(1));
+                }
+            }
+
+            foreach (var property in properties)
+            {
+                if (existingColumns.Contains(property.Name)) continue;
+
+                var colType = GetEntitySqlType(property.PropertyType);
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = $"ALTER TABLE [{entity.TableName}] ADD COLUMN [{property.Name}] {colType};";
+                cmd.ExecuteNonQuery();
+            }
+        }
+    }
+
+    private static string GetEntitySqlType(Type propertyType)
+    {
+        var type = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+        if (type == typeof(bool) || type == typeof(byte) || type == typeof(sbyte) ||
+            type == typeof(short) || type == typeof(ushort) || type == typeof(int) ||
+            type == typeof(uint) || type == typeof(long) || type == typeof(ulong))
+        {
+            return "INTEGER";
+        }
+
+        if (type == typeof(float) || type == typeof(double) || type == typeof(decimal))
+        {
+            return "REAL";
+        }
+
+        return "TEXT";
+    }
+
     private static void SyncSchemaFromTemplate(string dbFile, string templateFile)
     {
-        var templateTables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var templateSchema = new Dictionary<string, (string CreateSql, List<(string Name, string Type)> Columns)>(StringComparer.OrdinalIgnoreCase);
+
         using (var templateConn = new SqliteConnection($"Data Source={templateFile};Mode=ReadOnly"))
         {
             templateConn.Open();
-            using var cmd = templateConn.CreateCommand();
-            cmd.CommandText = "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+
+            var tableNames = new List<(string Name, string Sql)>();
+            using (var cmd = templateConn.CreateCommand())
             {
-                templateTables[reader.GetString(0)] = reader.GetString(1);
+                cmd.CommandText = "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    tableNames.Add((reader.GetString(0), reader.GetString(1)));
+                }
+            }
+
+            foreach (var (name, sql) in tableNames)
+            {
+                var columns = new List<(string Name, string Type)>();
+                using var colCmd = templateConn.CreateCommand();
+                colCmd.CommandText = $"PRAGMA table_info([{name}]);";
+                using var colReader = colCmd.ExecuteReader();
+                while (colReader.Read())
+                {
+                    columns.Add((colReader.GetString(1), colReader.GetString(2)));
+                }
+                templateSchema[name] = (sql, columns);
             }
         }
 
-        if (templateTables.Count == 0) return;
+        if (templateSchema.Count == 0) return;
 
         using var mainConn = new SqliteConnection($"Data Source={dbFile}");
         mainConn.Open();
@@ -105,13 +225,36 @@ class DatabaseController
             }
         }
 
-        foreach (var (tableName, createSql) in templateTables)
+        foreach (var (tableName, (createSql, templateColumns)) in templateSchema)
         {
-            if (existingTables.Contains(tableName)) continue;
+            if (!existingTables.Contains(tableName))
+            {
+                using var cmd = mainConn.CreateCommand();
+                cmd.CommandText = createSql;
+                cmd.ExecuteNonQuery();
+            }
+            else
+            {
+                var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                using (var cmd = mainConn.CreateCommand())
+                {
+                    cmd.CommandText = $"PRAGMA table_info([{tableName}]);";
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        existingColumns.Add(reader.GetString(1));
+                    }
+                }
 
-            using var cmd = mainConn.CreateCommand();
-            cmd.CommandText = createSql;
-            cmd.ExecuteNonQuery();
+                foreach (var (colName, colType) in templateColumns)
+                {
+                    if (existingColumns.Contains(colName)) continue;
+
+                    using var cmd = mainConn.CreateCommand();
+                    cmd.CommandText = $"ALTER TABLE [{tableName}] ADD COLUMN [{colName}] {colType};";
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 
