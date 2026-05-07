@@ -13,6 +13,10 @@ $PublishDir = ".\bin\Release\net8.0-windows\win-x64\publish"
 $OutputDir = ".\releases"
 $RepoUrl = "https://github.com/Krassheiten/SystemGameManager"
 
+if (-not $env:GITHUB_TOKEN) {
+    Write-Host "❌ TOKEN IST LEER"
+    exit 1
+}
 
 if ([string]::IsNullOrWhiteSpace($Version)) {
     Write-Host "[X] Bitte Version angeben: .\publishnewversion.ps1 1.0.1"
