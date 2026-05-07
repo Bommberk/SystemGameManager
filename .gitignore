@@ -5,4 +5,4 @@ temp-build-check
 Output
 database/systemgamemanager.db
 publishnewversion.ps1
-releases/*
+releases/*.nupkg
