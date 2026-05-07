@@ -4,4 +4,4 @@ obj
 temp-build-check
 Output
 RELEASE*
-publishnewversion.ps1
+database/systemgamemanager.db
