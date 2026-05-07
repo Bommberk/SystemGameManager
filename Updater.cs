@@ -21,3 +21,4 @@ public class Updater
         mgr.ApplyUpdatesAndRestart(update);
     }
 }
+// test
