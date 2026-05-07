@@ -6,3 +6,5 @@ Output
 database/systemgamemanager.db
 publishnewversion.ps1
 releases/*.nupkg
+releases/*.zip
+releases/*.exe
