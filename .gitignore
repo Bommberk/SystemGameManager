@@ -3,7 +3,5 @@ obj
 .vscode
 temp-build-check
 Output
-Releases/*
-!Releases/.gitkeep
 database/systemgamemanager.db
 publishnewversion.ps1

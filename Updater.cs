@@ -12,7 +12,7 @@ public class Updater
         try
         {
             var repoUrl = GlobalConfig.Settings.AppConfig.RepositoryUrl;
-            var source = new GithubSource(repoUrl, null, false);
+            var source = new GithubSource(repoUrl, null, true);
             var mgr = new UpdateManager(source);
 
             if (!mgr.IsInstalled)
