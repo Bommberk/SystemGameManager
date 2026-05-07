@@ -9,7 +9,7 @@ public class AppConfig
     public string AppName { get; set; } = "SystemGameManager";
     public string Version { get; set; } = "1.0.0";
     public string Environment { get; set; } = "Production";
-    public string RepositoryUrl { get; set; } = "https://github.com/Krassheiten/SystemGameManager";
+    public string RepositoryUrl { get; set; } = "https://github.com/Bommberk/SystemGameManager";
     public string Author { get; set; } = "Bommberk";
     public string LogLevel { get; set; } = "Info";
     public string Language { get; set; } = "de-DE";
