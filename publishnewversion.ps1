@@ -40,6 +40,6 @@ git push
 git push origin "v$Version"
 
 # 5. OPTIONAL: GitHub Release Upload
-vpk upload github --repoUrl $RepoUrl --repoToken $env:GITHUB_TOKEN
+vpk upload github --repoUrl $RepoUrl
 
 Write-Host "[DONE] Release $Version komplett fertig!"
