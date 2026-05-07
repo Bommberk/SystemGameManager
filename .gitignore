@@ -5,3 +5,4 @@ temp-build-check
 Output
 RELEASE*
 database/systemgamemanager.db
+publishnewversion.ps1
