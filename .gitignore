@@ -1,0 +1,11 @@
+bin
+obj
+.vscode
+temp-build-check
+Output
+RELEASE*
+database/systemgamemanager.db
+*.db-wal
+*.db-shm
+*.db-journal
+publishnewversion.ps1
