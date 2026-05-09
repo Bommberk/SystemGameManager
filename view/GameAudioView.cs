@@ -448,7 +448,6 @@ internal sealed class GameAudioView
             Anchor = AnchorStyles.Right,
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.FromArgb(37, 99, 235),
-            // BackColor = Color.FromArgb(255, 34, 229),
             ForeColor = Color.White,
             Cursor = Cursors.Hand,
             Enabled = false,

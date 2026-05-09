@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Krassheiten.SystemGameManager.Controller;
 using Krassheiten.SystemGameManager.Service;
 using Krassheiten.SystemGameManager.View;
+using System.Text.Json;
 
 namespace Krassheiten.SystemGameManager;
 
@@ -18,7 +19,7 @@ public class MainForm : Form
 
     public MainForm()
     {
-        Text = "System & Game Manager";
+        Text = $"System & Game Manager (v{GetVersionFromReleases()})";
         StartPosition = FormStartPosition.CenterScreen;
         MinimumSize = new Size(980, 640);
         Width = 1180;
@@ -156,6 +157,51 @@ public class MainForm : Form
         button.FlatAppearance.MouseDownBackColor = Color.FromArgb(67, 56, 202);
         button.FlatAppearance.MouseOverBackColor = Color.FromArgb(99, 102, 241);
         return button;
+    }
+
+    private static string GetVersionFromReleases()
+    {
+        try
+        {
+            // Sucht die assets.win.json entweder im aktuellen oder im übergeordneten Verzeichnis (für die Entwicklung)
+            var currentDir = AppDomain.CurrentDomain.BaseDirectory;
+            var path = System.IO.Path.Combine(currentDir, "releases", "assets.win.json");
+            
+            if (!System.IO.File.Exists(path))
+            {
+                path = System.IO.Path.Combine(currentDir, "..", "..", "..", "releases", "assets.win.json");
+            }
+
+            if (System.IO.File.Exists(path))
+            {
+                var content = System.IO.File.ReadAllText(path);
+                using var doc = JsonDocument.Parse(content);
+                foreach (var element in doc.RootElement.EnumerateArray())
+                {
+                    if (element.TryGetProperty("Type", out var typeProp) && typeProp.GetString() == "Full")
+                    {
+                        if (element.TryGetProperty("RelativeFileName", out var fileProp))
+                        {
+                            var fileName = fileProp.GetString();
+                            if (!string.IsNullOrEmpty(fileName))
+                            {
+                                var match = System.Text.RegularExpressions.Regex.Match(fileName, @"\d+\.\d+\.\d+");
+                                if (match.Success)
+                                {
+                                    return match.Value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Fehler ignorieren und auf Fallback zurückgreifen
+        }
+        
+        return "Unknown";
     }
 
     private sealed record MainViewData(string SystemText, GameViewService.GameManagerViewData GameManager);
