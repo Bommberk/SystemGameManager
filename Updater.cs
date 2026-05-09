@@ -29,6 +29,7 @@ public class Updater
         catch (Exception ex)
         {
             ConsoleError($"Fehler beim automatischen Update: {ex.Message}");
+            System.Windows.Forms.MessageBox.Show($"Ein Fehler ist beim automatischen Update aufgetreten:\n\n{ex.Message}", "Update-Fehler", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
         }
     }
 }
