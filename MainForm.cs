@@ -163,42 +163,19 @@ public class MainForm : Form
     {
         try
         {
-            // Sucht die assets.win.json entweder im aktuellen oder im übergeordneten Verzeichnis (für die Entwicklung)
-            var currentDir = AppDomain.CurrentDomain.BaseDirectory;
-            var path = System.IO.Path.Combine(currentDir, "releases", "assets.win.json");
-            
-            if (!System.IO.File.Exists(path))
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            if (version != null)
             {
-                path = System.IO.Path.Combine(currentDir, "..", "..", "..", "releases", "assets.win.json");
-            }
-
-            if (System.IO.File.Exists(path))
-            {
-                var content = System.IO.File.ReadAllText(path);
-                using var doc = JsonDocument.Parse(content);
-                foreach (var element in doc.RootElement.EnumerateArray())
+                if (version.Revision > 0)
                 {
-                    if (element.TryGetProperty("Type", out var typeProp) && typeProp.GetString() == "Full")
-                    {
-                        if (element.TryGetProperty("RelativeFileName", out var fileProp))
-                        {
-                            var fileName = fileProp.GetString();
-                            if (!string.IsNullOrEmpty(fileName))
-                            {
-                                var match = System.Text.RegularExpressions.Regex.Match(fileName, @"\d+\.\d+\.\d+");
-                                if (match.Success)
-                                {
-                                    return match.Value;
-                                }
-                            }
-                        }
-                    }
+                    return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
                 }
+                return $"{version.Major}.{version.Minor}.{version.Build}";
             }
         }
         catch
         {
-            // Fehler ignorieren und auf Fallback zurückgreifen
+            // Fehler ignorieren
         }
         
         return "Unknown";
