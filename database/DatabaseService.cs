@@ -108,6 +108,7 @@ class DatabaseService
 
     public void CreateTable(string tableName, string[] columns)
     {
+        dump($"Creating table '{tableName}'");
         using var command = dbConnection.CreateCommand();
         var columnDefinitions = string.Join(",\r\n", columns);
         command.CommandText = $@"

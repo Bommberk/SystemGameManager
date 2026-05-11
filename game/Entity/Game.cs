@@ -14,7 +14,7 @@ class Game
         public string Name { get; set; }
         public string InstallFolderPath { get; set; }
         public string ExePath { get; set; }
-        public string ProzessName { get; set; }
+        public string? ProzessName { get; set; }
         public int? MusicVolumePercent { get; set; } = MUSIC_VOLUME_PERCENT;
         public int? GameVolumePercent { get; set; } = GAME_VOLUME_PERCENT;
         public string? AudioOutputDevice { get; set; }
@@ -24,7 +24,7 @@ class Game
             Name = name;
             InstallFolderPath = installFolderPath;
             ExePath = exePath;
-            ProzessName = prozessName ?? string.Empty;
+            ProzessName = prozessName;
             MusicVolumePercent = musicVolumePercent;
             GameVolumePercent = gameVolumePercent;
             AudioOutputDevice = audioOutputDevice;

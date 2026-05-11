@@ -116,6 +116,12 @@ class GameService
         return fallbackName;
     }
 
+    
+    /// <summary>
+    /// Wendet gespeicherte Einstellungen auf die installierten Spiele an.
+    /// Liest die Spieleinstellungen aus der Datenbank und übernimmt die benutzerdefinierten
+    /// Werte für Musiklautstärke, Spiellautstärke und Audioausgabegerät in die aktuellen Spieldaten.
+    /// </summary>
     private static void ApplySavedSettings()
     {
         var gamesInDb = Game.GetGames();
