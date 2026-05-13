@@ -28,7 +28,8 @@ internal sealed class GameViewService : IDisposable
                 game.Name,
                 string.IsNullOrWhiteSpace(game.InstallFolderPath)
                     ? "Pfad nicht verfügbar"
-                    : game.InstallFolderPath))
+                    : game.InstallFolderPath,
+                game.GameImage))
             .ToArray();
 
         var summaryText = $"{games.Length} Spiele • {launchers.Length} Launcher erkannt";
@@ -126,5 +127,5 @@ internal sealed class GameViewService : IDisposable
 
     internal sealed record LauncherBadgeItem(string Title, string Subtitle);
 
-    internal sealed record GameCardItem(string Title, string InstallPath);
+    internal sealed record GameCardItem(string Title, string InstallPath, string? ImagePath);
 }

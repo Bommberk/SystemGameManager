@@ -8,6 +8,8 @@ internal static class GameCardControl
 {
     public static Control Create(GameViewService.GameCardItem game, Image? artwork, Action<string> openGameDirectory)
     {
+        var gameArtwork = TryLoadGameArtwork(game.ImagePath) ?? artwork;
+
         var shell = new HoverShadowPanel()
         {
             Width = 290,
@@ -50,22 +52,18 @@ internal static class GameCardControl
 
         var picture = new PictureBox()
         {
-            Size = new Size(120, 120),
-            SizeMode = PictureBoxSizeMode.Zoom,
-            Image = artwork,
+            Dock = DockStyle.Fill,
+            SizeMode = PictureBoxSizeMode.StretchImage,
+            Image = gameArtwork,
             BackColor = Color.Transparent
         };
 
-        void CenterArtwork()
+        if (gameArtwork is not null && !ReferenceEquals(gameArtwork, artwork))
         {
-            picture.Location = new Point(
-                Math.Max(0, (imageHost.ClientSize.Width - picture.Width) / 2),
-                Math.Max(0, (imageHost.ClientSize.Height - picture.Height) / 2));
+            picture.Disposed += (_, _) => gameArtwork.Dispose();
         }
 
         imageHost.Controls.Add(picture);
-        imageHost.Resize += (_, _) => CenterArtwork();
-        CenterArtwork();
 
         var badge = new Label()
         {
@@ -126,5 +124,24 @@ internal static class GameCardControl
 
         HoverShadowPanel.AddHoverEffect(shell, body);
         return shell;
+    }
+
+    private static Image? TryLoadGameArtwork(string? imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath) || !File.Exists(imagePath))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var stream = File.OpenRead(imagePath);
+            using var image = Image.FromStream(stream);
+            return new Bitmap(image);
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

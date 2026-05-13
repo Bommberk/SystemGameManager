@@ -15,6 +15,7 @@ class GameService
                                        .ToArray();
                                        
         Game.InstalledGames = allGames;
+        SetGamesImage();
         ApplySavedSettings();
         Game.SaveGames();
     }
@@ -116,6 +117,50 @@ class GameService
         return fallbackName;
     }
 
+    private static void SetGamesImage()
+    {
+        string userName = Environment.UserName;
+        string imagesFolder = Path.Combine(@"C:\Users", userName, "Pictures");
+        if (!Directory.Exists(imagesFolder))
+            return;
+
+        // Search recursively for image files in the Pictures folder
+        foreach (Game.Record game in Game.InstalledGames ?? Array.Empty<Game.Record>())
+        {
+            // Entfernt alle Sonderzeichen aus einem String (behält nur Buchstaben, Ziffern, Leerzeichen, Bindestrich, Unterstrich)
+            static string StripSpecialChars(string s) =>
+                new string(s.Where(c => char.IsLetterOrDigit(c) || c == ' ' || c == '-' || c == '_').ToArray());
+
+            // Erzeuge verschiedene Varianten des Spielnamens (ohne Sonderzeichen)
+            var cleanName = StripSpecialChars(game.Name);
+            var nameVariants = new[]
+            {
+                cleanName,
+                cleanName.Replace(" ", "-"),
+                cleanName.Replace(" ", "_")
+            };
+
+            // Suche alle Bilddateien im Pictures-Ordner (rekursiv)
+            var imageFiles = Directory.GetFiles(imagesFolder, "*.*", SearchOption.AllDirectories)
+                .Where(file => file.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                            || file.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
+                            || file.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase));
+
+            // Vergleiche Dateinamen (ohne Erweiterung, ohne Sonderzeichen) mit den Varianten, case-insensitive
+            var foundImage = imageFiles.FirstOrDefault(file =>
+                nameVariants.Any(variant =>
+                    string.Equals(
+                        StripSpecialChars(Path.GetFileNameWithoutExtension(file)),
+                        variant,
+                        StringComparison.OrdinalIgnoreCase)));
+
+            if (foundImage != null)
+            {
+                game.GameImage = foundImage;
+            }
+        }
+    }
+
     
     /// <summary>
     /// Wendet gespeicherte Einstellungen auf die installierten Spiele an.
@@ -132,6 +177,7 @@ class GameService
             if (game == null)
                 continue;
 
+            // Übernehme benutzerdefinierte Einstellungen, falls vorhanden
             if(gameInDb.MusicVolumePercent != null)
                 game.MusicVolumePercent = gameInDb.MusicVolumePercent;
 
@@ -140,6 +186,9 @@ class GameService
 
             if(gameInDb.AudioOutputDevice != null)
                 game.AudioOutputDevice = gameInDb.AudioOutputDevice;
+                
+            if(gameInDb.GameImage != null)
+                game.GameImage = gameInDb.GameImage;
         }
     }
 
