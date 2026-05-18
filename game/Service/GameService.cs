@@ -38,6 +38,17 @@ class GameService
                 string[] gameDirs = Directory.GetDirectories(gameFolder);
                 foreach (var gameDir in gameDirs)
                 {
+                    bool hasExe;
+                    try
+                    {
+                        hasExe = Directory.EnumerateFiles(gameDir, "*.exe", SearchOption.AllDirectories).Any();
+                    }
+                    catch (UnauthorizedAccessException) { continue; }
+                    catch (IOException) { continue; }
+
+                    if (!hasExe)
+                        continue;
+
                     string gameName = Path.GetFileName(gameDir);
                     string exePath = GetGameExe(gameDir);
                     games.Add(new Game.Record(gameName, gameDir, exePath));
