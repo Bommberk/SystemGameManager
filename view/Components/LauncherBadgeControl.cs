@@ -45,7 +45,7 @@ internal static class LauncherBadgeControl
             Margin = new Padding(0)
         }, 0, 1);
 
-        body.Controls.Add(new Label
+        var chevronLabel = new Label
         {
             Text = "›",
             AutoSize = true,
@@ -53,8 +53,9 @@ internal static class LauncherBadgeControl
             ForeColor = UIHelpers.AccentColor,
             Anchor = AnchorStyles.Right | AnchorStyles.Top,
             Margin = new Padding(8, 6, 0, 0)
-        }, 1, 0);
-        body.SetRowSpan(body.Controls[^1], 2);
+        };
+        body.Controls.Add(chevronLabel, 1, 0);
+        body.SetRowSpan(chevronLabel, 2);
 
         shell.Controls.Add(body);
         HoverShadowPanel.AddHoverEffect(shell, body);

@@ -22,7 +22,7 @@ public class MainForm : Form
     {
         Text = $"System & Game Manager (v{GetVersionFromReleases()})";
         StartPosition = FormStartPosition.CenterScreen;
-        MinimumSize = new Size(1180, 760);
+        MinimumSize = new Size(1280, 820);
         Width = 1360;
         Height = 860;
         BackColor = UIHelpers.WindowBackground;
