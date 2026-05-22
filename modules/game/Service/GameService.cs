@@ -1,6 +1,6 @@
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Games.Service;
 
-using Krassheiten.SystemGameManager.Entity;
+using SystemGameManager.Games.Entity;
 using Microsoft.Win32;
 
 class GameService

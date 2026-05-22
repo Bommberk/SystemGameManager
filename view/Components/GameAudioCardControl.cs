@@ -1,9 +1,9 @@
+namespace SystemGameManager.View.Components;
+
 using System.Drawing;
 using System.Windows.Forms;
-using Krassheiten.SystemGameManager.Entity;
+using SystemGameManager.Games.Entity;
 using NAudio.CoreAudioApi;
-
-namespace Krassheiten.SystemGameManager.View.Components;
 
 internal static class GameAudioCardControl
 {

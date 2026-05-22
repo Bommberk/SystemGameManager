@@ -1,8 +1,8 @@
+namespace SystemGameManager.View.Components;
+
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-
-namespace Krassheiten.SystemGameManager.View.Components;
 
 internal static class UIHelpers
 {

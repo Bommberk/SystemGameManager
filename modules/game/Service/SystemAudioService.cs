@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi;
 
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Games.Service;
 
 public class SystemAudioService
 {

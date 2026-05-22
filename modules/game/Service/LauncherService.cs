@@ -1,8 +1,8 @@
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Games.Service;
 
 using Microsoft.Win32;
 using System.Text.Json;
-using Krassheiten.SystemGameManager.Entity;
+using SystemGameManager.Games.Entity;
 
 class LauncherService
 {

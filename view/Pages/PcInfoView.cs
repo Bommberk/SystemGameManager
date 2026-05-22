@@ -1,9 +1,9 @@
+namespace SystemGameManager.View;
+
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Krassheiten.SystemGameManager.Controller;
-
-namespace Krassheiten.SystemGameManager.View;
+using SystemGameManager.Pc.Controller;
 
 internal sealed class PcInfoView
 {

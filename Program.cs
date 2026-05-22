@@ -1,13 +1,16 @@
-﻿namespace Krassheiten.SystemGameManager;
+namespace SystemGameManager;
 
-using Krassheiten.SystemGameManager.Entity;
-using Krassheiten.SystemGameManager.Controller;
+using SystemGameManager.Database.Controller;
+using SystemGameManager.Games.Controller;
+using SystemGameManager.Games.Entity;
+using SystemGameManager.Pc.Controller;
+using GameEntity = SystemGameManager.Games.Entity.Game;
 using System;
 using System.Threading;
 using System.Windows.Forms;
 using Velopack;
 using System.Threading.Tasks;
-using Krassheiten.SystemGameManager.Service;
+using SystemGameManager.Service;
 
 internal static class Program
 {
@@ -33,7 +36,7 @@ internal static class Program
         GetInfoAsync();
 
         using var shutdownSignal = new ManualResetEventSlim(false);
-        Console.WriteLine("Audio-Monitoring läuft. Mit Strg+C beenden.");
+        Console.WriteLine("Audio-Monitoring l�uft. Mit Strg+C beenden.");
 
         Console.CancelKeyPress += (_, eventArgs) =>
         {
@@ -66,7 +69,7 @@ internal static class Program
         writeHeadline();
         // pcInfo.Write();
         // gameInfo.Write();
-        var game = new Game();
+        var game = new GameEntity();
         game.WriteGamesFromDatabase();
     }
 }

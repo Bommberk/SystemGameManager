@@ -1,11 +1,11 @@
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Games.Service;
 
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using Krassheiten.SystemGameManager.Entity;
+using SystemGameManager.Games.Entity;
 
 class GameAudioMonitoringService
 : GameAudioService, IDisposable

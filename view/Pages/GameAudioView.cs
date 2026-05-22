@@ -1,10 +1,10 @@
+namespace SystemGameManager.View;
+
 using System.Drawing;
 using System.Windows.Forms;
-using Krassheiten.SystemGameManager.Entity;
-using Krassheiten.SystemGameManager.Service;
-using Krassheiten.SystemGameManager.View.Components;
-
-namespace Krassheiten.SystemGameManager.View;
+using SystemGameManager.Games.Entity;
+using SystemGameManager.Games.Service;
+using SystemGameManager.View.Components;
 
 internal sealed class GameAudioView
 {

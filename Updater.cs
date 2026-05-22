@@ -1,4 +1,4 @@
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Service;
 
 using Velopack;
 using Velopack.Sources;

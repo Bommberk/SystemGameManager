@@ -1,4 +1,4 @@
-namespace Krassheiten.SystemGameManager.Functions;
+namespace SystemGameManager.Functions;
 
 using System;
 using System.Collections;

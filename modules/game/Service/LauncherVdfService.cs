@@ -1,4 +1,4 @@
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Games.Service;
 
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;

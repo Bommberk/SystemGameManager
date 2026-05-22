@@ -1,8 +1,8 @@
+namespace SystemGameManager.View.Components;
+
 using System.Drawing;
 using System.Windows.Forms;
-using Krassheiten.SystemGameManager.Service;
-
-namespace Krassheiten.SystemGameManager.View.Components;
+using SystemGameManager.Games.Service;
 
 internal static class GameCardControl
 {

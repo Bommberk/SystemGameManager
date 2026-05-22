@@ -1,9 +1,9 @@
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Games.Service;
 
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using Krassheiten.SystemGameManager.Entity;
+using SystemGameManager.Games.Entity;
 
 internal sealed class GameViewService : IDisposable
 {

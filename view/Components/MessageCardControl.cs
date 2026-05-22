@@ -1,7 +1,7 @@
+namespace SystemGameManager.View.Components;
+
 using System.Drawing;
 using System.Windows.Forms;
-
-namespace Krassheiten.SystemGameManager.View.Components;
 
 internal static class MessageCardControl
 {

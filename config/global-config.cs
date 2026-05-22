@@ -1,4 +1,4 @@
-namespace Krassheiten.SystemGameManager.Config;
+namespace SystemGameManager.Config;
 
 using System;
 using System.IO;

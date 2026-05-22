@@ -1,13 +1,15 @@
+namespace SystemGameManager.View.Components;
+
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-
-namespace Krassheiten.SystemGameManager.View.Components;
 
 internal sealed class HoverShadowPanel : Panel
 {
     private bool isHovered;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool IsHovered
     {
         get => isHovered;

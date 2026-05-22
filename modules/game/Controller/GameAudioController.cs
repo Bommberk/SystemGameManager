@@ -1,6 +1,6 @@
-using Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Games.Controller;
 
-namespace Krassheiten.SystemGameManager.Controller;
+using SystemGameManager.Games.Service;
 
 internal sealed class GameAudioController : IDisposable
 {

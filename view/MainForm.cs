@@ -1,11 +1,13 @@
+namespace SystemGameManager;
+
 using System.Drawing;
 using System.Windows.Forms;
-using Krassheiten.SystemGameManager.Controller;
-using Krassheiten.SystemGameManager.Service;
-using Krassheiten.SystemGameManager.View;
+using SystemGameManager.Games.Controller;
+using SystemGameManager.Games.Service;
+using SystemGameManager.Pc.Controller;
+using SystemGameManager.Service;
+using SystemGameManager.View;
 using System.Text.Json;
-
-namespace Krassheiten.SystemGameManager;
 
 public class MainForm : Form
 {
@@ -19,7 +21,7 @@ public class MainForm : Form
 
     public MainForm()
     {
-        Text = $"System & Game Manager (v{GetVersionFromReleases()})";
+        Text = $"System & Game Manager (v{ViewService.GetVersionFromReleases()})";
         StartPosition = FormStartPosition.CenterScreen;
         MinimumSize = new Size(980, 640);
         Width = 1180;
@@ -157,28 +159,6 @@ public class MainForm : Form
         button.FlatAppearance.MouseDownBackColor = Color.FromArgb(67, 56, 202);
         button.FlatAppearance.MouseOverBackColor = Color.FromArgb(99, 102, 241);
         return button;
-    }
-
-    private static string GetVersionFromReleases()
-    {
-        try
-        {
-            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            if (version != null)
-            {
-                if (version.Revision > 0)
-                {
-                    return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-                }
-                return $"{version.Major}.{version.Minor}.{version.Build}";
-            }
-        }
-        catch
-        {
-            // Fehler ignorieren
-        }
-        
-        return "Unknown";
     }
 
     private sealed record MainViewData(string SystemText, GameViewService.GameManagerViewData GameManager);

@@ -1,9 +1,9 @@
-namespace Krassheiten.SystemGameManager.Controller;
+namespace SystemGameManager.Database.Controller;
 
 using System.Reflection;
 using Microsoft.Data.Sqlite;
-using Krassheiten.SystemGameManager.Service;
-using Krassheiten.SystemGameManager.Entity;
+using SystemGameManager.Database.Service;
+using SystemGameManager.Games.Entity;
 
 class DatabaseController
 {

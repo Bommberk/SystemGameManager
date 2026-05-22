@@ -1,6 +1,6 @@
-using Krassheiten.SystemGameManager.Entity;
+namespace SystemGameManager.Games.Service;
 
-namespace Krassheiten.SystemGameManager.Service;
+using SystemGameManager.Games.Entity;
 
 class GameAudioService
 {

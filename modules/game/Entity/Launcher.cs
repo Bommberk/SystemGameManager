@@ -1,6 +1,6 @@
 using System.Reflection.Metadata;
 
-namespace Krassheiten.SystemGameManager.Entity;
+namespace SystemGameManager.Games.Entity;
 
 class Launcher
 {

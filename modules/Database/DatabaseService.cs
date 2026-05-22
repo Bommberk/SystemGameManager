@@ -1,5 +1,6 @@
-namespace Krassheiten.SystemGameManager.Service;
+namespace SystemGameManager.Database.Service;
 
+using SystemGameManager.Database.Controller;
 using Microsoft.Data.Sqlite;
 using System.Collections;
 using System.Reflection;
