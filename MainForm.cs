@@ -12,6 +12,7 @@ public class MainForm : Form
 {
     private readonly Button btnLoadInfo;
     private readonly Label statusLabel;
+    private readonly TabControl tabs;
     private readonly GameViewService gameViewService;
     private readonly PcInfoView pcInfoView;
     private readonly GameInfoView gameInfoView;
@@ -34,33 +35,93 @@ public class MainForm : Form
         gameInfoView = new GameInfoView(gameViewService.Artwork, OpenGameDirectory);
         gameAudioView = new GameAudioView();
 
+        var root = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Fill,
+            BackColor = UIHelpers.WindowBackground,
+            ColumnCount = 2,
+            RowCount = 1
+        };
+        root.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 72));
+        root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        var sidebar = new Panel()
+        {
+            Dock = DockStyle.Fill,
+            BackColor = UIHelpers.SidebarBackground,
+            Padding = new Padding(10, 76, 10, 14)
+        };
+
+        var sidebarActions = new FlowLayoutPanel()
+        {
+            Dock = DockStyle.Top,
+            FlowDirection = FlowDirection.TopDown,
+            WrapContents = false,
+            BackColor = Color.Transparent,
+            AutoSize = true
+        };
+
+        var menuButton = CreateSidebarButton("☰");
+        var homeButton = CreateSidebarButton("⌗", true);
+        var settingsButton = CreateSidebarButton("⚙");
+        var infoButton = CreateSidebarButton("i");
+
+        menuButton.Margin = new Padding(0, 0, 0, 16);
+        homeButton.Margin = new Padding(0, 0, 0, 16);
+        settingsButton.Margin = new Padding(0, 0, 0, 16);
+        infoButton.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
+
+        sidebarActions.Controls.Add(menuButton);
+        sidebarActions.Controls.Add(homeButton);
+        sidebarActions.Controls.Add(settingsButton);
+        sidebar.Controls.Add(sidebarActions);
+
+        var infoHost = new Panel()
+        {
+            Dock = DockStyle.Bottom,
+            Height = 44
+        };
+        infoHost.Controls.Add(infoButton);
+        sidebar.Controls.Add(infoHost);
+
+        var shell = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Fill,
+            BackColor = UIHelpers.WindowBackground,
+            ColumnCount = 1,
+            RowCount = 2
+        };
+        shell.RowStyles.Add(new RowStyle(SizeType.Absolute, 86));
+        shell.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
         var toolbar = new Panel()
         {
             Dock = DockStyle.Top,
-            Height = 60,
-            Padding = new Padding(12),
+            Height = 86,
+            Padding = new Padding(16, 18, 16, 10),
             BackColor = UIHelpers.SurfaceBackground
         };
 
         btnLoadInfo = UIHelpers.CreatePrimaryButton("Infos laden", 132);
         btnLoadInfo.Dock = DockStyle.Left;
+        btnLoadInfo.Text = "ⓘ  Infos laden";
 
         statusLabel = new Label()
         {
             Text = "Bereit",
             Dock = DockStyle.Fill,
-            Padding = new Padding(14, 7, 0, 0),
+            Padding = new Padding(16, 7, 0, 0),
             TextAlign = ContentAlignment.MiddleLeft,
             ForeColor = UIHelpers.TextSecondaryColor
         };
 
-        var tabs = new TabControl()
+        tabs = new TabControl()
         {
             Dock = DockStyle.Fill,
             BackColor = UIHelpers.WindowBackground,
-            Padding = new Point(20, 12),
+            Padding = new Point(22, 12),
             DrawMode = TabDrawMode.OwnerDrawFixed,
-            ItemSize = new Size(180, 40),
+            ItemSize = new Size(210, 42),
             SizeMode = TabSizeMode.Fixed
         };
         tabs.DrawItem += (_, e) => DrawTab(tabs, e);
@@ -76,8 +137,13 @@ public class MainForm : Form
         toolbar.Controls.Add(statusLabel);
         toolbar.Controls.Add(btnLoadInfo);
 
-        Controls.Add(tabs);
-        Controls.Add(toolbar);
+        shell.Controls.Add(toolbar, 0, 0);
+        shell.Controls.Add(tabs, 0, 1);
+
+        root.Controls.Add(sidebar, 0, 0);
+        root.Controls.Add(shell, 1, 0);
+
+        Controls.Add(root);
 
         pcInfoView.ShowLoadingState();
         gameInfoView.ShowLoadingState();
@@ -177,6 +243,26 @@ public class MainForm : Form
 
         using var accentBrush = new SolidBrush(UIHelpers.AccentColor);
         e.Graphics.FillRectangle(accentBrush, bounds.Left + 12, bounds.Bottom - 3, bounds.Width - 24, 3);
+    }
+
+    private static Button CreateSidebarButton(string text, bool isActive = false)
+    {
+        var button = new Button()
+        {
+            Text = text,
+            Width = 50,
+            Height = 50,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = isActive ? UIHelpers.SidebarActiveBackground : Color.Transparent,
+            ForeColor = isActive ? UIHelpers.TextPrimaryColor : Color.FromArgb(223, 231, 210),
+            Font = new Font("Segoe UI Symbol", 15F, FontStyle.Regular),
+            Cursor = Cursors.Hand
+        };
+
+        button.FlatAppearance.BorderSize = 0;
+        button.FlatAppearance.MouseDownBackColor = UIHelpers.SidebarActiveBackground;
+        button.FlatAppearance.MouseOverBackColor = UIHelpers.SidebarActiveBackground;
+        return button;
     }
 
     private static string GetVersionFromReleases()

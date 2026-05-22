@@ -7,10 +7,13 @@ namespace Krassheiten.SystemGameManager.View.Components;
 internal static class UIHelpers
 {
     public static Color WindowBackground => Color.FromArgb(22, 24, 23);
+    public static Color WindowGradientEnd => Color.FromArgb(18, 21, 24);
     public static Color SurfaceBackground => Color.FromArgb(30, 33, 31);
     public static Color CardBackground => Color.FromArgb(36, 39, 37);
     public static Color CardHoverBackground => Color.FromArgb(46, 51, 47);
     public static Color BorderColor => Color.FromArgb(64, 69, 64);
+    public static Color SidebarBackground => Color.FromArgb(47, 63, 43);
+    public static Color SidebarActiveBackground => Color.FromArgb(99, 119, 80);
     public static Color AccentColor => Color.FromArgb(163, 176, 94);
     public static Color AccentPressedColor => Color.FromArgb(128, 140, 69);
     public static Color AccentHoverColor => Color.FromArgb(182, 195, 108);

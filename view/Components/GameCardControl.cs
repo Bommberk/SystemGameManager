@@ -12,8 +12,8 @@ internal static class GameCardControl
 
         var shell = new HoverShadowPanel()
         {
-            Width = 318,
-            Height = 360,
+            Width = 348,
+            Height = 306,
             Margin = new Padding(0, 0, 18, 18)
         };
 
@@ -21,7 +21,7 @@ internal static class GameCardControl
         {
             Dock = DockStyle.Fill,
             BackColor = UIHelpers.CardBackground,
-            Padding = new Padding(14)
+            Padding = new Padding(10)
         };
         UIHelpers.SetRoundedRegion(body, 18);
 
@@ -29,26 +29,22 @@ internal static class GameCardControl
         {
             Dock = DockStyle.Fill,
             ColumnCount = 1,
-            RowCount = 6,
+            RowCount = 2,
             BackColor = Color.Transparent,
             Margin = new Padding(0),
             Padding = new Padding(0)
         };
 
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 164));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
 
         var imageHost = new Panel()
         {
             Dock = DockStyle.Fill,
             BackColor = UIHelpers.SurfaceBackground,
-            Margin = new Padding(0, 0, 0, 10)
+            Margin = new Padding(0, 0, 0, 8)
         };
-        UIHelpers.SetRoundedRegion(imageHost, 14);
+        UIHelpers.SetRoundedRegion(imageHost, 12);
 
         var picture = new PictureBox()
         {
@@ -65,59 +61,54 @@ internal static class GameCardControl
 
         imageHost.Controls.Add(picture);
 
+        var footer = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            RowCount = 1,
+            Margin = new Padding(0),
+            Padding = new Padding(0),
+            BackColor = Color.Transparent
+        };
+        footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        footer.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
         var badge = new Label()
         {
-            Text = "✓ INSTALLIERT",
+            Text = "✓  INSTALLIERT",
             AutoSize = true,
+            Anchor = AnchorStyles.Left | AnchorStyles.Top,
             BackColor = UIHelpers.AccentBadgeBackground,
             ForeColor = UIHelpers.AccentColor,
-            Padding = new Padding(10, 4, 10, 4),
-            Font = new Font("Segoe UI", 8F, FontStyle.Bold),
-            Margin = new Padding(0, 2, 0, 10)
+            Padding = new Padding(12, 5, 12, 5),
+            Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+            Margin = new Padding(0, 4, 0, 0)
         };
+        UIHelpers.SetRoundedRegion(badge, 10);
 
-        var title = new Label()
+        var optionsButton = new Button()
         {
-            Text = game.Title,
-            Dock = DockStyle.Fill,
-            AutoSize = false,
-            Height = 48,
-            Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-            ForeColor = UIHelpers.TextPrimaryColor,
-            Margin = new Padding(0, 0, 0, 8)
-        };
-
-        var pathTitle = new Label()
-        {
-            Text = "Installationspfad",
-            AutoSize = true,
-            Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
-            ForeColor = UIHelpers.TextMutedColor,
-            Margin = new Padding(0, 0, 0, 4)
-        };
-
-        var pathLabel = new Label()
-        {
-            Text = game.InstallPath,
-            Dock = DockStyle.Fill,
-            AutoSize = false,
-            Height = 44,
-            AutoEllipsis = true,
+            Text = "⋮",
+            Width = 32,
+            Height = 30,
+            FlatStyle = FlatStyle.Flat,
+            BackColor = Color.Transparent,
             ForeColor = UIHelpers.TextSecondaryColor,
-            Margin = new Padding(0, 0, 0, 8)
+            Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+            Cursor = Cursors.Hand,
+            Margin = new Padding(0)
         };
-
-        var openButton = UIHelpers.CreateSecondaryButton("Ordner öffnen", 130);
-        openButton.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
-        openButton.Margin = new Padding(0);
-        openButton.Click += (_, _) => openGameDirectory(game.InstallPath);
+        optionsButton.FlatAppearance.BorderSize = 0;
+        optionsButton.FlatAppearance.MouseOverBackColor = UIHelpers.CardHoverBackground;
+        optionsButton.FlatAppearance.MouseDownBackColor = UIHelpers.CardHoverBackground;
+        optionsButton.Click += (_, _) => openGameDirectory(game.InstallPath);
+        optionsButton.Anchor = AnchorStyles.Right | AnchorStyles.Top;
+        optionsButton.AccessibleDescription = game.Title;
 
         layout.Controls.Add(imageHost, 0, 0);
-        layout.Controls.Add(badge, 0, 1);
-        layout.Controls.Add(title, 0, 2);
-        layout.Controls.Add(pathTitle, 0, 3);
-        layout.Controls.Add(pathLabel, 0, 4);
-        layout.Controls.Add(openButton, 0, 5);
+        footer.Controls.Add(badge, 0, 0);
+        footer.Controls.Add(optionsButton, 1, 0);
+        layout.Controls.Add(footer, 0, 1);
 
         body.Controls.Add(layout);
         shell.Controls.Add(body);

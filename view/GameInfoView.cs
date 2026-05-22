@@ -70,16 +70,45 @@ internal sealed class GameInfoView
         {
             Dock = DockStyle.Fill,
             BackColor = UIHelpers.SurfaceBackground,
-            Padding = new Padding(24),
+            Padding = new Padding(22),
             Margin = new Padding(0, 0, 0, 18)
         };
         UIHelpers.SetRoundedRegion(heroPanel, 22);
+
+        var heroLayout = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Fill,
+            BackColor = Color.Transparent,
+            Margin = new Padding(0),
+            Padding = new Padding(0),
+            ColumnCount = 2,
+            RowCount = 1
+        };
+        heroLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 82));
+        heroLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        var heroIconHost = new Panel()
+        {
+            Width = 64,
+            Height = 64,
+            BackColor = Color.FromArgb(61, 70, 47),
+            Margin = new Padding(0, 2, 14, 0)
+        };
+        UIHelpers.SetRoundedRegion(heroIconHost, 18);
+        heroIconHost.Controls.Add(new Label
+        {
+            Text = "🎮",
+            Dock = DockStyle.Fill,
+            TextAlign = ContentAlignment.MiddleCenter,
+            Font = new Font("Segoe UI Emoji", 24F, FontStyle.Regular),
+            ForeColor = UIHelpers.AccentColor
+        });
 
         var heroTitle = new Label()
         {
             Text = "Game Library",
             AutoSize = true,
-            Font = new Font("Segoe UI", 19F, FontStyle.Bold),
+            Font = new Font("Segoe UI", 18F, FontStyle.Bold),
             ForeColor = UIHelpers.TextPrimaryColor,
             Margin = new Padding(0)
         };
@@ -105,7 +134,9 @@ internal sealed class GameInfoView
         heroTextLayout.Controls.Add(heroTitle);
         heroTextLayout.Controls.Add(gameManagerSummaryLabel);
         heroTextLayout.Controls.Add(heroSubtitle);
-        heroPanel.Controls.Add(heroTextLayout);
+        heroLayout.Controls.Add(heroIconHost, 0, 0);
+        heroLayout.Controls.Add(heroTextLayout, 1, 0);
+        heroPanel.Controls.Add(heroLayout);
 
         var launcherTitle = new Label()
         {
