@@ -61,9 +61,9 @@ class StandardLightTheme : ITheme
 {
     public Color PrimaryBackgroundColor => Color.FromArgb(252, 251, 251);
     public Color SecondaryBackgroundColor => Color.FromArgb(113, 123, 89);
-    public Color CardBackgroundColor => Color.FromArgb(200, 200, 200);
-    public Color PrimaryTextColor => Color.FromArgb(30, 30, 30);
-    public Color SecondaryTextColor => Color.FromArgb(152, 177, 100);
+    public Color CardBackgroundColor => Color.FromArgb(242, 242, 242);
+    public Color PrimaryTextColor => Color.FromArgb(152, 177, 100);
+    public Color SecondaryTextColor => Color.FromArgb(30, 30, 30);
 
     public Color GetHoveredColor(Color baseColor)
     {
