@@ -25,16 +25,16 @@ internal sealed class GameInfoView
         AutoScroll = true,
         WrapContents = true,
         Margin = new Padding(0),
-        Padding = new Padding(0, 8, 12, 12),
-        BackColor = Color.FromArgb(245, 247, 250)
+        Padding = new Padding(0, 8, 6, 12),
+        BackColor = Color.Transparent
     };
 
     private readonly Label gameManagerSummaryLabel = new()
     {
         Text = "Noch keine Daten geladen.",
         AutoSize = true,
-        ForeColor = Color.FromArgb(224, 231, 255),
-        Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+        ForeColor = UIHelpers.AccentColor,
+        Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
         Margin = new Padding(0, 4, 0, 0)
     };
 
@@ -48,16 +48,16 @@ internal sealed class GameInfoView
     {
         var tab = new TabPage("Game-Manager")
         {
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = UIHelpers.WindowBackground
         };
 
         var layout = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
-            Padding = new Padding(12),
+            Padding = new Padding(18, 16, 18, 18),
             ColumnCount = 1,
             RowCount = 5,
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = UIHelpers.WindowBackground
         };
 
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 118));
@@ -69,17 +69,18 @@ internal sealed class GameInfoView
         var heroPanel = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = Color.FromArgb(30, 41, 59),
-            Padding = new Padding(18),
-            Margin = new Padding(0, 0, 0, 12)
+            BackColor = UIHelpers.SurfaceBackground,
+            Padding = new Padding(24),
+            Margin = new Padding(0, 0, 0, 18)
         };
+        UIHelpers.SetRoundedRegion(heroPanel, 22);
 
         var heroTitle = new Label()
         {
             Text = "Game Library",
             AutoSize = true,
-            Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-            ForeColor = Color.White,
+            Font = new Font("Segoe UI", 19F, FontStyle.Bold),
+            ForeColor = UIHelpers.TextPrimaryColor,
             Margin = new Padding(0)
         };
 
@@ -87,8 +88,8 @@ internal sealed class GameInfoView
         {
             Text = "Launcher, Spiele und schnelle Aktionen auf einen Blick.",
             AutoSize = true,
-            ForeColor = Color.FromArgb(209, 213, 219),
-            Margin = new Padding(0, 6, 0, 0)
+            ForeColor = UIHelpers.TextSecondaryColor,
+            Margin = new Padding(0, 8, 0, 0)
         };
 
         var heroTextLayout = new FlowLayoutPanel()
@@ -110,18 +111,18 @@ internal sealed class GameInfoView
         {
             Text = "Launcher",
             AutoSize = true,
-            Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
-            Margin = new Padding(0, 0, 0, 8)
+            Font = new Font("Segoe UI", 12.5F, FontStyle.Bold),
+            ForeColor = UIHelpers.TextPrimaryColor,
+            Margin = new Padding(0, 0, 0, 10)
         };
 
         var gamesTitle = new Label()
         {
             Text = "Installierte Spiele",
             AutoSize = true,
-            Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
-            Margin = new Padding(0, 6, 0, 6)
+            Font = new Font("Segoe UI", 12.5F, FontStyle.Bold),
+            ForeColor = UIHelpers.TextPrimaryColor,
+            Margin = new Padding(0, 10, 0, 8)
         };
 
         layout.Controls.Add(heroPanel, 0, 0);

@@ -17,7 +17,7 @@ internal static class StateCardControl
         var body = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = Color.White,
+            BackColor = UIHelpers.CardBackground,
             Padding = new Padding(18)
         };
         UIHelpers.SetRoundedRegion(body, 18);
@@ -37,7 +37,7 @@ internal static class StateCardControl
             Text = title,
             AutoSize = true,
             Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
+            ForeColor = UIHelpers.TextPrimaryColor,
             Margin = new Padding(0, 0, 0, 8)
         });
 
@@ -46,7 +46,7 @@ internal static class StateCardControl
             Text = message,
             AutoSize = true,
             MaximumSize = new Size(360, 0),
-            ForeColor = Color.FromArgb(107, 114, 128)
+            ForeColor = UIHelpers.TextSecondaryColor
         });
 
         body.Controls.Add(textLayout);

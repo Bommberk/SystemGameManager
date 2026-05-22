@@ -31,7 +31,7 @@ internal sealed class GameAudioView
     {
         Dock = DockStyle.Fill,
         AutoScroll = true,
-        BackColor = Color.FromArgb(245, 247, 250)
+        BackColor = UIHelpers.WindowBackground
     };
 
     private bool isUpdatingSliders;
@@ -54,16 +54,16 @@ internal sealed class GameAudioView
     {
         var tab = new TabPage("Game-Audio-Manager")
         {
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = UIHelpers.WindowBackground
         };
 
         var layout = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
-            Padding = new Padding(12),
+            Padding = new Padding(18, 16, 18, 18),
             ColumnCount = 1,
             RowCount = 5,
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = UIHelpers.WindowBackground
         };
 
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -89,8 +89,8 @@ internal sealed class GameAudioView
         {
             Text = "Audio-Steuerung für Spiele und Musik",
             AutoSize = true,
-            Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
+            Font = new Font("Segoe UI", 12.5F, FontStyle.Bold),
+            ForeColor = UIHelpers.TextPrimaryColor,
             Anchor = AnchorStyles.Left,
             Margin = new Padding(0, 6, 0, 0)
         };
@@ -118,7 +118,7 @@ internal sealed class GameAudioView
             Text = "Lautstärke für ausgewählte Spiele",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
+            ForeColor = UIHelpers.TextPrimaryColor,
             Margin = new Padding(0, 0, 0, 8)
         };
 
@@ -132,7 +132,7 @@ internal sealed class GameAudioView
         {
             Dock = DockStyle.Top,
             Height = 1,
-            BackColor = Color.FromArgb(221, 227, 237),
+            BackColor = UIHelpers.BorderColor,
             Margin = new Padding(0, 6, 0, 10)
         };
 
@@ -156,7 +156,7 @@ internal sealed class GameAudioView
             Text = "Spiele auswählen",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
+            ForeColor = UIHelpers.TextPrimaryColor,
             Anchor = AnchorStyles.Left | AnchorStyles.Top,
             Margin = new Padding(0, 6, 0, 0)
         };
@@ -373,7 +373,7 @@ internal sealed class GameAudioView
             Text = title,
             AutoSize = true,
             Anchor = AnchorStyles.Left,
-            ForeColor = Color.FromArgb(55, 65, 81),
+            ForeColor = UIHelpers.TextSecondaryColor,
             Margin = new Padding(0, 6, 0, 0)
         }, 0, rowIndex);
 
@@ -383,13 +383,15 @@ internal sealed class GameAudioView
 
     private static Panel CreateSectionPanel()
     {
-        return new Panel()
+        var panel = new Panel()
         {
             Dock = DockStyle.Top,
             AutoSize = true,
             Padding = new Padding(14),
-            BackColor = Color.White
+            BackColor = UIHelpers.CardBackground
         };
+        UIHelpers.SetRoundedRegion(panel, 18);
+        return panel;
     }
 
     private void SetControlsEnabled(bool enabled)
@@ -433,54 +435,28 @@ internal sealed class GameAudioView
             AutoSize = true,
             Anchor = AnchorStyles.Left,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(67, 56, 202),
+            ForeColor = UIHelpers.AccentColor,
             Margin = new Padding(8, 6, 0, 0)
         };
     }
 
     private static Button CreateSaveButton()
     {
-        var button = new Button()
-        {
-            Text = "Save",
-            Width = 100,
-            Height = 34,
-            Anchor = AnchorStyles.Right,
-            FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(37, 99, 235),
-            ForeColor = Color.White,
-            Cursor = Cursors.Hand,
-            Enabled = false,
-            Margin = new Padding(12, 0, 0, 0)
-        };
-
-        button.FlatAppearance.BorderSize = 0;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(29, 78, 216);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(59, 130, 246);
+        var button = UIHelpers.CreatePrimaryButton("Save", 100);
+        button.Anchor = AnchorStyles.Right;
+        button.Enabled = false;
+        button.Margin = new Padding(12, 0, 0, 0);
         return button;
     }
 
     private static Button CreateActionButton(string text)
     {
-        var button = new Button()
-        {
-            Text = text,
-            AutoSize = true,
-            Height = 30,
-            Anchor = AnchorStyles.Right,
-            FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(243, 244, 246),
-            ForeColor = Color.FromArgb(31, 41, 55),
-            Cursor = Cursors.Hand,
-            Enabled = false,
-            Margin = new Padding(6, 0, 0, 0),
-            Padding = new Padding(10, 0, 10, 0)
-        };
-
-        button.FlatAppearance.BorderColor = Color.FromArgb(209, 213, 219);
-        button.FlatAppearance.BorderSize = 1;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(229, 231, 235);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(249, 250, 251);
+        var button = UIHelpers.CreateSecondaryButton(text, 148);
+        button.Height = 30;
+        button.Anchor = AnchorStyles.Right;
+        button.Enabled = false;
+        button.Margin = new Padding(6, 0, 0, 0);
+        button.Padding = new Padding(10, 0, 10, 0);
         return button;
     }
 
@@ -492,7 +468,9 @@ internal sealed class GameAudioView
             Width = 220,
             FlatStyle = FlatStyle.Flat,
             Enabled = false,
-            Margin = new Padding(6, 0, 0, 0)
+            Margin = new Padding(6, 0, 0, 0),
+            BackColor = UIHelpers.SurfaceBackground,
+            ForeColor = UIHelpers.TextPrimaryColor
         };
 
         combo.Items.Add("(Standard-Gerät)");

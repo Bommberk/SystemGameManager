@@ -12,15 +12,15 @@ internal static class GameCardControl
 
         var shell = new HoverShadowPanel()
         {
-            Width = 290,
-            Height = 390,
+            Width = 318,
+            Height = 360,
             Margin = new Padding(0, 0, 18, 18)
         };
 
         var body = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = Color.White,
+            BackColor = UIHelpers.CardBackground,
             Padding = new Padding(14)
         };
         UIHelpers.SetRoundedRegion(body, 18);
@@ -35,7 +35,7 @@ internal static class GameCardControl
             Padding = new Padding(0)
         };
 
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 150));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 164));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -45,7 +45,7 @@ internal static class GameCardControl
         var imageHost = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = Color.FromArgb(236, 240, 248),
+            BackColor = UIHelpers.SurfaceBackground,
             Margin = new Padding(0, 0, 0, 10)
         };
         UIHelpers.SetRoundedRegion(imageHost, 14);
@@ -67,11 +67,11 @@ internal static class GameCardControl
 
         var badge = new Label()
         {
-            Text = "INSTALLIERT",
+            Text = "✓ INSTALLIERT",
             AutoSize = true,
-            BackColor = Color.FromArgb(224, 231, 255),
-            ForeColor = Color.FromArgb(67, 56, 202),
-            Padding = new Padding(8, 4, 8, 4),
+            BackColor = Color.FromArgb(68, 74, 49),
+            ForeColor = UIHelpers.AccentColor,
+            Padding = new Padding(10, 4, 10, 4),
             Font = new Font("Segoe UI", 8F, FontStyle.Bold),
             Margin = new Padding(0, 2, 0, 10)
         };
@@ -83,7 +83,7 @@ internal static class GameCardControl
             AutoSize = false,
             Height = 48,
             Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
+            ForeColor = UIHelpers.TextPrimaryColor,
             Margin = new Padding(0, 0, 0, 8)
         };
 
@@ -92,7 +92,7 @@ internal static class GameCardControl
             Text = "Installationspfad",
             AutoSize = true,
             Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(107, 114, 128),
+            ForeColor = UIHelpers.TextMutedColor,
             Margin = new Padding(0, 0, 0, 4)
         };
 
@@ -103,11 +103,11 @@ internal static class GameCardControl
             AutoSize = false,
             Height = 44,
             AutoEllipsis = true,
-            ForeColor = Color.FromArgb(75, 85, 99),
+            ForeColor = UIHelpers.TextSecondaryColor,
             Margin = new Padding(0, 0, 0, 8)
         };
 
-        var openButton = UIHelpers.CreatePrimaryButton("Ordner öffnen", 120);
+        var openButton = UIHelpers.CreateSecondaryButton("Ordner öffnen", 130);
         openButton.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
         openButton.Margin = new Padding(0);
         openButton.Click += (_, _) => openGameDirectory(game.InstallPath);

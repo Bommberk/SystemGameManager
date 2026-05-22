@@ -12,8 +12,9 @@ internal static class MessageCardControl
             Dock = DockStyle.Top,
             AutoSize = true,
             Padding = new Padding(14),
-            BackColor = Color.White
+            BackColor = UIHelpers.CardBackground
         };
+        UIHelpers.SetRoundedRegion(card, 18);
 
         var layout = new FlowLayoutPanel()
         {
@@ -31,7 +32,7 @@ internal static class MessageCardControl
             Text = title,
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
+            ForeColor = UIHelpers.TextPrimaryColor,
             Margin = new Padding(0, 0, 0, 8)
         });
 
@@ -40,7 +41,7 @@ internal static class MessageCardControl
             Text = message,
             AutoSize = true,
             MaximumSize = new Size(900, 0),
-            ForeColor = Color.FromArgb(107, 114, 128)
+            ForeColor = UIHelpers.TextSecondaryColor
         });
 
         card.Controls.Add(layout);

@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Krassheiten.SystemGameManager.Controller;
 using Krassheiten.SystemGameManager.Service;
 using Krassheiten.SystemGameManager.View;
+using Krassheiten.SystemGameManager.View.Components;
 using System.Text.Json;
 
 namespace Krassheiten.SystemGameManager;
@@ -21,11 +22,12 @@ public class MainForm : Form
     {
         Text = $"System & Game Manager (v{GetVersionFromReleases()})";
         StartPosition = FormStartPosition.CenterScreen;
-        MinimumSize = new Size(980, 640);
-        Width = 1180;
-        Height = 760;
-        BackColor = Color.FromArgb(245, 247, 250);
+        MinimumSize = new Size(1180, 760);
+        Width = 1360;
+        Height = 860;
+        BackColor = UIHelpers.WindowBackground;
         DoubleBuffered = true;
+        Font = new Font("Segoe UI", 9F);
 
         gameViewService = new GameViewService();
         pcInfoView = new PcInfoView();
@@ -37,10 +39,10 @@ public class MainForm : Form
             Dock = DockStyle.Top,
             Height = 60,
             Padding = new Padding(12),
-            BackColor = Color.White
+            BackColor = UIHelpers.SurfaceBackground
         };
 
-        btnLoadInfo = CreatePrimaryButton("Infos laden", 125);
+        btnLoadInfo = UIHelpers.CreatePrimaryButton("Infos laden", 132);
         btnLoadInfo.Dock = DockStyle.Left;
 
         statusLabel = new Label()
@@ -49,14 +51,20 @@ public class MainForm : Form
             Dock = DockStyle.Fill,
             Padding = new Padding(14, 7, 0, 0),
             TextAlign = ContentAlignment.MiddleLeft,
-            ForeColor = Color.FromArgb(55, 65, 81)
+            ForeColor = UIHelpers.TextSecondaryColor
         };
 
         var tabs = new TabControl()
         {
             Dock = DockStyle.Fill,
-            Padding = new Point(18, 8)
+            BackColor = UIHelpers.WindowBackground,
+            Padding = new Point(20, 12),
+            DrawMode = TabDrawMode.OwnerDrawFixed,
+            ItemSize = new Size(180, 40),
+            SizeMode = TabSizeMode.Fixed
         };
+        tabs.DrawItem += (_, e) => DrawTab(tabs, e);
+        tabs.SelectedIndexChanged += (_, _) => tabs.Invalidate();
 
         tabs.TabPages.Add(pcInfoView.CreateTab());
         tabs.TabPages.Add(gameInfoView.CreateTab());
@@ -140,23 +148,35 @@ public class MainForm : Form
             gameViewService.BuildViewData());
     }
 
-    private static Button CreatePrimaryButton(string text, int width)
+    private static void DrawTab(TabControl tabControl, DrawItemEventArgs e)
     {
-        var button = new Button()
-        {
-            Text = text,
-            Width = width,
-            Height = 34,
-            FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(79, 70, 229),
-            ForeColor = Color.White,
-            Cursor = Cursors.Hand
-        };
+        var page = tabControl.TabPages[e.Index];
+        var bounds = e.Bounds;
+        bool isSelected = e.Index == tabControl.SelectedIndex;
 
-        button.FlatAppearance.BorderSize = 0;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(67, 56, 202);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(99, 102, 241);
-        return button;
+        using var backgroundBrush = new SolidBrush(UIHelpers.SurfaceBackground);
+        e.Graphics.FillRectangle(backgroundBrush, bounds);
+
+        var textBounds = Rectangle.Inflate(bounds, -10, -2);
+        using var textFont = new Font("Segoe UI", 10F, isSelected ? FontStyle.Bold : FontStyle.Regular);
+        TextRenderer.DrawText(
+            e.Graphics,
+            page.Text,
+            textFont,
+            textBounds,
+            isSelected ? UIHelpers.TextPrimaryColor : UIHelpers.TextSecondaryColor,
+            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+
+        using var borderPen = new Pen(UIHelpers.BorderColor);
+        e.Graphics.DrawLine(borderPen, bounds.Left, bounds.Bottom - 1, bounds.Right, bounds.Bottom - 1);
+
+        if (!isSelected)
+        {
+            return;
+        }
+
+        using var accentBrush = new SolidBrush(UIHelpers.AccentColor);
+        e.Graphics.FillRectangle(accentBrush, bounds.Left + 12, bounds.Bottom - 3, bounds.Width - 24, 3);
     }
 
     private static string GetVersionFromReleases()

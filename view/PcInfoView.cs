@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using Krassheiten.SystemGameManager.Controller;
+using Krassheiten.SystemGameManager.View.Components;
 
 namespace Krassheiten.SystemGameManager.View;
 
@@ -13,16 +14,27 @@ internal sealed class PcInfoView
     {
         var tab = new TabPage("SystemManager")
         {
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = UIHelpers.WindowBackground
         };
 
         var wrapper = new Panel()
         {
             Dock = DockStyle.Fill,
-            Padding = new Padding(10)
+            Padding = new Padding(18, 16, 18, 18),
+            BackColor = UIHelpers.WindowBackground
         };
 
-        wrapper.Controls.Add(systemOutput);
+        var card = new Panel()
+        {
+            Dock = DockStyle.Fill,
+            Padding = new Padding(1),
+            BackColor = UIHelpers.BorderColor
+        };
+        UIHelpers.SetRoundedRegion(card, 20);
+
+        systemOutput.BorderStyle = BorderStyle.None;
+        card.Controls.Add(systemOutput);
+        wrapper.Controls.Add(card);
         tab.Controls.Add(wrapper);
         return tab;
     }
@@ -84,10 +96,10 @@ internal sealed class PcInfoView
             ReadOnly = true,
             Dock = DockStyle.Fill,
             Font = new Font("Consolas", 10F),
-            BackColor = Color.White,
-            ForeColor = Color.FromArgb(31, 41, 55),
+            BackColor = UIHelpers.SurfaceBackground,
+            ForeColor = UIHelpers.TextPrimaryColor,
             WordWrap = false,
-            BorderStyle = BorderStyle.FixedSingle
+            BorderStyle = BorderStyle.None
         };
     }
 

@@ -44,7 +44,7 @@ internal sealed class HoverShadowPanel : Panel
 
         var cardBounds = new Rectangle(6, 6, Width - 22, Height - 22);
         var layers = IsHovered ? 6 : 3;
-        var baseAlpha = IsHovered ? 18 : 8;
+        var baseAlpha = IsHovered ? 16 : 7;
 
         for (var layer = layers; layer >= 1; layer--)
         {
@@ -55,7 +55,7 @@ internal sealed class HoverShadowPanel : Panel
                 Math.Max(1, cardBounds.Height));
 
             using var path = UIHelpers.CreateRoundedRectanglePath(shadowBounds, 18);
-            using var brush = new SolidBrush(Color.FromArgb(baseAlpha + (layer * 5), 15, 23, 42));
+            using var brush = new SolidBrush(Color.FromArgb(baseAlpha + (layer * 4), 0, 0, 0));
             e.Graphics.FillPath(brush, path);
         }
     }
@@ -65,7 +65,7 @@ internal sealed class HoverShadowPanel : Panel
         void SetState(bool hovered)
         {
             shell.IsHovered = hovered;
-            body.BackColor = hovered ? Color.FromArgb(245, 247, 255) : Color.White;
+            body.BackColor = hovered ? UIHelpers.CardHoverBackground : UIHelpers.CardBackground;
         }
 
         void EnterHandler(object? sender, EventArgs e) => SetState(true);

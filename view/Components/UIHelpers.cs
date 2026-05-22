@@ -6,6 +6,18 @@ namespace Krassheiten.SystemGameManager.View.Components;
 
 internal static class UIHelpers
 {
+    public static Color WindowBackground => Color.FromArgb(22, 24, 23);
+    public static Color SurfaceBackground => Color.FromArgb(30, 33, 31);
+    public static Color CardBackground => Color.FromArgb(36, 39, 37);
+    public static Color CardHoverBackground => Color.FromArgb(46, 51, 47);
+    public static Color BorderColor => Color.FromArgb(64, 69, 64);
+    public static Color AccentColor => Color.FromArgb(163, 176, 94);
+    public static Color AccentPressedColor => Color.FromArgb(128, 140, 69);
+    public static Color AccentHoverColor => Color.FromArgb(182, 195, 108);
+    public static Color TextPrimaryColor => Color.FromArgb(242, 243, 237);
+    public static Color TextSecondaryColor => Color.FromArgb(184, 189, 176);
+    public static Color TextMutedColor => Color.FromArgb(136, 142, 131);
+
     public static Button CreatePrimaryButton(string text, int width)
     {
         var button = new Button()
@@ -14,15 +26,46 @@ internal static class UIHelpers
             Width = width,
             Height = 34,
             FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(79, 70, 229),
-            ForeColor = Color.White,
             Cursor = Cursors.Hand
         };
 
-        button.FlatAppearance.BorderSize = 0;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(67, 56, 202);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(99, 102, 241);
+        ApplyPrimaryButtonStyle(button);
         return button;
+    }
+
+    public static Button CreateSecondaryButton(string text, int width)
+    {
+        var button = new Button()
+        {
+            Text = text,
+            Width = width,
+            Height = 34,
+            FlatStyle = FlatStyle.Flat,
+            Cursor = Cursors.Hand
+        };
+
+        ApplySecondaryButtonStyle(button);
+        return button;
+    }
+
+    public static void ApplyPrimaryButtonStyle(Button button)
+    {
+        button.BackColor = AccentColor;
+        button.ForeColor = Color.FromArgb(35, 40, 24);
+        button.FlatAppearance.BorderColor = AccentColor;
+        button.FlatAppearance.BorderSize = 0;
+        button.FlatAppearance.MouseDownBackColor = AccentPressedColor;
+        button.FlatAppearance.MouseOverBackColor = AccentHoverColor;
+    }
+
+    public static void ApplySecondaryButtonStyle(Button button)
+    {
+        button.BackColor = SurfaceBackground;
+        button.ForeColor = TextPrimaryColor;
+        button.FlatAppearance.BorderColor = BorderColor;
+        button.FlatAppearance.BorderSize = 1;
+        button.FlatAppearance.MouseDownBackColor = CardBackground;
+        button.FlatAppearance.MouseOverBackColor = CardHoverBackground;
     }
 
     public static void SetRoundedRegion(Control control, int radius)
