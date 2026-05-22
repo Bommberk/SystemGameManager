@@ -69,7 +69,7 @@ internal static class GameCardControl
         {
             Text = "✓ INSTALLIERT",
             AutoSize = true,
-            BackColor = Color.FromArgb(68, 74, 49),
+            BackColor = UIHelpers.AccentBadgeBackground,
             ForeColor = UIHelpers.AccentColor,
             Padding = new Padding(10, 4, 10, 4),
             Font = new Font("Segoe UI", 8F, FontStyle.Bold),

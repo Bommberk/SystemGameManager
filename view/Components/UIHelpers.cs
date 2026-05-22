@@ -14,6 +14,7 @@ internal static class UIHelpers
     public static Color AccentColor => Color.FromArgb(163, 176, 94);
     public static Color AccentPressedColor => Color.FromArgb(128, 140, 69);
     public static Color AccentHoverColor => Color.FromArgb(182, 195, 108);
+    public static Color AccentBadgeBackground => Color.FromArgb(68, 74, 49);
     public static Color TextPrimaryColor => Color.FromArgb(242, 243, 237);
     public static Color TextSecondaryColor => Color.FromArgb(184, 189, 176);
     public static Color TextMutedColor => Color.FromArgb(136, 142, 131);
