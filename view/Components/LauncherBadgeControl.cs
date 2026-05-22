@@ -12,7 +12,7 @@ internal static class LauncherBadgeControl
             AutoSize = true,
             Margin = new Padding(0, 0, 10, 10),
             Padding = new Padding(1),
-            BackColor = Color.FromArgb(221, 227, 237)
+            BackColor = ColorThemes.GetCardBackgroundColor()
         };
 
         var body = new FlowLayoutPanel()
@@ -20,7 +20,7 @@ internal static class LauncherBadgeControl
             AutoSize = true,
             FlowDirection = FlowDirection.TopDown,
             WrapContents = false,
-            BackColor = Color.White,
+            BackColor = ColorThemes.GetCardBackgroundColor(),
             Padding = new Padding(12),
             Margin = new Padding(0)
         };
@@ -30,7 +30,7 @@ internal static class LauncherBadgeControl
             Text = title,
             AutoSize = true,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55)
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
         });
 
         body.Controls.Add(new Label
@@ -38,7 +38,7 @@ internal static class LauncherBadgeControl
             Text = subtitle,
             AutoSize = true,
             MaximumSize = new Size(280, 0),
-            ForeColor = Color.FromArgb(107, 114, 128)
+            ForeColor = ColorThemes.GetSecondaryTextColor()
         });
 
         shell.Controls.Add(body);

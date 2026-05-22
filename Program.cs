@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using Velopack;
 using System.Threading.Tasks;
 using SystemGameManager.Service;
+using SystemGameManager.View;
 
 internal static class Program
 {

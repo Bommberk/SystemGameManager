@@ -20,7 +20,7 @@ internal static class GameCardControl
         var body = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = Color.White,
+            BackColor = ColorThemes.GetCardBackgroundColor(),
             Padding = new Padding(14)
         };
         UIHelpers.SetRoundedRegion(body, 18);
@@ -45,7 +45,7 @@ internal static class GameCardControl
         var imageHost = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = Color.FromArgb(236, 240, 248),
+            BackColor = ColorThemes.GetSecondaryBackgroundColor(),
             Margin = new Padding(0, 0, 0, 10)
         };
         UIHelpers.SetRoundedRegion(imageHost, 14);
@@ -69,8 +69,8 @@ internal static class GameCardControl
         {
             Text = "INSTALLIERT",
             AutoSize = true,
-            BackColor = Color.FromArgb(224, 231, 255),
-            ForeColor = Color.FromArgb(67, 56, 202),
+            BackColor = ColorThemes.GetSecondaryBackgroundColor(),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Padding = new Padding(8, 4, 8, 4),
             Font = new Font("Segoe UI", 8F, FontStyle.Bold),
             Margin = new Padding(0, 2, 0, 10)
@@ -83,7 +83,7 @@ internal static class GameCardControl
             AutoSize = false,
             Height = 48,
             Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(0, 0, 0, 8)
         };
 
@@ -92,7 +92,7 @@ internal static class GameCardControl
             Text = "Installationspfad",
             AutoSize = true,
             Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(107, 114, 128),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 0, 0, 4)
         };
 
@@ -103,7 +103,7 @@ internal static class GameCardControl
             AutoSize = false,
             Height = 44,
             AutoEllipsis = true,
-            ForeColor = Color.FromArgb(75, 85, 99),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 0, 0, 8)
         };
 

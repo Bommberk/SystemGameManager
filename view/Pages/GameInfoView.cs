@@ -26,14 +26,14 @@ internal sealed class GameInfoView
         WrapContents = true,
         Margin = new Padding(0),
         Padding = new Padding(0, 8, 12, 12),
-        BackColor = Color.FromArgb(245, 247, 250)
+        BackColor = ColorThemes.GetPrimaryBackgroundColor()
     };
 
     private readonly Label gameManagerSummaryLabel = new()
     {
         Text = "Noch keine Daten geladen.",
         AutoSize = true,
-        ForeColor = Color.FromArgb(224, 231, 255),
+        ForeColor = ColorThemes.GetSecondaryTextColor(),
         Font = new Font("Segoe UI", 10F, FontStyle.Bold),
         Margin = new Padding(0, 4, 0, 0)
     };
@@ -48,7 +48,7 @@ internal sealed class GameInfoView
     {
         var tab = new TabPage("Game-Manager")
         {
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = ColorThemes.GetPrimaryBackgroundColor()
         };
 
         var layout = new TableLayoutPanel()
@@ -57,7 +57,7 @@ internal sealed class GameInfoView
             Padding = new Padding(12),
             ColumnCount = 1,
             RowCount = 5,
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = ColorThemes.GetPrimaryBackgroundColor()
         };
 
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 118));
@@ -69,7 +69,7 @@ internal sealed class GameInfoView
         var heroPanel = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = Color.FromArgb(30, 41, 59),
+            BackColor = ColorThemes.GetCardBackgroundColor(),
             Padding = new Padding(18),
             Margin = new Padding(0, 0, 0, 12)
         };
@@ -79,7 +79,7 @@ internal sealed class GameInfoView
             Text = "Game Library",
             AutoSize = true,
             Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-            ForeColor = Color.White,
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(0)
         };
 
@@ -87,7 +87,7 @@ internal sealed class GameInfoView
         {
             Text = "Launcher, Spiele und schnelle Aktionen auf einen Blick.",
             AutoSize = true,
-            ForeColor = Color.FromArgb(209, 213, 219),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 6, 0, 0)
         };
 
@@ -111,7 +111,7 @@ internal sealed class GameInfoView
             Text = "Launcher",
             AutoSize = true,
             Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(0, 0, 0, 8)
         };
 
@@ -120,7 +120,7 @@ internal sealed class GameInfoView
             Text = "Installierte Spiele",
             AutoSize = true,
             Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(0, 6, 0, 6)
         };
 

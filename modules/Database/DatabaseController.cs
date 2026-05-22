@@ -50,8 +50,8 @@ class DatabaseController
 
     protected static SqliteConnection GetSqlConnection()
     {
-        const string dbFile = "database/systemgamemanager.db";
-        const string templateFile = "database/template-systemgamemanager.db";
+        const string dbFile = "modules/database/systemgamemanager.db";
+        const string templateFile = "modules/database/template-systemgamemanager.db";
 
         lock (_dbInitLock)
         {

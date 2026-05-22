@@ -1,4 +1,4 @@
-namespace SystemGameManager;
+namespace SystemGameManager.View;
 
 using System.Drawing;
 using System.Windows.Forms;
@@ -6,8 +6,9 @@ using SystemGameManager.Games.Controller;
 using SystemGameManager.Games.Service;
 using SystemGameManager.Pc.Controller;
 using SystemGameManager.Service;
-using SystemGameManager.View;
+using SystemGameManager.View.Service;
 using System.Text.Json;
+using SystemGameManager.View.Components;
 
 public class MainForm : Form
 {
@@ -26,12 +27,12 @@ public class MainForm : Form
         MinimumSize = new Size(980, 640);
         Width = 1180;
         Height = 760;
-        BackColor = Color.FromArgb(245, 247, 250);
+        BackColor = ColorThemes.GetPrimaryBackgroundColor();
         DoubleBuffered = true;
 
         gameViewService = new GameViewService();
         pcInfoView = new PcInfoView();
-        gameInfoView = new GameInfoView(gameViewService.Artwork, OpenGameDirectory);
+        gameInfoView = new GameInfoView(gameViewService.Artwork, ViewService.OpenGameDirectory);
         gameAudioView = new GameAudioView();
 
         var toolbar = new Panel()
@@ -39,10 +40,10 @@ public class MainForm : Form
             Dock = DockStyle.Top,
             Height = 60,
             Padding = new Padding(12),
-            BackColor = Color.White
+            BackColor = ColorThemes.GetPrimaryBackgroundColor()
         };
 
-        btnLoadInfo = CreatePrimaryButton("Infos laden", 125);
+        btnLoadInfo = UIHelpers.CreatePrimaryButton("Infos laden", 125);
         btnLoadInfo.Dock = DockStyle.Left;
 
         statusLabel = new Label()
@@ -51,7 +52,7 @@ public class MainForm : Form
             Dock = DockStyle.Fill,
             Padding = new Padding(14, 7, 0, 0),
             TextAlign = ContentAlignment.MiddleLeft,
-            ForeColor = Color.FromArgb(55, 65, 81)
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
         };
 
         var tabs = new TabControl()
@@ -124,13 +125,6 @@ public class MainForm : Form
         }
     }
 
-    private void OpenGameDirectory(string path)
-    {
-        if (!gameViewService.TryOpenDirectory(path, out var errorMessage))
-        {
-            MessageBox.Show(errorMessage, "Hinweis", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-    }
 
     private MainViewData BuildViewData()
     {
@@ -140,25 +134,6 @@ public class MainForm : Form
         return new MainViewData(
             pcInfoView.BuildSystemText(pcInfo),
             gameViewService.BuildViewData());
-    }
-
-    private static Button CreatePrimaryButton(string text, int width)
-    {
-        var button = new Button()
-        {
-            Text = text,
-            Width = width,
-            Height = 34,
-            FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(79, 70, 229),
-            ForeColor = Color.White,
-            Cursor = Cursors.Hand
-        };
-
-        button.FlatAppearance.BorderSize = 0;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(67, 56, 202);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(99, 102, 241);
-        return button;
     }
 
     private sealed record MainViewData(string SystemText, GameViewService.GameManagerViewData GameManager);

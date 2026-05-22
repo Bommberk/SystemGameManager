@@ -31,7 +31,7 @@
     <None Update="assets\game\knownLaunchers.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="database/systemgamemanager.db">
+    <None Update="modules\database\systemgamemanager.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

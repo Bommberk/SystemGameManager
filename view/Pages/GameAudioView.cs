@@ -31,7 +31,7 @@ internal sealed class GameAudioView
     {
         Dock = DockStyle.Fill,
         AutoScroll = true,
-        BackColor = Color.FromArgb(245, 247, 250)
+        BackColor = ColorThemes.GetPrimaryBackgroundColor()
     };
 
     private bool isUpdatingSliders;
@@ -54,7 +54,7 @@ internal sealed class GameAudioView
     {
         var tab = new TabPage("Game-Audio-Manager")
         {
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = ColorThemes.GetPrimaryBackgroundColor()
         };
 
         var layout = new TableLayoutPanel()
@@ -63,7 +63,7 @@ internal sealed class GameAudioView
             Padding = new Padding(12),
             ColumnCount = 1,
             RowCount = 5,
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = ColorThemes.GetPrimaryBackgroundColor()
         };
 
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -90,7 +90,7 @@ internal sealed class GameAudioView
             Text = "Audio-Steuerung für Spiele und Musik",
             AutoSize = true,
             Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Anchor = AnchorStyles.Left,
             Margin = new Padding(0, 6, 0, 0)
         };
@@ -118,7 +118,7 @@ internal sealed class GameAudioView
             Text = "Lautstärke für ausgewählte Spiele",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(0, 0, 0, 8)
         };
 
@@ -132,7 +132,7 @@ internal sealed class GameAudioView
         {
             Dock = DockStyle.Top,
             Height = 1,
-            BackColor = Color.FromArgb(221, 227, 237),
+            BackColor = ColorThemes.GetSecondaryBackgroundColor(),
             Margin = new Padding(0, 6, 0, 10)
         };
 
@@ -156,7 +156,7 @@ internal sealed class GameAudioView
             Text = "Spiele auswählen",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(31, 41, 55),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Anchor = AnchorStyles.Left | AnchorStyles.Top,
             Margin = new Padding(0, 6, 0, 0)
         };
@@ -373,7 +373,7 @@ internal sealed class GameAudioView
             Text = title,
             AutoSize = true,
             Anchor = AnchorStyles.Left,
-            ForeColor = Color.FromArgb(55, 65, 81),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 6, 0, 0)
         }, 0, rowIndex);
 
@@ -388,7 +388,7 @@ internal sealed class GameAudioView
             Dock = DockStyle.Top,
             AutoSize = true,
             Padding = new Padding(14),
-            BackColor = Color.White
+            BackColor = ColorThemes.GetCardBackgroundColor()
         };
     }
 
@@ -433,7 +433,7 @@ internal sealed class GameAudioView
             AutoSize = true,
             Anchor = AnchorStyles.Left,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(67, 56, 202),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(8, 6, 0, 0)
         };
     }
@@ -447,16 +447,16 @@ internal sealed class GameAudioView
             Height = 34,
             Anchor = AnchorStyles.Right,
             FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(37, 99, 235),
-            ForeColor = Color.White,
+            BackColor = ColorThemes.GetSecondaryBackgroundColor(),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Cursor = Cursors.Hand,
             Enabled = false,
             Margin = new Padding(12, 0, 0, 0)
         };
 
         button.FlatAppearance.BorderSize = 0;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(29, 78, 216);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(59, 130, 246);
+        button.FlatAppearance.MouseDownBackColor = ColorThemes.CurrentTheme.GetHoveredColor(button.BackColor);
+        button.FlatAppearance.MouseOverBackColor = ColorThemes.CurrentTheme.GetHoveredColor(button.BackColor);
         return button;
     }
 
@@ -469,18 +469,18 @@ internal sealed class GameAudioView
             Height = 30,
             Anchor = AnchorStyles.Right,
             FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(243, 244, 246),
-            ForeColor = Color.FromArgb(31, 41, 55),
+            BackColor = ColorThemes.GetSecondaryBackgroundColor(),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Cursor = Cursors.Hand,
             Enabled = false,
             Margin = new Padding(6, 0, 0, 0),
             Padding = new Padding(10, 0, 10, 0)
         };
 
-        button.FlatAppearance.BorderColor = Color.FromArgb(209, 213, 219);
+        button.FlatAppearance.BorderColor = ColorThemes.GetSecondaryBackgroundColor();
         button.FlatAppearance.BorderSize = 1;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(229, 231, 235);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(249, 250, 251);
+        button.FlatAppearance.MouseDownBackColor = ColorThemes.CurrentTheme.GetHoveredColor(button.BackColor);
+        button.FlatAppearance.MouseOverBackColor = ColorThemes.CurrentTheme.GetHoveredColor(button.BackColor);
         return button;
     }
 
@@ -494,6 +494,9 @@ internal sealed class GameAudioView
             Enabled = false,
             Margin = new Padding(6, 0, 0, 0)
         };
+
+        combo.BackColor = ColorThemes.GetSecondaryBackgroundColor();
+        combo.ForeColor = ColorThemes.GetPrimaryTextColor();
 
         combo.Items.Add("(Standard-Gerät)");
         foreach (var deviceName in GameAudioCardControl.GetAudioOutputDeviceNames())

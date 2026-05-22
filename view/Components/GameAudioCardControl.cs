@@ -14,7 +14,7 @@ internal static class GameAudioCardControl
             Dock = DockStyle.Top,
             AutoSize = true,
             Padding = new Padding(14),
-            BackColor = Color.White,
+            BackColor = ColorThemes.GetCardBackgroundColor(),
             Margin = new Padding(0, 0, 0, 12)
         };
 
@@ -48,7 +48,7 @@ internal static class GameAudioCardControl
             Text = game.Name,
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(17, 24, 39),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(0, 0, 0, 4)
         };
 
@@ -56,7 +56,7 @@ internal static class GameAudioCardControl
         {
             Text = string.IsNullOrWhiteSpace(game.InstallFolderPath) ? "Pfad nicht verfügbar" : game.InstallFolderPath,
             AutoSize = true,
-            ForeColor = Color.FromArgb(107, 114, 128),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 0, 0, 4)
         };
 
@@ -65,7 +65,7 @@ internal static class GameAudioCardControl
             Text = $"Game: {game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT}%  |  Music: {game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT}%",
             AutoSize = true,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(67, 56, 202),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(0, 0, 0, 0)
         };
 
@@ -84,7 +84,7 @@ internal static class GameAudioCardControl
             Text = "Audioausgabe:",
             AutoSize = true,
             Anchor = AnchorStyles.Left,
-            ForeColor = Color.FromArgb(55, 65, 81),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 4, 8, 0)
         };
 
@@ -93,7 +93,7 @@ internal static class GameAudioCardControl
             Text = game.AudioOutputDevice ?? "(Standard-Gerät)",
             AutoSize = true,
             Anchor = AnchorStyles.Left,
-            ForeColor = Color.FromArgb(55, 65, 81),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 4, 0, 0)
         };
 

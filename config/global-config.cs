@@ -17,7 +17,7 @@ public class AppConfig
 
 public class DatabaseConfig
 {
-    public string ConnectionString { get; set; } = "Data Source=database/systemgamemanager.db";
+    public string ConnectionString { get; set; } = "Data Source=modules/database/systemgamemanager.db";
     public bool BackupEnabled { get; set; } = true;
 }
 

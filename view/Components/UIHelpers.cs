@@ -14,14 +14,14 @@ internal static class UIHelpers
             Width = width,
             Height = 34,
             FlatStyle = FlatStyle.Flat,
-            BackColor = Color.FromArgb(79, 70, 229),
-            ForeColor = Color.White,
+            BackColor = ColorThemes.GetSecondaryBackgroundColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Cursor = Cursors.Hand
         };
 
         button.FlatAppearance.BorderSize = 0;
-        button.FlatAppearance.MouseDownBackColor = Color.FromArgb(67, 56, 202);
-        button.FlatAppearance.MouseOverBackColor = Color.FromArgb(99, 102, 241);
+        button.FlatAppearance.MouseDownBackColor = ColorThemes.CurrentTheme.GetHoveredColor(button.BackColor);
+        button.FlatAppearance.MouseOverBackColor = ColorThemes.CurrentTheme.GetHoveredColor(button.BackColor);
         return button;
     }
 
@@ -55,5 +55,28 @@ internal static class UIHelpers
         path.CloseFigure();
 
         return path;
+    }
+
+    public static Color Darker(Color color, float factor)
+    {
+        factor = Math.Clamp(factor, 0f, 1f);
+
+        return Color.FromArgb(
+            color.A,
+            (int)(color.R * factor),
+            (int)(color.G * factor),
+            (int)(color.B * factor)
+        );
+    }
+    public static Color Lighter(Color color, float factor)
+    {
+        factor = Math.Clamp(factor, 0f, 1f);
+
+        return Color.FromArgb(
+            color.A,
+            (int)(color.R + (255 - color.R) * factor),
+            (int)(color.G + (255 - color.G) * factor),
+            (int)(color.B + (255 - color.B) * factor)
+        );
     }
 }

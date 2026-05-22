@@ -67,7 +67,7 @@ internal sealed class HoverShadowPanel : Panel
         void SetState(bool hovered)
         {
             shell.IsHovered = hovered;
-            body.BackColor = hovered ? Color.FromArgb(245, 247, 255) : Color.White;
+            body.BackColor = hovered ? ColorThemes.CurrentTheme.GetHoveredColor(ColorThemes.GetCardBackgroundColor()) : ColorThemes.GetCardBackgroundColor();
         }
 
         void EnterHandler(object? sender, EventArgs e) => SetState(true);

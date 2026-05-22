@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using SystemGameManager.Pc.Controller;
+using SystemGameManager.View.Components;
 
 internal sealed class PcInfoView
 {
@@ -13,7 +14,7 @@ internal sealed class PcInfoView
     {
         var tab = new TabPage("SystemManager")
         {
-            BackColor = Color.FromArgb(245, 247, 250)
+            BackColor = ColorThemes.GetPrimaryBackgroundColor()
         };
 
         var wrapper = new Panel()
@@ -84,8 +85,8 @@ internal sealed class PcInfoView
             ReadOnly = true,
             Dock = DockStyle.Fill,
             Font = new Font("Consolas", 10F),
-            BackColor = Color.White,
-            ForeColor = Color.FromArgb(31, 41, 55),
+            BackColor = ColorThemes.GetPrimaryBackgroundColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             WordWrap = false,
             BorderStyle = BorderStyle.FixedSingle
         };
