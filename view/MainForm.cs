@@ -1,6 +1,7 @@
 namespace SystemGameManager.View;
 
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using SystemGameManager.Games.Controller;
 using SystemGameManager.Games.Service;
@@ -12,6 +13,11 @@ using SystemGameManager.View.Components;
 
 public class MainForm : Form
 {
+    private const int DwmwaUseImmersiveDarkMode = 20;
+    private const int DwmwaUseImmersiveDarkModeBefore20H1 = 19;
+    private const int DwmwaBorderColor = 34;
+    private const int DwmwaCaptionColor = 35;
+
     private readonly Button btnLoadInfo;
     private readonly Label statusLabel;
     private readonly GameViewService gameViewService;
@@ -55,7 +61,7 @@ public class MainForm : Form
             ForeColor = ColorThemes.GetPrimaryTextColor(),
         };
 
-        var tabs = new TabControl()
+        var tabs = new ThemedTabControl()
         {
             Dock = DockStyle.Fill,
             Padding = new Point(18, 8)
@@ -77,6 +83,12 @@ public class MainForm : Form
         pcInfoView.ShowLoadingState();
         gameInfoView.ShowLoadingState();
         gameAudioView.ShowLoadingState();
+    }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        ApplyDarkWindowChrome();
     }
 
     protected override void Dispose(bool disposing)
@@ -135,6 +147,29 @@ public class MainForm : Form
             pcInfoView.BuildSystemText(pcInfo),
             gameViewService.BuildViewData());
     }
+
+    private void ApplyDarkWindowChrome()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        int darkModeEnabled = 1;
+        _ = DwmSetWindowAttribute(Handle, DwmwaUseImmersiveDarkMode, ref darkModeEnabled, sizeof(int));
+        _ = DwmSetWindowAttribute(Handle, DwmwaUseImmersiveDarkModeBefore20H1, ref darkModeEnabled, sizeof(int));
+
+        int captionColor = ToColorRef(ColorThemes.GetPrimaryBackgroundColor());
+        int borderColor = ToColorRef(ColorThemes.GetCardBackgroundColor());
+
+        _ = DwmSetWindowAttribute(Handle, DwmwaCaptionColor, ref captionColor, sizeof(int));
+        _ = DwmSetWindowAttribute(Handle, DwmwaBorderColor, ref borderColor, sizeof(int));
+    }
+
+    private static int ToColorRef(Color color) => color.R | (color.G << 8) | (color.B << 16);
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
 
     private sealed record MainViewData(string SystemText, GameViewService.GameManagerViewData GameManager);
 }
