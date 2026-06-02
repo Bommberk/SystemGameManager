@@ -6,7 +6,6 @@
         "StdInstallPath": "C:\\Program Files (x86)\\Steam\\steam.exe",
         "InstallPath": "",
         "StdGameFoldersPath": "steamapps\\common",
-        "GameFolderPath": [],
         "StdLibraryFilePath": "steamapps\\libraryfolders.vdf"
     },
     {
@@ -24,7 +23,7 @@
         "StdInstallPath": "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe",
         "InstallPath": "",
         "StdGameFoldersPath": "Games",
-        "GameFolderPath": []
+        "GameFolderPath": "C:\\ProgramData\\"
     },
     {
         "Name": "Ubisoft Connect",
@@ -40,6 +39,7 @@
         "SearchName": "ea app",
         "DirectRegistryKey": "SOFTWARE\\WOW6432Node\\EA Games",
         "StdInstallPath": "C:\\Program Files\\Electronic Arts\\EA Desktop\\EA Desktop\\EADesktop.exe",
+        "ProgramData": "C:\\ProgramData\\EA Desktop",
         "InstallPath": "",
         "StdGameFoldersPath": "EA Games",
         "GameFolderPath": []

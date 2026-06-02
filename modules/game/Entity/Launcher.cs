@@ -20,11 +20,11 @@ class Launcher
         public string StdInstallPath { get; set; }
         public string InstallPath { get; set; }
         public string StdGameFoldersPath { get; set; }
-        public string[] GameFolderPath { get; set; }
+        public string? GameFolderPath { get; set; }
         public string? StdLibraryFilePath { get; set; }
         public string? DirectRegistryKey { get; set; }
 
-        public Record(string name, string searchName, string stdInstallPath, string installPath, string stdGameFoldersPath, string[] gameFolderPath, string? stdLibraryFilePath = null, string? directRegistryKey = null)
+        public Record(string name, string searchName, string stdInstallPath, string installPath, string stdGameFoldersPath, string? gameFolderPath = null, string? stdLibraryFilePath = null, string? directRegistryKey = null)
         {
             Name = name;
             SearchName = searchName;
