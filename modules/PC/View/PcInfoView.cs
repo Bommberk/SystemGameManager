@@ -1,4 +1,4 @@
-namespace SystemGameManager.View;
+namespace SystemGameManager.Pc.View;
 
 using System.Drawing;
 using System.Text;

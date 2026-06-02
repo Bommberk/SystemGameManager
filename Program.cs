@@ -64,7 +64,7 @@ internal static class Program
     private static void GetInfoAsync()
     {
         var dbController = new DatabaseController();
-        var pcInfo = new PcInfoController();
+        // var pcInfo = new PcInfoController();
         var gameInfo = new GameInfoController();
         // var gameAudio = new GameAudioController();
         writeHeadline();
