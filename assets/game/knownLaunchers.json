@@ -23,7 +23,7 @@
         "StdInstallPath": "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe",
         "InstallPath": "",
         "StdGameFoldersPath": "Games",
-        "GameFolderPath": "C:\\ProgramData\\"
+        "GameFolderPath": []
     },
     {
         "Name": "Ubisoft Connect",

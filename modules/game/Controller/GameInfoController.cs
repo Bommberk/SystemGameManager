@@ -43,7 +43,7 @@ class GameInfoController
             {
                 Console.WriteLine($"- {launcher.Name}:");
                 Console.WriteLine($"  -> Installationspfad: {launcher.InstallPath}");
-                Console.WriteLine($"  -> Spielordnerpfade: {string.Join(", ", launcher.GameFolderPath)}");
+                Console.WriteLine($"  -> Spielordnerpfade: {string.Join(", ", launcher.GameFolderPath ?? Array.Empty<string>())}");
             }
         }
         else
