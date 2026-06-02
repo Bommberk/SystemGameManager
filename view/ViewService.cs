@@ -1,6 +1,7 @@
 namespace SystemGameManager.View.Service;
 
 using SystemGameManager.Games.Service;
+using System.Drawing.Drawing2D;
 
 class ViewService
 {
@@ -52,5 +53,19 @@ class ViewService
         }
 
         return "Dark"; // Default to dark theme if detection fails
+    }
+
+    public static void MakeRoundedPanel(Panel panel, int radius)
+    {
+        GraphicsPath path = new GraphicsPath();
+
+        path.AddArc(0, 0, radius, radius, 180, 90);
+        path.AddArc(panel.Width - radius, 0, radius, radius, 270, 90);
+        path.AddArc(panel.Width - radius, panel.Height - radius, radius, radius, 0, 90);
+        path.AddArc(0, panel.Height - radius, radius, radius, 90, 90);
+
+        path.CloseFigure();
+
+        panel.Region = new Region(path);
     }
 }

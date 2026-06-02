@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using SystemGameManager.Games.Controller;
 using SystemGameManager.Games.Service;
-using SystemGameManager.Service;
 using SystemGameManager.View.Service;
 using SystemGameManager.View.Components;
 
@@ -16,6 +15,7 @@ public class MainForm : Form
     private readonly GameInfoView gameInfoView;
     private readonly GameAudioView gameAudioView;
     private GameAudioController? gameAudioController;
+    private readonly ViewService viewService = new ViewService();
 
     public MainForm()
     {
@@ -52,7 +52,7 @@ public class MainForm : Form
         };
         containerWrapper.Controls.Add(container);
         this.Controls.Add(containerWrapper);
-        
+
 
         gameViewService = new GameViewService();
         gameInfoView = new GameInfoView(gameViewService.Artwork, ViewService.OpenGameDirectory);
@@ -63,7 +63,7 @@ public class MainForm : Form
             Dock = DockStyle.Top,
             Height = 60,
             Padding = new Padding(12),
-            BackColor = ColorThemes.GetPrimaryBackgroundColor()
+            BackColor = Color.Transparent
         };
 
         btnLoadInfo = UIHelpers.CreatePrimaryButton("Infos laden", 125);
@@ -77,7 +77,15 @@ public class MainForm : Form
             TextAlign = ContentAlignment.MiddleLeft,
             ForeColor = ColorThemes.GetPrimaryTextColor(),
         };
+        
+        btnLoadInfo.Click += BtnLoadInfo_Click;
+        Shown += async (_, _) => await LoadInfoAsync();
 
+        toolbar.Controls.Add(statusLabel);
+        toolbar.Controls.Add(btnLoadInfo);
+        container.Controls.Add(toolbar);
+
+        return;
 
         var tabs = new ThemedTabControl()
         {
@@ -88,15 +96,7 @@ public class MainForm : Form
         tabs.TabPages.Add(gameInfoView.CreateTab());
         tabs.TabPages.Add(gameAudioView.CreateTab());
 
-        btnLoadInfo.Click += BtnLoadInfo_Click;
-        Shown += async (_, _) => await LoadInfoAsync();
-
-        toolbar.Controls.Add(statusLabel);
-        toolbar.Controls.Add(btnLoadInfo);
-
         Controls.Add(tabs);
-        Controls.Add(toolbar);
-
         gameInfoView.ShowLoadingState();
         gameAudioView.ShowLoadingState();
     }
