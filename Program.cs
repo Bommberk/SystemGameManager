@@ -18,7 +18,6 @@ internal static class Program
     [STAThread]
     private static async Task Main(string[] args)
     {
-
         VelopackApp.Build().Run();
         await new Updater().AutoUpdate();
 
