@@ -7,7 +7,7 @@ using SystemGameManager.Games.Service;
 using SystemGameManager.View.Service;
 using SystemGameManager.View.Components;
 using SystemGameManager.View.Elements;
-using System.Drawing.Printing;
+using SystemGameManager.View.Pages;
 
 public class MainForm : Form
 {
@@ -20,7 +20,7 @@ public class MainForm : Form
     private readonly ViewService viewService = new ViewService();
     private readonly Navbar navbar = new Navbar(); 
     private readonly Header header = new Header();
-    protected readonly Panel container;
+    public static Panel container;
 
     public MainForm()
     {
@@ -29,7 +29,7 @@ public class MainForm : Form
         MinimumSize = new Size(980, 640);
         Width = 1180;
         Height = 760;
-        BackColor = ColorThemes.GetPrimaryBackgroundColor();
+        BackColor = ColorThemes.GetPrimaryBackgroundColor(); 
         DoubleBuffered = true;
 
         var body = new Panel()
@@ -42,7 +42,7 @@ public class MainForm : Form
         header.RenderHeader(body);
         this.Controls.Add(body);
 
-        var container = new Panel()
+        container = new Panel()
         {
             Dock = DockStyle.Fill,
             Padding = new Padding(60, 0, 0, 0),
@@ -50,15 +50,10 @@ public class MainForm : Form
         };
         body.Controls.Add(container);
 
-        var page = new Panel()
-        {
-            Dock = DockStyle.Fill,
-            Padding = new Padding(20,20,20,20),
-            BackColor = Color.Transparent
-        };
-        container.Controls.Add(page);
+        new MenuPage().CreatePageInput();
 
-        new Menu().RenderPage(page);
+
+
 
         return;
         

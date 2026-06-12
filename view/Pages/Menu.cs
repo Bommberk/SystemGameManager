@@ -1,11 +1,11 @@
-namespace SystemGameManager.View;
+namespace SystemGameManager.View.Pages;
 
 using System.Drawing;
 using SystemGameManager.View.Components;
 
-class Menu
+class MenuPage : Page
 {
-    public void RenderPage(Panel container)
+    public void CreatePageInput()
     {
         var text = new Label()
         {
@@ -14,6 +14,6 @@ class Menu
             Font = new Font("Segoe UI", 18, FontStyle.Bold),
             ForeColor = ColorThemes.GetPrimaryTextColor(),
         };
-        container.Controls.Add(text);
+        page.Controls.Add(text);
     }
 }

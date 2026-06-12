@@ -1,4 +1,4 @@
-namespace SystemGameManager.View;
+namespace SystemGameManager.View.Pages;
 
 class Settings
 {
