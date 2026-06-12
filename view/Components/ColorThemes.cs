@@ -2,7 +2,7 @@ namespace SystemGameManager.View.Components;
 
 using ViewService = SystemGameManager.View.Service.ViewService;
 
-class ColorThemes
+public class ColorThemes
 {
     public static ITheme CurrentTheme {get;}
     static ColorThemes()

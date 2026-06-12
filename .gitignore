@@ -3,7 +3,7 @@ obj
 .vscode
 temp-build-check
 Output
-modules/database/systemgamemanager.db
+modules/Database/systemgamemanager.db
 publishnewversion.ps1
 releases/*.nupkg
 releases/*.zip

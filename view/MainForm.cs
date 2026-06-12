@@ -6,6 +6,8 @@ using SystemGameManager.Games.Controller;
 using SystemGameManager.Games.Service;
 using SystemGameManager.View.Service;
 using SystemGameManager.View.Components;
+using SystemGameManager.View.Elements;
+using System.Drawing.Printing;
 
 public class MainForm : Form
 {
@@ -16,6 +18,9 @@ public class MainForm : Form
     private readonly GameAudioView gameAudioView;
     private GameAudioController? gameAudioController;
     private readonly ViewService viewService = new ViewService();
+    private readonly Navbar navbar = new Navbar(); 
+    private readonly Header header = new Header();
+    protected readonly Panel container;
 
     public MainForm()
     {
@@ -26,64 +31,67 @@ public class MainForm : Form
         Height = 760;
         BackColor = ColorThemes.GetPrimaryBackgroundColor();
         DoubleBuffered = true;
-        
-        Color test = ColorThemes.GetSecondaryBackgroundColor();
 
-        var sideBar = new Panel()
-        {
-            Dock = DockStyle.Left,
-            Width = 60,
-            Padding = new Padding(12),
-            BackColor = ColorThemes.GetSecondaryBackgroundColor()
-        };
-        this.Controls.Add(sideBar);
-
-        var containerWrapper = new Panel()
+        var body = new Panel()
         {
             Dock = DockStyle.Fill,
-            Padding = new Padding(60+20, 20, 20, 20),
+            Padding = new Padding(0),
             BackColor = Color.Transparent
         };
+        navbar.RenderNavbar(body);
+        header.RenderHeader(body);
+        this.Controls.Add(body);
 
         var container = new Panel()
         {
             Dock = DockStyle.Fill,
-            BackColor = ColorThemes.GetPrimaryBackgroundColor()
-        };
-        containerWrapper.Controls.Add(container);
-        this.Controls.Add(containerWrapper);
-
-
-        gameViewService = new GameViewService();
-        gameInfoView = new GameInfoView(gameViewService.Artwork, ViewService.OpenGameDirectory);
-        gameAudioView = new GameAudioView();
-
-        var toolbar = new Panel()
-        {
-            Dock = DockStyle.Top,
-            Height = 60,
-            Padding = new Padding(12),
+            Padding = new Padding(60, 0, 0, 0),
             BackColor = Color.Transparent
         };
+        body.Controls.Add(container);
 
-        btnLoadInfo = UIHelpers.CreatePrimaryButton("Infos laden", 125);
-        btnLoadInfo.Dock = DockStyle.Left;
-
-        statusLabel = new Label()
+        var page = new Panel()
         {
-            Text = "Bereit",
             Dock = DockStyle.Fill,
-            Padding = new Padding(14, 7, 0, 0),
-            TextAlign = ContentAlignment.MiddleLeft,
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            Padding = new Padding(20,20,20,20),
+            BackColor = Color.Transparent
         };
-        
-        btnLoadInfo.Click += BtnLoadInfo_Click;
-        Shown += async (_, _) => await LoadInfoAsync();
+        container.Controls.Add(page);
 
-        toolbar.Controls.Add(statusLabel);
-        toolbar.Controls.Add(btnLoadInfo);
-        container.Controls.Add(toolbar);
+        new Menu().RenderPage(page);
+
+        return;
+        
+        // gameViewService = new GameViewService();
+        // gameInfoView = new GameInfoView(gameViewService.Artwork, ViewService.OpenGameDirectory);
+        // gameAudioView = new GameAudioView();
+
+        // var toolbar = new Panel()
+        // {
+        //     Dock = DockStyle.Top,
+        //     Height = 60,
+        //     Padding = new Padding(12),
+        //     BackColor = Color.Transparent
+        // };
+
+        // btnLoadInfo = UIHelpers.CreatePrimaryButton("Infos laden", 125);
+        // btnLoadInfo.Dock = DockStyle.Left;
+
+        // statusLabel = new Label()
+        // {
+        //     Text = "Bereit",
+        //     Dock = DockStyle.Fill,
+        //     Padding = new Padding(14, 7, 0, 0),
+        //     TextAlign = ContentAlignment.MiddleLeft,
+        //     ForeColor = ColorThemes.GetPrimaryTextColor(),
+        // };
+        
+        // btnLoadInfo.Click += BtnLoadInfo_Click;
+        // Shown += async (_, _) => await LoadInfoAsync();
+
+        // toolbar.Controls.Add(statusLabel);
+        // toolbar.Controls.Add(btnLoadInfo);
+        // container.Controls.Add(toolbar);
 
         return;
 
@@ -96,7 +104,7 @@ public class MainForm : Form
         tabs.TabPages.Add(gameInfoView.CreateTab());
         tabs.TabPages.Add(gameAudioView.CreateTab());
 
-        Controls.Add(tabs);
+        container.Controls.Add(tabs);
         gameInfoView.ShowLoadingState();
         gameAudioView.ShowLoadingState();
     }
