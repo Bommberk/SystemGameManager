@@ -2,10 +2,40 @@ namespace SystemGameManager.View.Components;
 
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Windows.Forms;
+using Svg;
 
 internal static class UIHelpers
 {
+    public static Image LoadIcon(string path, Size? targetSize = null)
+    {
+        var extension = Path.GetExtension(path);
+
+        if (string.Equals(extension, ".svg", StringComparison.OrdinalIgnoreCase))
+        {
+            var size = targetSize ?? new Size(24, 24);
+            var svgDocument = SvgDocument.Open(path);
+            ChangeNavbarMenuIconColor(svgDocument);
+            return svgDocument.Draw(size.Width, size.Height);
+        }
+
+        using var image = Image.FromFile(path);
+        if (targetSize is null)
+        {
+            return new Bitmap(image);
+        }
+
+        return new Bitmap(image, targetSize.Value);
+    }
+    private static void ChangeNavbarMenuIconColor(SvgDocument svg)
+    {
+        foreach (var element in svg.Descendants().OfType<SvgVisualElement>())
+        {
+            element.Fill = new SvgColourServer(ColorThemes.GetSecondaryTextColor());
+        }
+    }
+
     public static Button CreatePrimaryButton(string text, int width)
     {
         var button = new Button()

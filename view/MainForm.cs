@@ -20,7 +20,7 @@ public class MainForm : Form
     private readonly ViewService viewService = new ViewService();
     private readonly Navbar navbar = new Navbar(); 
     private readonly Header header = new Header();
-    public static Panel container;
+    public static Panel container = new Panel();
 
     public MainForm()
     {
@@ -50,7 +50,7 @@ public class MainForm : Form
         };
         body.Controls.Add(container);
 
-        new MenuPage().CreatePageInput();
+        new MenuPage(navbar);
 
 
 
