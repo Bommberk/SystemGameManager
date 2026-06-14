@@ -11,14 +11,14 @@ using SystemGameManager.View.Pages;
 
 public class MainForm : Form
 {
-    private readonly Button btnLoadInfo;
-    private readonly Label statusLabel;
-    private readonly GameViewService gameViewService;
+    private readonly Button btnLoadInfo = new Button();
+    private readonly Label statusLabel = new Label();
+    private readonly GameViewService gameViewService = new GameViewService();
     private readonly GameInfoView gameInfoView;
-    private readonly GameAudioView gameAudioView;
+    private readonly GameAudioView gameAudioView = new GameAudioView();
     private GameAudioController? gameAudioController;
     private readonly ViewService viewService = new ViewService();
-    private readonly Navbar navbar = new Navbar(); 
+    public static Navbar navbar = new Navbar(); 
     private readonly Header header = new Header();
     public static Panel container = new Panel();
 
@@ -50,7 +50,10 @@ public class MainForm : Form
         };
         body.Controls.Add(container);
 
-        new MenuPage(navbar);
+        new GameManager();
+        new MenuPage();
+        new Settings();
+        new Info();
 
 
 

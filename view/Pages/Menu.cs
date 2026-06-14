@@ -6,15 +6,12 @@ using SystemGameManager.View.Elements;
 
 class MenuPage : Page
 {
-    private const string MENUPAGE_ICON_PATH = "assets/icons/house-solid-full.svg";
-    private const string MENUPAGE_TEXT = "Home";
+    private const string TAB_ICON_PATH = "assets/icons/house-solid-full.svg";
+    private const string TAB_TEXT = "Home";
+    private const string PAGE_TITLE = "Willkommen zum System & Game Manager";
 
-    public MenuPage(Navbar navbar)
+    public MenuPage() : base(TAB_TEXT, TAB_ICON_PATH, "center")
     {
-        SetTabTitle(MENUPAGE_TEXT);
-        SetTabIconPath(MENUPAGE_ICON_PATH);
-        SetNavbar(navbar);
-        CreateNavTab();
         CreatePageInput();
     }
 
@@ -22,7 +19,7 @@ class MenuPage : Page
     {
         var text = new Label()
         {
-            Text = "Willkommen zum System & Game Manager!",
+            Text = PAGE_TITLE,
             Dock = DockStyle.Fill,
             Font = new Font("Segoe UI", 18, FontStyle.Bold),
             ForeColor = ColorThemes.GetPrimaryTextColor(),

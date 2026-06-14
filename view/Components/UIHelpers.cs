@@ -36,6 +36,19 @@ internal static class UIHelpers
         }
     }
 
+    public static Panel ItemContainer(Padding padding, Control child)
+    {
+        var panel = new Panel()
+        {
+            Dock = DockStyle.Top,
+            Height = child.Height + padding.Vertical,
+            Padding = padding,
+            BackColor = Color.Transparent
+        };
+        panel.Controls.Add(child);
+        return panel;
+    }
+
     public static Button CreatePrimaryButton(string text, int width)
     {
         var button = new Button()

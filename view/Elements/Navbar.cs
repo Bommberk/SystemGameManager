@@ -4,7 +4,7 @@ using SystemGameManager.View.Components;
 using System.Windows.Forms;
 using Svg;
 
-class Navbar
+public class Navbar
 {
     public Panel navbar = new Panel();
     private Panel topNavigation = new Panel();
@@ -57,8 +57,8 @@ class Navbar
         bottomNavigation = new Panel()
         {
             Dock = DockStyle.Bottom,
-            Height = 60,
-            BackColor = Color.Blue
+            Height = 100,
+            BackColor = Color.Transparent
         };
         this.navbar.Controls.Add(bottomNavigation);
     }
