@@ -7,7 +7,7 @@ using SystemGameManager.View.Elements;
 class Page
 {
     private Panel container;
-    protected Panel page;
+    public Panel page;
     private string? tabText;
     private string? tabIconPath;
     protected Navbar Navbar = new Navbar();

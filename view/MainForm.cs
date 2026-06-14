@@ -51,9 +51,11 @@ public class MainForm : Form
         body.Controls.Add(container);
 
         new GameManager();
-        new MenuPage();
+        var menuPage = new MenuPage();
         new Settings();
         new Info();
+
+        menuPage.page.BringToFront();
 
 
 

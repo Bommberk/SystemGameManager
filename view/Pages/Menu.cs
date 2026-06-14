@@ -8,7 +8,7 @@ class MenuPage : Page
 {
     private const string TAB_ICON_PATH = "assets/icons/house-solid-full.svg";
     private const string TAB_TEXT = "Home";
-    private const string PAGE_TITLE = "Willkommen zum System & Game Manager";
+    private const string PAGE_TITLE = "Willkommen zum SystemGameManager";
 
     public MenuPage() : base(TAB_TEXT, TAB_ICON_PATH, "center")
     {
