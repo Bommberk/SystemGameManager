@@ -32,10 +32,10 @@ internal sealed class GameManager : Page
     };
 
     // Audio controls
-    private readonly TrackBar gameSlider = CreateSlider(100);
-    private readonly TrackBar musicSlider = CreateSlider(50);
-    private readonly Label gameValueLabel = CreateValueLabel(100);
-    private readonly Label musicValueLabel = CreateValueLabel(50);
+    private readonly TrackBar gameSlider = CreateSlider(Game.GAME_VOLUME_PERCENT);
+    private readonly TrackBar musicSlider = CreateSlider(Game.MUSIC_VOLUME_PERCENT);
+    private readonly Label gameValueLabel = CreateValueLabel(Game.GAME_VOLUME_PERCENT);
+    private readonly Label musicValueLabel = CreateValueLabel(Game.MUSIC_VOLUME_PERCENT);
     private readonly Button saveButton = CreateSaveButton();
     private readonly Button selectAllButton = CreateActionButton("Alle auswählen");
     private readonly Button toggleSelectionButton = CreateActionButton("Auswahl umkehren");
@@ -539,8 +539,8 @@ internal sealed class GameManager : Page
         isUpdatingSliders = true;
         try
         {
-            gameSlider.Value = GetAverageValue(snapshot.Select(g => g.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT), 100);
-            musicSlider.Value = GetAverageValue(snapshot.Select(g => g.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT), 50);
+            gameSlider.Value = GetAverageValue(snapshot.Select(g => g.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT), Game.GAME_VOLUME_PERCENT);
+            musicSlider.Value = GetAverageValue(snapshot.Select(g => g.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT), Game.MUSIC_VOLUME_PERCENT);
             UpdateValueLabel(gameValueLabel, gameSlider.Value);
             UpdateValueLabel(musicValueLabel, musicSlider.Value);
         }
