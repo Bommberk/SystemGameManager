@@ -57,10 +57,16 @@ internal sealed class GameAudioView
             BackColor = UIHelpers.WindowBackground
         };
 
+        tab.Controls.Add(CreateContent(new Padding(18, 16, 18, 18)));
+        return tab;
+    }
+
+    public Control CreateContent(Padding? padding = null)
+    {
         var layout = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
-            Padding = new Padding(18, 16, 18, 18),
+            Padding = padding ?? Padding.Empty,
             ColumnCount = 1,
             RowCount = 5,
             BackColor = UIHelpers.WindowBackground
@@ -172,8 +178,7 @@ internal sealed class GameAudioView
         layout.Controls.Add(listHeader, 0, 3);
         layout.Controls.Add(gameListHost, 0, 4);
 
-        tab.Controls.Add(layout);
-        return tab;
+        return layout;
     }
 
     public void ShowLoadingState()

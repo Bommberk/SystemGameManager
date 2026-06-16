@@ -9,6 +9,7 @@ internal sealed class GameInfoView
 {
     private readonly Image? artwork;
     private readonly Action<string> openGameDirectory;
+    private readonly GameAudioView gameAudioView;
     private readonly FlowLayoutPanel launcherPanel = new()
     {
         Dock = DockStyle.Top,
@@ -38,10 +39,11 @@ internal sealed class GameInfoView
         Margin = new Padding(0, 4, 0, 0)
     };
 
-    public GameInfoView(Image? artwork, Action<string> openGameDirectory)
+    public GameInfoView(Image? artwork, Action<string> openGameDirectory, GameAudioView gameAudioView)
     {
         this.artwork = artwork;
         this.openGameDirectory = openGameDirectory;
+        this.gameAudioView = gameAudioView;
     }
 
     public TabPage CreateTab()
@@ -56,11 +58,12 @@ internal sealed class GameInfoView
             Dock = DockStyle.Fill,
             Padding = new Padding(18, 16, 18, 18),
             ColumnCount = 1,
-            RowCount = 5,
+            RowCount = 6,
             BackColor = UIHelpers.WindowBackground
         };
 
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 118));
+        layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -156,11 +159,15 @@ internal sealed class GameInfoView
             Margin = new Padding(0, 10, 0, 8)
         };
 
+        var audioPanel = gameAudioView.CreateContent(new Padding(0));
+        audioPanel.Margin = new Padding(0, 0, 0, 8);
+
         layout.Controls.Add(heroPanel, 0, 0);
         layout.Controls.Add(launcherTitle, 0, 1);
         layout.Controls.Add(launcherPanel, 0, 2);
-        layout.Controls.Add(gamesTitle, 0, 3);
-        layout.Controls.Add(gameCardsPanel, 0, 4);
+        layout.Controls.Add(audioPanel, 0, 3);
+        layout.Controls.Add(gamesTitle, 0, 4);
+        layout.Controls.Add(gameCardsPanel, 0, 5);
 
         tab.Controls.Add(layout);
         return tab;

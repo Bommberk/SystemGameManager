@@ -32,8 +32,8 @@ public class MainForm : Form
 
         gameViewService = new GameViewService();
         pcInfoView = new PcInfoView();
-        gameInfoView = new GameInfoView(gameViewService.Artwork, OpenGameDirectory);
         gameAudioView = new GameAudioView();
+        gameInfoView = new GameInfoView(gameViewService.Artwork, OpenGameDirectory, gameAudioView);
 
         var root = new TableLayoutPanel()
         {
@@ -129,7 +129,6 @@ public class MainForm : Form
 
         tabs.TabPages.Add(pcInfoView.CreateTab());
         tabs.TabPages.Add(gameInfoView.CreateTab());
-        tabs.TabPages.Add(gameAudioView.CreateTab());
 
         btnLoadInfo.Click += BtnLoadInfo_Click;
         Shown += async (_, _) => await LoadInfoAsync();
