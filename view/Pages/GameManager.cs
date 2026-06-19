@@ -77,29 +77,7 @@ class GameManager : Page
 
     private void CreateLauncherSection()
     {
-        var section = new FlowLayoutPanel()
-        {
-            Dock = DockStyle.Top,
-            AutoSize = true,
-            FlowDirection = FlowDirection.TopDown,
-            WrapContents = false,
-            Margin = new Padding(0, 0, 0, 12),
-        };
-        var sectionTitlePanel = new Panel()
-        {
-            Dock = DockStyle.Top,
-            AutoSize = true,
-        };
-        var sectionTitle = new Label()
-        {
-            Text = "Launcher",
-            AutoSize = true,
-            Font = new Font("Segoe UI", 12, FontStyle.Bold),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
-        };
-        sectionTitlePanel.Controls.Add(sectionTitle);
-        // Sectiontitlepanel als dropdown deklarieren
-        section.Controls.Add(sectionTitlePanel);
+        var section = GetNewSection("Launcher");
         // Launcher hinzufügen
         var launchers = gameViewService.GetInstalledLauncher();
         var launcherSection = new FlowLayoutPanel()
@@ -109,7 +87,6 @@ class GameManager : Page
             FlowDirection = FlowDirection.LeftToRight,
             WrapContents = true,
         };
-        section.Controls.Add(launcherSection);
         foreach (var launcher in launchers)
         {
             var launcherCard = CardControls.GetRoundedCardPanel(8);
@@ -142,17 +119,114 @@ class GameManager : Page
             launcherCard.Controls.Add(launcherTextContentPanel);
             launcherSection.Controls.Add(launcherCard);
         }
-        CardControls.GetDropDownCard(section);
+        section.Controls.Add(launcherSection);
         page.Controls.Add(section);
     }
 
     private void CreateAudioSettingsSection()
     {
-        var section = CardControls.GetRoundedCardPanel(5);
-        section = CardControls.GetDropDownCard(section);
+        var section = GetNewSection("Audio Einstellungen");
+        
     }
     private void CreateGameOverviewSection()
     {
-        
+        var section = GetNewSection("Spiele");
+        // Spiele hinzufügen
+        var games = gameViewService.GetInstalledGames();
+        var gameSection = new FlowLayoutPanel()
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = true,
+        };
+        foreach (var game in games)
+        {
+            var gameCard = CardControls.GetRoundedCardPanel(8);
+            gameCard.AutoSize = false;
+            gameCard.Size = new Size(301, 287);
+            gameCard.Margin = new Padding(5);
+            gameCard.FlowDirection = FlowDirection.TopDown;
+            var gameWallpaper = new PictureBox()
+            {
+                Image = Image.FromFile(game.GameImage ?? "assets/bild.jpg"),
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Size = new Size(280, 158),
+                BackColor = ColorThemes.GetSecondaryBackgroundColor(),
+                Margin = new Padding(0, 0, 0, 10),
+            };
+            var gameName = new Label()
+            {
+                Text = game.Name,
+                AutoSize = true,
+                MaximumSize = new Size(280, 0),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = ColorThemes.GetPrimaryTextColor(),
+                Margin = new Padding(0, 0, 0, 5),
+            };
+            var gamePlayTime = new Label()
+            {
+                Text = $"Playtime: Nicht erkannt", // Placeholder, da Playtime-erkennung kommt erst mit smarthome update/integration
+                AutoSize = true,
+                MaximumSize = new Size(280, 0),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = ColorThemes.GetPrimaryTextColor(),
+            };
+            var gameInstallPathTitle = new Label()
+            {
+                Text = "Installpath:",
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = ColorThemes.GetPrimaryTextColor(),
+            };
+            var gameInstallPath = new Label()
+            {
+                Text = game.ExePath,
+                AutoSize = true,
+                MaximumSize = new Size(280, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = ColorThemes.GetSecondaryTextColor(),
+            };
+            var openGameDirectoryButton = new NormalButton()
+            {
+                Text = "Ordner öffnen",
+                AutoSize = true,
+            };
+            gameCard.Controls.Add(gameWallpaper);
+            gameCard.Controls.Add(gameName);
+            gameCard.Controls.Add(gamePlayTime);
+            gameCard.Controls.Add(gameInstallPathTitle);
+            gameCard.Controls.Add(gameInstallPath);
+            gameCard.Controls.Add(openGameDirectoryButton);
+            gameSection.Controls.Add(gameCard);
+        }
+        section.Controls.Add(gameSection);
+        page.Controls.Add(section);
+    }
+    private FlowLayoutPanel GetNewSection(string title)
+    {
+        var section = new FlowLayoutPanel()
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            FlowDirection = FlowDirection.TopDown,
+            WrapContents = false,
+            Margin = new Padding(0, 0, 0, 12),
+        };
+        var sectionTitlePanel = new Panel()
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+        };
+        var sectionTitle = new Label()
+        {
+            Text = title,
+            AutoSize = true,
+            Font = new Font("Segoe UI", 12, FontStyle.Bold),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
+        };
+        sectionTitlePanel.Controls.Add(sectionTitle);
+        section.Controls.Add(sectionTitlePanel);
+        return section;
     }
 }

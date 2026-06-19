@@ -6,7 +6,7 @@ class CardControls
     {
         
     }
-    public static FlowLayoutPanel GetRoundedCardPanel(int radius)
+    public static FlowLayoutPanel GetRoundedCardPanel(int radius, bool isBoxShadow = false, bool isDropDown = false)
     {
         var panel = new FlowLayoutPanel()
         {
@@ -18,10 +18,19 @@ class CardControls
             Padding = new Padding(10),
             BackColor = ColorThemes.GetCardBackgroundColor(),
         };
+        if(isBoxShadow)
+        {
+            SetBoxShadow(panel);
+        }
+
         UIHelpers.SetRoundedRegion(panel, radius);
+        if(isDropDown)
+        {
+            GetDropDownCard(panel);
+        }
         return panel;
     }
-    public static FlowLayoutPanel GetDropDownCard(FlowLayoutPanel card)
+    private static FlowLayoutPanel GetDropDownCard(FlowLayoutPanel card)
     {
         var dropDownArrow = new PictureBox()
         {
@@ -34,6 +43,16 @@ class CardControls
         dropDownArrow.Click += (_, _) => ToggleCardDropDown(card, dropDownArrow);
         card.Controls.Add(dropDownArrow);
         return card;
+    }
+    private static void SetBoxShadow(FlowLayoutPanel card)
+    {
+        var shadowPanel = new HoverShadowPanel()
+        {
+            Dock = DockStyle.Fill,
+            IsHovered = false,
+        };
+        card.Controls.Add(shadowPanel);
+        shadowPanel.SendToBack();
     }
     private static void ToggleCardDropDown(FlowLayoutPanel card, PictureBox arrow)
     {
