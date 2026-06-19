@@ -24,14 +24,14 @@ class ViewService
         return "Unknown";
     }
 
-    public static void OpenGameDirectory(string path)
-    {
-        var gameViewService = new GameViewService();
-        if (!gameViewService.TryOpenDirectory(path, out var errorMessage))
-        {
-            MessageBox.Show(errorMessage, "Hinweis", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-    }
+    // public static void OpenGameDirectory(string path)
+    // {
+    //     var gameViewService = new GameViewService();
+    //     if (!gameViewService.TryOpenDirectory(path, out var errorMessage))
+    //     {
+    //         MessageBox.Show(errorMessage, "Hinweis", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    //     }
+    // }
 
     public static string GetSystemTheme()
     {

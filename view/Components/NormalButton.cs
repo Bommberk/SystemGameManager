@@ -9,7 +9,7 @@ class NormalButton : Button
         Dock = DockStyle.Fill;
         FlatStyle = FlatStyle.Flat;
         BackColor = ColorThemes.GetSecondaryBackgroundColor();
-        ForeColor = ColorThemes.GetSecondaryTextColor();
+        ForeColor = ColorThemes.GetPrimaryTextColor();
         Cursor = Cursors.Hand;
         TabStop = false;
 

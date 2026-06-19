@@ -90,7 +90,7 @@ internal sealed class GameAudioView
             Text = "Audio-Steuerung für Spiele und Musik",
             AutoSize = true,
             Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Anchor = AnchorStyles.Left,
             Margin = new Padding(0, 6, 0, 0)
         };
@@ -118,7 +118,7 @@ internal sealed class GameAudioView
             Text = "Lautstärke für ausgewählte Spiele",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 0, 0, 8)
         };
 
@@ -156,7 +156,7 @@ internal sealed class GameAudioView
             Text = "Spiele auswählen",
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Anchor = AnchorStyles.Left | AnchorStyles.Top,
             Margin = new Padding(0, 6, 0, 0)
         };
@@ -448,7 +448,7 @@ internal sealed class GameAudioView
             Anchor = AnchorStyles.Right,
             FlatStyle = FlatStyle.Flat,
             BackColor = ColorThemes.GetSecondaryBackgroundColor(),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Cursor = Cursors.Hand,
             Enabled = false,
             Margin = new Padding(12, 0, 0, 0)
@@ -470,7 +470,7 @@ internal sealed class GameAudioView
             Anchor = AnchorStyles.Right,
             FlatStyle = FlatStyle.Flat,
             BackColor = ColorThemes.GetSecondaryBackgroundColor(),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Cursor = Cursors.Hand,
             Enabled = false,
             Margin = new Padding(6, 0, 0, 0),
@@ -496,7 +496,7 @@ internal sealed class GameAudioView
         };
 
         combo.BackColor = ColorThemes.GetSecondaryBackgroundColor();
-        combo.ForeColor = ColorThemes.GetPrimaryTextColor();
+        combo.ForeColor = ColorThemes.GetSecondaryTextColor();
 
         combo.Items.Add("(Standard-Gerät)");
         foreach (var deviceName in GameAudioCardControl.GetAudioOutputDeviceNames())

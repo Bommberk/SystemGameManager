@@ -22,7 +22,7 @@ class MenuPage : Page
             Text = PAGE_TITLE,
             Dock = DockStyle.Fill,
             Font = new Font("Segoe UI", 18, FontStyle.Bold),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
         };
         page.Controls.Add(text);
     }

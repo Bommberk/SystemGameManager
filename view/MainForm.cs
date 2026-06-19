@@ -14,7 +14,7 @@ public class MainForm : Form
     private readonly Button btnLoadInfo = new Button();
     private readonly Label statusLabel = new Label();
     private readonly GameViewService gameViewService = new GameViewService();
-    private readonly GameInfoView gameInfoView;
+    // private readonly GameInfoView gameInfoView;
     private readonly GameAudioView gameAudioView = new GameAudioView();
     private GameAudioController? gameAudioController;
     private readonly ViewService viewService = new ViewService();
@@ -55,7 +55,7 @@ public class MainForm : Form
         new Settings();
         new Info();
 
-        menuPage.page.BringToFront();
+        // menuPage.page.BringToFront();
 
 
 
@@ -83,7 +83,7 @@ public class MainForm : Form
         //     Dock = DockStyle.Fill,
         //     Padding = new Padding(14, 7, 0, 0),
         //     TextAlign = ContentAlignment.MiddleLeft,
-        //     ForeColor = ColorThemes.GetPrimaryTextColor(),
+        //     ForeColor = ColorThemes.GetSecondaryTextColor(),
         // };
         
         // btnLoadInfo.Click += BtnLoadInfo_Click;
@@ -95,59 +95,59 @@ public class MainForm : Form
 
         return;
 
-        var tabs = new ThemedTabControl()
-        {
-            Dock = DockStyle.Fill,
-            Padding = new Point(18, 8)
-        };
+        // var tabs = new ThemedTabControl()
+        // {
+        //     Dock = DockStyle.Fill,
+        //     Padding = new Point(18, 8)
+        // };
 
-        tabs.TabPages.Add(gameInfoView.CreateTab());
-        tabs.TabPages.Add(gameAudioView.CreateTab());
+        // tabs.TabPages.Add(gameInfoView.CreateTab());
+        // tabs.TabPages.Add(gameAudioView.CreateTab());
 
-        container.Controls.Add(tabs);
-        gameInfoView.ShowLoadingState();
-        gameAudioView.ShowLoadingState();
+        // container.Controls.Add(tabs);
+        // gameInfoView.ShowLoadingState();
+        // gameAudioView.ShowLoadingState();
     }
 
-    private async void BtnLoadInfo_Click(object? sender, EventArgs e)
-    {
-        await LoadInfoAsync();
-    }
+    // private async void BtnLoadInfo_Click(object? sender, EventArgs e)
+    // {
+    //     await LoadInfoAsync();
+    // }
 
-    private async Task LoadInfoAsync()
-    {
-        btnLoadInfo.Enabled = false;
-        statusLabel.Text = "Lade Informationen...";
-        gameInfoView.ShowLoadingState();
-        gameAudioView.ShowLoadingState();
+    // private async Task LoadInfoAsync()
+    // {
+    //     btnLoadInfo.Enabled = false;
+    //     statusLabel.Text = "Lade Informationen...";
+    //     gameInfoView.ShowLoadingState();
+    //     gameAudioView.ShowLoadingState();
 
-        try
-        {
-            var viewData = await Task.Run(BuildViewData);
-            gameInfoView.Populate(viewData.GameManager);
-            gameAudioView.RefreshGames();
-            gameAudioController ??= new GameAudioController();
-            statusLabel.Text = "Informationen geladen.";
-        }
-        catch (Exception ex)
-        {
-            gameInfoView.ShowErrorState(ex.Message);
-            gameAudioView.ShowErrorState(ex.Message);
-            statusLabel.Text = "Fehler beim Laden.";
-        }
-        finally
-        {
-            btnLoadInfo.Enabled = true;
-        }
-    }
+    //     try
+    //     {
+    //         var viewData = await Task.Run(BuildViewData);
+    //         gameInfoView.Populate(viewData.GameManager);
+    //         gameAudioView.RefreshGames();
+    //         gameAudioController ??= new GameAudioController();
+    //         statusLabel.Text = "Informationen geladen.";
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         gameInfoView.ShowErrorState(ex.Message);
+    //         gameAudioView.ShowErrorState(ex.Message);
+    //         statusLabel.Text = "Fehler beim Laden.";
+    //     }
+    //     finally
+    //     {
+    //         btnLoadInfo.Enabled = true;
+    //     }
+    // }
 
 
-    private MainViewData BuildViewData()
-    {
-        _ = new GameInfoController();
+    // private MainViewData BuildViewData()
+    // {
+    //     _ = new GameInfoController();
 
-        return new MainViewData(gameViewService.BuildViewData());
-    }
+    //     return new MainViewData(gameViewService.BuildViewData());
+    // }
 
-    private sealed record MainViewData(GameViewService.GameManagerViewData GameManager);
+    // private sealed record MainViewData(GameViewService.GameManagerViewData GameManager);
 }

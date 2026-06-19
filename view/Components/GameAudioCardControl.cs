@@ -48,7 +48,7 @@ internal static class GameAudioCardControl
             Text = game.Name,
             AutoSize = true,
             Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 0, 0, 4)
         };
 
@@ -65,7 +65,7 @@ internal static class GameAudioCardControl
             Text = $"Game: {game.GameVolumePercent ?? Game.GAME_VOLUME_PERCENT}%  |  Music: {game.MusicVolumePercent ?? Game.MUSIC_VOLUME_PERCENT}%",
             AutoSize = true,
             Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-            ForeColor = ColorThemes.GetPrimaryTextColor(),
+            ForeColor = ColorThemes.GetSecondaryTextColor(),
             Margin = new Padding(0, 0, 0, 0)
         };
 

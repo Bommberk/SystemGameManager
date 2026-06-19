@@ -32,7 +32,7 @@ internal static class UIHelpers
     {
         foreach (var element in svg.Descendants().OfType<SvgVisualElement>())
         {
-            element.Fill = new SvgColourServer(ColorThemes.GetSecondaryTextColor());
+            element.Fill = new SvgColourServer(ColorThemes.GetPrimaryTextColor());
         }
     }
 

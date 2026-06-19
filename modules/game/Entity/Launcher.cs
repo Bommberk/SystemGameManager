@@ -42,4 +42,9 @@ class Launcher
         var databaseController = new DatabaseController();
         databaseController.ShowTable(TABLE_NAME);
     }
+    public static Record[]? GetLaunchers()
+    {
+        var databaseController = new DatabaseController();
+        return databaseController.GetDatabaseService().GetTableRecords<Record>(TABLE_NAME);
+    }
 }

@@ -7,7 +7,7 @@ using SystemGameManager.View.Elements;
 class Page
 {
     private Panel container;
-    public Panel page;
+    public TableLayoutPanel page;
     private string? tabText;
     private string? tabIconPath;
     protected Navbar Navbar = new Navbar();
@@ -41,11 +41,12 @@ class Page
         };
     }
 
-    protected Panel SetPagePanel()
+    protected TableLayoutPanel SetPagePanel()
     {
-        var page = new Panel()
+        var page = new TableLayoutPanel()
         {
             Dock = DockStyle.Fill,
+            AutoScroll = true,
             Padding = new Padding(20,20,20,20),
             BackColor = Color.Transparent
         };
