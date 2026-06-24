@@ -27,6 +27,7 @@ internal static class Program
         }
         else
         {
+            // GetInfoAsync();
             runForm();
         }
     }

@@ -13,7 +13,7 @@ public class MainForm : Form
 {
     private readonly Button btnLoadInfo = new Button();
     private readonly Label statusLabel = new Label();
-    private readonly GameViewService gameViewService = new GameViewService();
+    // private readonly GameViewService gameViewService = new GameViewService();
     // private readonly GameInfoView gameInfoView;
     private readonly GameAudioView gameAudioView = new GameAudioView();
     private GameAudioController? gameAudioController;

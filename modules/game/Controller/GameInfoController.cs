@@ -11,12 +11,15 @@ class GameInfoController
 
     public GameInfoController()
     {
+        // Launcher information 
         launcherService.SetKnownLaunchers();
         launcherService.SetInstalledLaunchers();
         
+        // Database information
         var databaseController = new DatabaseController();
         databaseController.GetDatabaseService().RecordManager(Launcher.InstalledLaunchers);
 
+        // Game information
         gameService.SetInstalledGames();
     }
 

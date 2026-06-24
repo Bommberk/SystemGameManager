@@ -9,3 +9,4 @@ releases/*.nupkg
 releases/*.zip
 releases/*.exe
 diff.txt
+.VSCodeCounter
