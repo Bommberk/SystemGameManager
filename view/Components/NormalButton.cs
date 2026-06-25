@@ -14,7 +14,7 @@ class NormalButton : Button
         TabStop = false;
 
         FlatAppearance.BorderSize = 0;
-        FlatAppearance.MouseDownBackColor = Color.Transparent;
-        FlatAppearance.MouseOverBackColor = Color.Transparent;
+        FlatAppearance.MouseDownBackColor = ColorThemes.GetSecondaryBackgroundColorHover();
+        FlatAppearance.MouseOverBackColor = ColorThemes.GetSecondaryBackgroundColorHover();
     }
 }

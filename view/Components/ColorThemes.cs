@@ -24,10 +24,14 @@ public class ColorThemes
     public static Color GetPrimaryBackgroundColor()
     {
         return CurrentTheme.PrimaryBackgroundColor;
-    }   
+    }
     public static Color GetSecondaryBackgroundColor()
     {
         return CurrentTheme.SecondaryBackgroundColor;
+    }
+    public static Color GetSecondaryBackgroundColorHover()
+    {
+        return CurrentTheme.SecondaryBackgroundColorHover;
     }
     public static Color GetCardBackgroundColor()
     {
@@ -47,6 +51,7 @@ class StandardDarkTheme : ITheme
 {
     public Color PrimaryBackgroundColor => Color.FromArgb(23, 26, 26);
     public Color SecondaryBackgroundColor => Color.FromArgb(59, 67, 49);
+    public Color SecondaryBackgroundColorHover => Color.FromArgb(38, 43, 32);
     public Color TertiaryBackgroundColor => Color.FromArgb(15, 15, 15);
     public Color CardBackgroundColor => Color.FromArgb(35, 36, 36);
     public Color PrimaryTextColor => Color.FromArgb(233, 235, 236);
@@ -62,6 +67,7 @@ class StandardLightTheme : ITheme
 {
     public Color PrimaryBackgroundColor => Color.FromArgb(252, 251, 251);
     public Color SecondaryBackgroundColor => Color.FromArgb(113, 123, 89);
+    public Color SecondaryBackgroundColorHover => Color.FromArgb(92, 99, 73);
     public Color TertiaryBackgroundColor => Color.FromArgb(255, 255, 255);
     public Color CardBackgroundColor => Color.FromArgb(242, 242, 242);
     public Color PrimaryTextColor => Color.FromArgb(30, 30, 30);
@@ -77,6 +83,7 @@ public interface ITheme
 {
     Color PrimaryBackgroundColor { get; }
     Color SecondaryBackgroundColor { get; }
+    Color SecondaryBackgroundColorHover { get; }
     Color TertiaryBackgroundColor { get; }
     Color CardBackgroundColor { get; }
     Color PrimaryTextColor { get; }
