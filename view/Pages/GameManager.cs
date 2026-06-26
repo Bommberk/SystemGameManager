@@ -287,7 +287,8 @@ class GameManager : Page
             SmallChange = 5,
             LargeChange = 10,
             Dock = DockStyle.Fill,
-            Margin = new Padding(0)
+            Margin = new Padding(0),
+            Width = 200
         };
         musicVolumeValueLabel = new Label()
         {
@@ -306,7 +307,7 @@ class GameManager : Page
         var saveButton = new NormalButton()
         {
             Text = "Speichern",
-            AutoSize = true,
+            AutoSize = false,
             Margin = new Padding(0, 10, 0, 0),
         };
         GameManagerViewService.SaveAudioForGame(saveButton, audioDeviceSelection, gameVolumeTrackBar, musicVolumeTrackBar, gameBindings);
