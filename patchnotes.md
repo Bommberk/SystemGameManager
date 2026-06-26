@@ -1,32 +1,28 @@
-Here are the patchnotes based on your git diff data. The previous placeholder content in `patchnotes.md` was removed to make room for accurate details derived directly from the changes.
-
-# System & Game Manager – Changelog (v0.5.0)
+# System & Game Manager – Changelog (v0.5.x)
 
 ### 🛠 Architecture Refactoring
-- **Namespace Cleanup:** Removed the legacy `Krassheiten.` prefix from all namespaces (`Controller`, `Service`, `Entity`), streamlining to standard scopes like `SystemGameManager.*`.
-- **Module Restructuring:** Moved core functionality into a dedicated `/modules/` directory:
-  - Renamed root database files and configs to `modules/database/systemgamemanager.db`.
-  - Consolidated Services, Controllers, Views, and Entities under their respective module folders.
-- **UI Decoupling:** Separated the primary application window logic from service layers by encapsulating it in the new `/view/MainForm.cs` structure. Removed legacy monolithic controllers (`Game`, `Launcher`) and replaced them with static entity managers within modules.
+- **Namespace Cleanup:** Removed the legacy `Krassheiten.` prefix from all namespaces, streamlining to standard scopes like `SystemGameManager.*`.
+- **Module Restructuring:** Moved core functionality (`Database`, `PC Info`, `Games`) into a dedicated `/modules/` directory. Updated project references and `.gitignore` accordingly.
+- **UI Decoupling & Page System:** Replaced the monolithic `MainForm.cs` logic with a modular page system under `/view/Pages/`. Introduced `GameManager`, `MenuPage`, `Settings`, and `Info` pages to decouple UI from service layers.
 
 ### 🎨 Visual & UX Improvements
-- **Theming Engine:** Implemented a robust `ColorThemes` system that automatically detects Dark/Light mode via Windows registry settings and applies consistent colors across the application (`.Net 10`).
-- **Custom Controls:** Introduced modular, reusable custom components:
-  - `NormalButton`: Handles dynamic hover/down states based on theme configuration.
-  - `ModernTrackBar`: Custom trackbar implementation for volume controls respecting current color themes.
-  - Themed panels (`HoverShadowPanel`) that adapt background colors dynamically per view state.
-- **Icon System:** Integrated Font Awesome SVG icons (via a new helper) for scalable, crisp iconography replacing hardcoded images or legacy assets in the navigation bar and cards.
+- **Theming Engine:** Implemented robust `ColorThemes` class that automatically detects Dark/Light mode via Windows registry settings (`AppsUseLightTheme`) and applies consistent colors across the application.
+- **Custom Controls:** Introduced reusable modular components:
+  - `NormalButton`: Handles dynamic hover/down states based on theme configuration instead of hardcoded hex values.
+  - `ModernTrackBar` & `HoverShadowPanel`: Custom implementations for volume controls and card shadows that respect global color themes.
+  - SVG Icon Support: Integrated Font Awesome icons (SVG) loaded dynamically via helper methods, replacing legacy assets or images.
+- **Layout Updates:** Redefined the UI with a dedicated side-bar navigation (`Navbar`) and consistent rounded corners based on global `ColorThemes`.
 
 ### 📦 Asset & Data Handling
-- **Database Migration:** Adjusted project references to load SQLite databases from the module structure (`modules/database/`). Added `.exe` files to release exclusions where necessary.
-- **Config Updates:** Updated `knownLaunchers.json` for EA Desktop, specifically adding support for a new `"ProgramData"` path alongside standard installation paths.
-- **Asset Management:** Consolidated asset handling logic (artwork loading) into modular services and updated project file references (`SystemGameManager.csproj`) to automatically copy SVG icons from `/assets/icons/`.
+- **Database Migration:** Adjusted configuration paths to load SQLite databases from `/modules/database/` (e.g., `systemgamemanager.db`). Updated `.csproj` copy logic.
+- **Config Updates:** Enhanced EA Desktop integration in `knownLaunchers.json`, specifically adding support for the `"ProgramData"` path alongside standard installation paths.
+- **Entity Refactoring:** Consolidated game and launcher data into new Entity modules under `/modules/game/`. Removed legacy entity classes (`Game.cs`, `Launcher.cs` from root) in favor of modular versions using generic arrays instead of Record types where appropriate.
 
 ### 🔧 Technical Fixes & Utilities
-- **Error Handling:** Enhanced exception handling across view initialization states (e.g., `LoadInfoAsync`, service creation) to provide clearer feedback during data fetching failures.
-- **Utility Helpers:** Added helper functions (`Darker`, `Lighter`) and SVG processing utilities for dynamic icon color adjustment based on the active theme.
-- **Console Output:** Fixed encoding issues in startup messages ("Audio-Monitoring läuft..." now displays correctly by updating target framework compatibility).
+- **Error Handling:** Enhanced exception handling across view initialization states (e.g., data fetching failures, file missing errors).
+- **Utility Helpers:** Added helper functions to darken/lighten colors dynamically (`Darker`, `Lighter`) based on theme settings and SVG processing utilities for dynamic icon color adjustment.
+- **Console Output:** Fixed encoding issues in startup messages ("Audio-Monitoring läuft..." now displays correctly) by updating the target framework compatibility and string literals.
 
-### 🧹 Code Hygiene & Refactoring
-- **Legacy Cleanup:** Removed unused legacy controllers (`PcInfoController`, `GameInfoView`) and monolithic view classes (e.g., old `MainForm.cs`). Split functionality into smaller, page-based components adhering to the modular design pattern.
-- **Consolidation of Usings:** Standardized static usings in `GlobalUsings.cs` for cleaner file structures; removed unused imports (`GameEntity = ...`) where they conflicted with direct usage patterns.
+### 🧹 Code Hygiene & Cleanup
+- **Legacy Removal:** Removed unused controllers (`PcInfoController`, `GameInfoView`) and legacy view classes that were replaced by new, modular components. Cleaned up monolithic service implementations (e.g., old `MainForm.cs` logic moved to pages).
+- **Consolidation of Usings:** Standardized static usings in `GlobalUsings.cs` for cleaner file structures; removed unused imports and consolidated into specific module namespaces.
