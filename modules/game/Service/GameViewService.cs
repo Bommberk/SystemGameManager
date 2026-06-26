@@ -4,10 +4,10 @@ namespace SystemGameManager.Games.Service;
 
 class GameViewService
 {
-    public Launcher.Record[] GetInstalledLauncher()
+    public Launcher[] GetInstalledLauncher()
     {
         var launchers = Launcher.GetLaunchers();
-        return launchers ?? Array.Empty<Launcher.Record>();
+        return launchers ?? Array.Empty<Launcher>();
     }
 
     public Game[] GetInstalledGames()

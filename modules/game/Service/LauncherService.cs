@@ -10,7 +10,7 @@ class LauncherService
     {
         string path = "assets/game/knownLaunchers.json";
         string json = File.ReadAllText(path);
-        Launcher.KnownLaunchers = JsonSerializer.Deserialize<Launcher.Record[]>(json);
+        Launcher.KnownLaunchers = JsonSerializer.Deserialize<Launcher[]>(json);
     }
 
     public void SetInstalledLaunchers()
@@ -20,7 +20,7 @@ class LauncherService
             return;
         }
     
-        List<Launcher.Record> installedLaunchers = new();
+        List<Launcher> installedLaunchers = new();
         foreach (var knownLauncher in Launcher.KnownLaunchers)
         {
             if (!IsInstalledLauncher(knownLauncher))
@@ -33,7 +33,7 @@ class LauncherService
         SetLibraryFolderPath();
     }
 
-    private static bool IsInstalledLauncher(Launcher.Record knownLauncher)
+    private static bool IsInstalledLauncher(Launcher knownLauncher)
     {
         foreach (var regPath in Launcher.RegistryUninstallPaths)
         {
@@ -67,7 +67,7 @@ class LauncherService
         }
     }
 
-    private static string? ResolveInstallPath(Launcher.Record launcher)
+    private static string? ResolveInstallPath(Launcher launcher)
     {
         // 1. Direkter Registry-Key, falls im JSON angegeben (z. B. Steam)
         if (!string.IsNullOrEmpty(launcher.DirectRegistryKey))
@@ -123,7 +123,7 @@ class LauncherService
         }
     }
 
-    private static string[] ResolveLibraryFolderPath(Launcher.Record launcher, string installPath)
+    private static string[] ResolveLibraryFolderPath(Launcher launcher, string installPath)
     {
         if (string.IsNullOrEmpty(installPath))
             return [];

@@ -34,7 +34,7 @@ class GameInfoController
 
     public void Write()
     {
-        Launcher.Record[]? InstalledLaunchers = Launcher.InstalledLaunchers;
+        Launcher[]? InstalledLaunchers = Launcher.InstalledLaunchers;
         Game[]? InstalledGames = Game.InstalledGames;
         
         WriteHeadline();
