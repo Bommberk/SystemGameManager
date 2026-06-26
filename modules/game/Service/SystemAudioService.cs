@@ -162,4 +162,19 @@ public class SystemAudioService
             return false;
         }
     }
+    public List<string> GetAudioOutputDeviceNames()
+    {
+        try
+        {
+            using var enumerator = new MMDeviceEnumerator();
+            return enumerator
+                .EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
+                .Select(device => device.FriendlyName)
+                .ToList();
+        }
+        catch
+        {
+            return new List<string>();
+        }
+    }
 }

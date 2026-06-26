@@ -193,7 +193,7 @@ internal sealed class GameAudioView
     public void RefreshGames()
     {
         Game.InstalledGames = Game.GetGames();
-        var games = Game.InstalledGames ?? Array.Empty<Game.Record>();
+        var games = Game.InstalledGames ?? Array.Empty<Game>();
 
         UpdateGlobalSliderSnapshot(games);
         SetControlsEnabled(games.Length > 0);
@@ -245,7 +245,7 @@ internal sealed class GameAudioView
         SetHasPendingChanges(true);
     }
 
-    private void UpdateGlobalSliderSnapshot(IEnumerable<Game.Record> games)
+    private void UpdateGlobalSliderSnapshot(IEnumerable<Game> games)
     {
         var snapshot = games.ToArray();
 
@@ -263,7 +263,7 @@ internal sealed class GameAudioView
         }
     }
 
-    private Control CreateGameCard(Game.Record game)
+    private Control CreateGameCard(Game game)
     {
         var card = GameAudioCardControl.Create(game, out var checkBox, out var volumeLabel, out var outputDeviceLabel);
         card.Tag = new GameCheckBinding(game, checkBox, volumeLabel, outputDeviceLabel);
@@ -343,7 +343,7 @@ internal sealed class GameAudioView
 
     private void ShowMessageCard(string title, string message)
     {
-        UpdateGlobalSliderSnapshot(Array.Empty<Game.Record>());
+        UpdateGlobalSliderSnapshot(Array.Empty<Game>());
 
         gameListTable.SuspendLayout();
         try
@@ -520,5 +520,5 @@ internal sealed class GameAudioView
             : (int)Math.Round(snapshot.Average());
     }
 
-    private sealed record GameCheckBinding(Game.Record Game, CheckBox CheckBox, Label VolumeLabel, Label OutputDeviceLabel);
+    private sealed record GameCheckBinding(Game Game, CheckBox CheckBox, Label VolumeLabel, Label OutputDeviceLabel);
 }

@@ -10,9 +10,9 @@ class GameViewService
         return launchers ?? Array.Empty<Launcher.Record>();
     }
 
-    public Game.Record[] GetInstalledGames()
+    public Game[] GetInstalledGames()
     {
         var games = Game.GetGames();
-        return games ?? Array.Empty<Game.Record>();
+        return games ?? Array.Empty<Game>();
     }
 }

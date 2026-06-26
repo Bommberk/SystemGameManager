@@ -70,7 +70,6 @@ internal static class Program
         writeHeadline();
         // pcInfo.Write();
         // gameInfo.Write();
-        var game = new GameEntity();
-        game.WriteGamesFromDatabase();
+        Game.WriteGamesFromDatabase();
     }
 }

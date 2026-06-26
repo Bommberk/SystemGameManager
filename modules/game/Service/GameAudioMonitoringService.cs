@@ -47,7 +47,7 @@ class GameAudioMonitoringService
 
         try
         {
-            Game.Record? runningGame = GetRunningOpenGame();
+            Game? runningGame = GetRunningOpenGame();
             int? currentMusicAppVolume = systemAudioService.GetMusicAppVolume(DEFAULT_MUSIC_APP_NAME);
 
             if (runningGame is not null)
@@ -133,7 +133,7 @@ class GameAudioMonitoringService
         StopAudioMonitoring();
     }
 
-    private static Game.Record? GetRunningOpenGame()
+    private static Game? GetRunningOpenGame()
     {
         if (Game.InstalledGames == null || Game.InstalledGames.Length == 0)
         {
@@ -143,7 +143,7 @@ class GameAudioMonitoringService
         return TryGetForegroundGame(Game.InstalledGames);
     }
 
-    private static Game.Record? TryGetForegroundGame(IEnumerable<Game.Record> installedGames)
+    private static Game? TryGetForegroundGame(IEnumerable<Game> installedGames)
     {
         uint? foregroundProcessId = GetForegroundProcessId();
         if (foregroundProcessId is null || foregroundProcessId == 0)
@@ -168,7 +168,7 @@ class GameAudioMonitoringService
         }
     }
 
-    private static Game.Record? TryGetGameFromProcess(Process process, IEnumerable<Game.Record> installedGames)
+    private static Game? TryGetGameFromProcess(Process process, IEnumerable<Game> installedGames)
     {
         try
         {
@@ -201,7 +201,7 @@ class GameAudioMonitoringService
         return null;
     }
 
-    private static bool MatchesGamePath(Game.Record game, string processPath)
+    private static bool MatchesGamePath(Game game, string processPath)
     {
         if (!string.IsNullOrWhiteSpace(game.ExePath))
         {

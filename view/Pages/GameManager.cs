@@ -12,23 +12,19 @@ class GameManager : Page
     private const string PAGE_TITLE = "Game Library";
     public int LauncherSectionHeight { get; private set; } = 0;
     private readonly GameManagerViewService GameManagerViewService;
+    private readonly SystemAudioService systemAudioService = new SystemAudioService();
 
-    private readonly List<GameSelectionBinding> gameBindings = new();
-    private NormalButton? selectAllGamesButton;
-    private ComboBox? audioDeviceSelection;
-    private TrackBar? gameVolumeTrackBar;
-    private TrackBar? musicVolumeTrackBar;
-    private Label? gameVolumeValueLabel;
-    private Label? musicVolumeValueLabel;
+    public readonly List<GameSelectionBinding> gameBindings = new();
+    public NormalButton? selectAllGamesButton;
+    public NormalButton? reverseSelectionButton;
+    public ComboBox? audioDeviceSelection;
+    public TrackBar? gameVolumeTrackBar;
+    public TrackBar? musicVolumeTrackBar;
+    public Label? gameVolumeValueLabel;
+    public Label? musicVolumeValueLabel;
 
-    private sealed record GameSelectionBinding(Game.Record Game, CheckBox CheckBox, Label VolumeLabel, Label AudioOutputDeviceLabel);
+    public sealed record GameSelectionBinding(Game Game, CheckBox CheckBox, Label VolumeLabel, Label AudioOutputDeviceLabel);
 
-    private void UpdateSelectAllButtonText()
-    {
-        if (selectAllGamesButton == null) return;
-        bool allChecked = gameBindings.Count > 0 && gameBindings.All(b => b.CheckBox.Checked);
-        selectAllGamesButton.Text = allChecked ? "Alle abwählen" : "Alle auswählen";
-    }
 
     public GameManager() : base(TAB_TEXT, TAB_ICON_PATH, "center")
     {
@@ -92,25 +88,14 @@ class GameManager : Page
             Margin = new Padding(10, 0, 0, 0),
             BackColor = Color.Transparent
         };
-        refreshButton.Click += async (_, _) =>
-        {
-            refreshButton.Enabled = false;
-            try
-            {
-                await GameManagerViewService.RefreshGameAndLauncherInfoAsync();
-            }
-            finally
-            {
-                refreshButton.Enabled = true;
-            }
-        };
         heroTitleContainer.Controls.Add(heroTitle);
         heroTitleContainer.Controls.Add(refreshButton);
+        GameManagerViewService.RefreshGameAndLauncherInfos(refreshButton); // Attach event handlers for user activities
 
         // More hero infos
         var heroGameInfo = new Label()
         {
-            Text = $"{GameManagerViewService.GetInstalledGames().Length} Spiele - {GameManagerViewService.GetInstalledLauncher().Length} Launcher",
+            Text = $"{Game.GetGames().Length} Spiele - {Launcher.GetLaunchers().Length} Launcher",
             AutoSize = true,
             ForeColor = ColorThemes.GetSecondaryTextColor(),
         };
@@ -132,9 +117,9 @@ class GameManager : Page
 
     private void CreateLauncherSection()
     {
-        var section = GameManagerViewService.GetNewSection("Launcher");
+        var section = ViewService.GetNewSection("Launcher");
         // Launcher hinzufügen
-        var launchers = GameManagerViewService.GetInstalledLauncher();
+        var launchers = Launcher.GetLaunchers();
         var launcherSection = new FlowLayoutPanel()
         {
             Dock = DockStyle.Top,
@@ -180,7 +165,7 @@ class GameManager : Page
 
     private void CreateAudioSettingsSection()
     {
-        var section = GameManagerViewService.GetNewSection("Audio Einstellungen");
+        var section = ViewService.GetNewSection("Audio Einstellungen");
         var gameAudioCard = CardControls.GetCardPanel(5);
         gameAudioCard.FlowDirection = FlowDirection.TopDown;
 
@@ -205,7 +190,7 @@ class GameManager : Page
             Width = 200,
         };
         audioDeviceSelection.Items.Add("(Standard-Gerät)");
-        foreach(var device in GameManagerViewService.GetAudioOutputDeviceNames())
+        foreach(var device in systemAudioService.GetAudioOutputDeviceNames())
         {
             audioDeviceSelection.Items.Add(device);
         }
@@ -215,32 +200,13 @@ class GameManager : Page
             Text = "Alle auswählen",
             AutoSize = true,
         };
-        var reverseSelectionButton = new NormalButton()
+        reverseSelectionButton = new NormalButton()
         {
             Text = "Auswahl umkehren",
             AutoSize = true,
         };
-
-        selectAllGamesButton.Click += (sender, e) =>
-        {
-            if (gameBindings.Count == 0) return;
-            bool allChecked = gameBindings.All(b => b.CheckBox.Checked);
-            foreach (var binding in gameBindings)
-            {
-                binding.CheckBox.Checked = !allChecked;
-            }
-            UpdateSelectAllButtonText();
-        };
-
-        reverseSelectionButton.Click += (sender, e) =>
-        {
-            foreach (var binding in gameBindings)
-            {
-                binding.CheckBox.Checked = !binding.CheckBox.Checked;
-            }
-            UpdateSelectAllButtonText();
-        };
-
+        GameManagerViewService.SelectAllGames(selectAllGamesButton);
+        GameManagerViewService.ReverseSelection(reverseSelectionButton);
         gameSelectionContainer.Controls.Add(audioDeviceSelection);
         gameSelectionContainer.Controls.Add(selectAllGamesButton);
         gameSelectionContainer.Controls.Add(reverseSelectionButton);
@@ -290,11 +256,8 @@ class GameManager : Page
             ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(5, 0, 0, 0),
         };
-        gameVolumeTrackBar.ValueChanged += (sender, e) =>
-        {
-            if (gameVolumeValueLabel != null && gameVolumeTrackBar != null)
-                gameVolumeValueLabel.Text = $"{gameVolumeTrackBar.Value}%";
-        };
+        GameManagerViewService.SetAudioTrackbar(gameVolumeTrackBar, gameVolumeValueLabel);
+
         gameVolumeContainer.Controls.Add(gameVolumeLabel);
         gameVolumeContainer.Controls.Add(gameVolumeTrackBar);
         gameVolumeContainer.Controls.Add(gameVolumeValueLabel);
@@ -334,11 +297,7 @@ class GameManager : Page
             ForeColor = ColorThemes.GetPrimaryTextColor(),
             Margin = new Padding(5, 0, 0, 0),
         };
-        musicVolumeTrackBar.ValueChanged += (sender, e) =>
-        {
-            if (musicVolumeValueLabel != null && musicVolumeTrackBar != null)
-                musicVolumeValueLabel.Text = $"{musicVolumeTrackBar.Value}%";
-        };
+        GameManagerViewService.SetAudioTrackbar(musicVolumeTrackBar, musicVolumeValueLabel);
         musicVolumeContainer.Controls.Add(musicVolumeLabel);
         musicVolumeContainer.Controls.Add(musicVolumeTrackBar);
         musicVolumeContainer.Controls.Add(musicVolumeValueLabel);
@@ -350,40 +309,7 @@ class GameManager : Page
             AutoSize = true,
             Margin = new Padding(0, 10, 0, 0),
         };
-        saveButton.Click += (sender, e) =>
-        {
-            if (audioDeviceSelection == null || gameVolumeTrackBar == null || musicVolumeTrackBar == null)
-                return;
-
-            var selectedDevice = audioDeviceSelection.SelectedItem?.ToString() ?? "(Standard-Gerät)";
-            var deviceToSave = selectedDevice == "(Standard-Gerät)" ? null : selectedDevice;
-
-            bool anySaved = false;
-            foreach (var binding in gameBindings)
-            {
-                if (binding.CheckBox.Checked)
-                {
-                    binding.Game.GameVolumePercent = gameVolumeTrackBar.Value;
-                    binding.Game.MusicVolumePercent = musicVolumeTrackBar.Value;
-                    binding.Game.AudioOutputDevice = deviceToSave;
-
-                    binding.VolumeLabel.Text = $"Game: {gameVolumeTrackBar.Value}% | Music: {musicVolumeTrackBar.Value}%";
-                    binding.AudioOutputDeviceLabel.Text = selectedDevice;
-                    anySaved = true;
-                }
-            }
-
-            if (anySaved)
-            {
-                Game.InstalledGames = gameBindings.Select(b => b.Game).ToArray();
-                Game.SaveGames();
-                MessageBox.Show("Einstellungen für die ausgewählten Spiele wurden gespeichert.", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show("Bitte wähle mindestens ein Spiel aus.", "Keine Auswahl", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        };
+        GameManagerViewService.SaveAudioForGame(saveButton, audioDeviceSelection, gameVolumeTrackBar, musicVolumeTrackBar, gameBindings);
         
         // Add to Controlls
         gameAudioCard.Controls.Add(gameSelectionLabel);
@@ -397,11 +323,11 @@ class GameManager : Page
     }
     private void CreateGameOverviewSection()
     {
-        var section = GameManagerViewService.GetNewSection("Spiele");
+        var section = ViewService.GetNewSection("Spiele");
         gameBindings.Clear();
 
         // Spiele hinzufügen
-        var games = GameManagerViewService.GetInstalledGames();
+        var games = Game.GetGames();
         var gameContainer = new FlowLayoutPanel()
         {
             Dock = DockStyle.Top,
@@ -437,15 +363,9 @@ class GameManager : Page
 
             // Bild klickbar machen, um Checkbox zu toggeln
             gameWallpaper.Cursor = Cursors.Hand;
-            gameWallpaper.Click += (sender, e) =>
-            {
-                gameSelectCheckBox.Checked = !gameSelectCheckBox.Checked;
-            };
-
-            gameSelectCheckBox.CheckedChanged += (sender, e) =>
-            {
-                UpdateSelectAllButtonText();
-            };
+            if(selectAllGamesButton != null)
+                GameManagerViewService.SelectGame(gameWallpaper, gameSelectCheckBox, selectAllGamesButton);
+            
 
             var gameName = new Label()
             {
@@ -516,21 +436,6 @@ class GameManager : Page
                 Text = "Ordner öffnen",
                 AutoSize = true,
                 Dock = DockStyle.Bottom,
-            };
-            openGameDirectoryButton.Click += (sender, e) =>
-            {
-                if (System.IO.Directory.Exists(game.InstallFolderPath))
-                {
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-                    {
-                        FileName = game.InstallFolderPath,
-                        UseShellExecute = true
-                    });
-                }
-                else
-                {
-                    MessageBox.Show("Ordner existiert nicht oder Pfad ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             };
 
             gameBindings.Add(new GameSelectionBinding(game, gameSelectCheckBox, volume, audioOutputDevice));

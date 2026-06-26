@@ -2,6 +2,8 @@ namespace SystemGameManager.View.Service;
 
 using SystemGameManager.Games.Service;
 using System.Drawing.Drawing2D;
+using SystemGameManager.View.Components;
+using SystemGameManager.Games.Entity;
 
 class ViewService
 {
@@ -67,5 +69,48 @@ class ViewService
         path.CloseFigure();
 
         panel.Region = new Region(path);
+    }
+    public static TableLayoutPanel GetNewSection(string title)
+    {
+        var section = new TableLayoutPanel()
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            Margin = new Padding(0, 0, 0, 12),
+        };
+        var sectionTitlePanel = new Panel()
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+        };
+        var sectionTitle = new Label()
+        {
+            Text = title,
+            AutoSize = true,
+            Font = new Font("Segoe UI", 12, FontStyle.Bold),
+            ForeColor = ColorThemes.GetPrimaryTextColor(),
+        };
+        sectionTitlePanel.Controls.Add(sectionTitle);
+        section.Controls.Add(sectionTitlePanel);
+        return section;
+    }
+    public static void OpenDirectory(NormalButton openGameDirectoryButton, Game game)
+    {
+        openGameDirectoryButton.Click += (sender, e) =>
+        {
+            if (System.IO.Directory.Exists(game.InstallFolderPath))
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = game.InstallFolderPath,
+                    UseShellExecute = true
+                });
+            }
+            else
+            {
+                MessageBox.Show("Ordner existiert nicht oder Pfad ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        };
     }
 }

@@ -20,9 +20,9 @@ class GameService
         Game.SaveGames();
     }
 
-    private IEnumerable<Game.Record> GetGamesWithGameFolder()
+    private IEnumerable<Game> GetGamesWithGameFolder()
     {
-        List<Game.Record> games = new();
+        List<Game> games = new();
         if(Launcher.InstalledLaunchers is null) return games;
         
         foreach (var launcher in Launcher.InstalledLaunchers)
@@ -51,16 +51,16 @@ class GameService
 
                     string gameName = Path.GetFileName(gameDir);
                     string exePath = GetGameExe(gameDir);
-                    games.Add(new Game.Record(gameName, gameDir, exePath));
+                    games.Add(new Game(gameName, gameDir, exePath));
                 }
             }
         }
         return games;
     }
 
-    private IEnumerable<Game.Record> GetGamesWithRegistry()
+    private IEnumerable<Game> GetGamesWithRegistry()
     {
-        List<Game.Record> games = new();
+        List<Game> games = new();
         if(Launcher.InstalledLaunchers is null) return games;
         
         foreach(var launcher in Launcher.InstalledLaunchers)
@@ -94,7 +94,7 @@ class GameService
 
                     string exePath = GetGameExe(installPath);
                     string processName = GetProcessName(resolvedGameName, exePath);
-                    games.Add(new Game.Record(resolvedGameName, installPath, exePath, processName));
+                    games.Add(new Game(resolvedGameName, installPath, exePath, processName));
                 }
             }
         }
@@ -136,7 +136,7 @@ class GameService
             return;
 
         // Search recursively for image files in the Pictures folder
-        foreach (Game.Record game in Game.InstalledGames ?? Array.Empty<Game.Record>())
+        foreach (Game game in Game.InstalledGames ?? Array.Empty<Game>())
         {
             // Entfernt alle Sonderzeichen aus einem String (behält nur Buchstaben, Ziffern, Leerzeichen, Bindestrich, Unterstrich)
             static string StripSpecialChars(string s) =>

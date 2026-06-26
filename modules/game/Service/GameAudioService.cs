@@ -7,7 +7,7 @@ class GameAudioService
     public const string DEFAULT_MUSIC_APP_NAME = "Spotify";
     protected readonly SystemAudioService systemAudioService = new();
 
-    public void SetAudioSettings(Game.Record? game = null, int gameVolume = Game.GAME_VOLUME_PERCENT, string musicAppName = DEFAULT_MUSIC_APP_NAME, int musicVolume = Game.MUSIC_VOLUME_PERCENT)
+    public void SetAudioSettings(Game? game = null, int gameVolume = Game.GAME_VOLUME_PERCENT, string musicAppName = DEFAULT_MUSIC_APP_NAME, int musicVolume = Game.MUSIC_VOLUME_PERCENT)
     {
         if(game is not null){
             SetMusicValueForOneGame(game, musicVolume);
@@ -29,7 +29,7 @@ class GameAudioService
             SetMusicValueForOneGame(game, musicVolume);
         }
     }
-    private void SetMusicValueForOneGame(Game.Record game, int musicVolume)
+    private void SetMusicValueForOneGame(Game game, int musicVolume)
     {
         game.MusicVolumePercent = musicVolume;
     }
@@ -42,7 +42,7 @@ class GameAudioService
             SetGameValueForOneGame(game, gameVolume);
         }
     }
-    private void SetGameValueForOneGame(Game.Record game, int gameVolume)
+    private void SetGameValueForOneGame(Game game, int gameVolume)
     {
         game.GameVolumePercent = gameVolume;
     }

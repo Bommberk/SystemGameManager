@@ -7,7 +7,7 @@ using NAudio.CoreAudioApi;
 
 internal static class GameAudioCardControl
 {
-    public static Panel Create(Game.Record game, out CheckBox selectionCheckBox, out Label volumeLabel, out Label outputDeviceLabel)
+    public static Panel Create(Game game, out CheckBox selectionCheckBox, out Label volumeLabel, out Label outputDeviceLabel)
     {
         var card = new Panel()
         {
