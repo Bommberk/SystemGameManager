@@ -1,27 +1,32 @@
-# System & Game Manager – Changelog (Latest Update)
+# System & Game Manager – Changelog  
 
-### 🛠 Architecture Refactoring
-- **Namespace Cleanup:** Removed the `Krassheiten.` prefix from all namespaces, streamlining to standard scopes like `SystemGameManager.*`.
-- **Module Restructuring:** Moved core functionality (`Database`, `PC Info`, `Games`) into dedicated modules within a new `/modules/` directory.
-- **Main Form Separation:** The primary application window logic is now encapsulated in the new `/view/MainForm.cs`, decoupling UI from service layers.
+### 🛠 Architecture Refactoring  
+- **Namespace Cleanup:** Removed the `Krassheiten.` prefix from all namespaces (e.g., `GlobalController.cs` → `SystemGameManager.Functions`).  
+- **Module Restructuring:** Core components moved into a dedicated `/modules/` directory. Specifically:
+  - Moved files like `DatabaseController`, `GameInfoController`, and view logic to subdirectories under `/modules/`. 
+  - Created separate modules for games, game entities (`SystemGameManager.Games.Entity`) etc., consolidating the project structure into more manageable chunks.
+- **Main Form Separation:** Encapsulated UI logic into new pages located in `/view/Pages/` (e.g., `GameManager`, `GameAudioView`). Moved from a single file approach to separate modules for cleaner separation of concerns and scalability.  
 
-### 🎨 Visual & UX Improvements
-- **Theming Engine:** Implemented `ColorThemes` to automatically detect and apply system-wide Dark/Light mode settings via Windows registry detection (`ViewService`).
-- **Custom Controls:** Introduced custom themed controls including:
-  - `ThemedTabControl`: Tab pages now respect theme colors without manual overrides.
-  - Dynamic button states using helper methods for hover/down effects instead of hardcoded hex values.
-- **Layout Updates:** Redesigned the UI with a new side-bar layout and consistent rounded corners based on global color themes.
+### 🎨 Visual & UX Improvements  
+- **Theming Engine:** Introduced `ColorThemes` class with support for automatic detection of system-wide Dark/Light mode settings via Windows registry (`SystemGameManager.View.Service.ViewService`) ensuring consistent theming across all components.
+  - Dynamic button states using helper methods in `UIHelpers.Lighter/Darker()` to adapt colors based on current theme settings, replacing hardcoded hex values.  
+- **Custom Controls:** Introduced reusable custom themed controls including: 
+  - Themed `TableLayoutPanel` and panels that respect global color themes without manual overrides (e.g., via `ColorThemes.GetPrimaryBackgroundColor()`).
+  - Rounded corner panels using a dedicated helper (`UIHelpers.SetRoundedRegion`).  
+- **Icon Management:** Replaced hardcoded image paths with Font Awesome SVG icons in `/assets/icons/`. Added dynamic loading of these SVGs into the application.  
 
-### 📦 Asset & Data Handling
-- **New Icons:** Added Font Awesome icons (SVG) to `assets/icons/` (`grip`, `bars`, `circle-info`).
-- **Database Structure:** Moved SQLite database configuration from root `/database/` to the new module structure at `/modules/database/systemgamemanager.db`.
-- **Config Updates:** Adjusted paths for EA Desktop integration and fixed null-handling in Launcher data.
+### 📦 Asset & Data Handling  
+- **New Icons:** Added Font Awesome 7.x icons as SVG assets to `/assets/icons/` including: `gamepad`, `gear`, `house`, and more.  
+- **Database Structure:** Moved SQLite database configuration from root folder (`database/systemgamemanager.db`) into the new module structure at `/modules/database/systemgamemanager.db`. Added a template DB file as well for easier deployment. 
+- **Config Updates:** Adjusted paths in `.csproj` files to reflect modular directory structures, and added entries for tracking release-related build outputs like `publishnewversion.ps1` scripts.  
 
-### 🔧 Technical Fixes & Utilities
-- **Error Handling:** Enhanced exception handling across `MainForm` loading states (`LoadInfoAsync`).
-- **Utility Helpers:** Added helper functions to darken/lighten colors dynamically based on theme settings.
-- **Console Output:** Fixed encoding issue in startup messages ("Audio-Monitoring läuft..." now displays correctly).
+### 🔧 Technical Fixes & Utilities  
+- **Error Handling:** Enhanced exception handling across app startup (`Program.cs`) with commented-out debug functions removed during production builds. 
+- **Utility Helpers:** Introduced helper methods in `UIHelpers.cs`:
+  - Added color manipulation utilities for theme support (e.g., darkening/lightening colors dynamically).
+  - SVG icon loader function that adjusts stroke width/color based on current theme settings (`ChangeNavbarMenuIconColor`).  
+- **Console Output:** Fixed encoding issue where `"Audio-Monitoring läuft..."` displayed incorrectly by removing unnecessary characters and simplifying startup messaging logic.  
 
-### 🧹 Code Hygiene & Cleanup
-- Removed unused controllers (disabled `PcInfoController` and `GameAudioController` instantiation in debug builds to reduce overhead during info loading).
-- Consolidated static usings (`GlobalUsings.cs`) for cleaner file structure.
+### 🧹 Code Hygiene & UI Cleanup
+- Removed unused or redundant controllers (e.g., disabled old PC info functionality) and consolidated static usings in `GlobalUsings.cs`.  
+- Refactored game card layouts into modular components (`CardControls`, `GameAudioCardControl`) enabling consistent styling across the app.
