@@ -50,8 +50,8 @@ public class MainForm : Form
         };
         body.Controls.Add(container);
 
-        new GameManager();
-        var menuPage = new MenuPage();
+        var menuPage = new GameManager();
+        new MenuPage();
         new Settings();
         new Info();
 
