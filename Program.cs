@@ -4,6 +4,7 @@ using SystemGameManager.Database.Controller;
 using SystemGameManager.Games.Controller;
 using SystemGameManager.Games.Entity;
 using SystemGameManager.Pc.Controller;
+using SystemGameManager.Handler;
 using GameEntity = SystemGameManager.Games.Entity.Game;
 using System;
 using System.Threading;
@@ -21,14 +22,21 @@ internal static class Program
         VelopackApp.Build().Run();
         await new Updater().AutoUpdate();
 
-        if (args.Length > 0 && args[0] == "--console")
+        try
         {
-            runConsole();
-        }
-        else
+            if (args.Length > 0 && args[0] == "--console")
+            {
+                runConsole();
+            }
+            else
+            {
+                // GetInfoAsync();
+                runForm();
+            }
+        }catch(Exception ex)
         {
-            // GetInfoAsync();
-            runForm();
+            ErrorHandler errorHandler = new ErrorHandler();
+            errorHandler.HandleError(ex);
         }
     }
 

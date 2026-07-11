@@ -8,19 +8,39 @@ using Svg;
 
 internal static class UIHelpers
 {
+    public static string ResolveRuntimePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return path;
+        }
+
+        if (Path.IsPathRooted(path))
+        {
+            return path;
+        }
+
+        var normalized = path
+            .Replace('/', Path.DirectorySeparatorChar)
+            .Replace('\\', Path.DirectorySeparatorChar);
+
+        return Path.Combine(AppContext.BaseDirectory, normalized);
+    }
+
     public static Image LoadIcon(string path, Size? targetSize = null)
     {
+        var resolvedPath = ResolveRuntimePath(path);
         var extension = Path.GetExtension(path);
 
         if (string.Equals(extension, ".svg", StringComparison.OrdinalIgnoreCase))
         {
             var size = targetSize ?? new Size(24, 24);
-            var svgDocument = SvgDocument.Open(path);
+            var svgDocument = SvgDocument.Open(resolvedPath);
             ChangeNavbarMenuIconColor(svgDocument);
             return svgDocument.Draw(size.Width, size.Height);
         }
 
-        using var image = Image.FromFile(path);
+        using var image = Image.FromFile(resolvedPath);
         if (targetSize is null)
         {
             return new Bitmap(image);
@@ -28,6 +48,14 @@ internal static class UIHelpers
 
         return new Bitmap(image, targetSize.Value);
     }
+
+    public static Image LoadImage(string path)
+    {
+        var resolvedPath = ResolveRuntimePath(path);
+        using var image = Image.FromFile(resolvedPath);
+        return new Bitmap(image);
+    }
+
     private static void ChangeNavbarMenuIconColor(SvgDocument svg)
     {
         foreach (var element in svg.Descendants().OfType<SvgVisualElement>())

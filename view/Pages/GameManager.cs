@@ -343,7 +343,7 @@ class GameManager : Page
             gameCard.Margin = new Padding(5);
             var gameWallpaper = new PictureBox()
             {
-                Image = Image.FromFile(game.GameImage ?? "assets/bild.jpg"),
+                Image = UIHelpers.LoadImage(game.GameImage ?? "assets/bild.jpg"),
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Size = new Size(280, 158),
                 BackColor = ColorThemes.GetSecondaryBackgroundColor(),
