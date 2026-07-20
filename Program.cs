@@ -20,6 +20,9 @@ internal static class Program
     private static async Task Main(string[] args)
     {
         VelopackApp.Build().Run();
+
+        ErrorHandler.Register();
+
         await new Updater().AutoUpdate();
 
         try
@@ -33,10 +36,10 @@ internal static class Program
                 // GetInfoAsync();
                 runForm();
             }
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
-            ErrorHandler errorHandler = new ErrorHandler();
-            errorHandler.HandleError(ex);
+            ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
         }
     }
 
@@ -45,7 +48,7 @@ internal static class Program
         GetInfoAsync();
 
         using var shutdownSignal = new ManualResetEventSlim(false);
-        Console.WriteLine("Audio-Monitoring l�uft. Mit Strg+C beenden.");
+        Console.WriteLine("Audio-Monitoring läuft. Mit Strg+C beenden.");
 
         Console.CancelKeyPress += (_, eventArgs) =>
         {
