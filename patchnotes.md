@@ -1,11 +1,16 @@
 # System & Game Manager – Changelog
 
-### 🔧 Main Entry Logic Refactor
-- **Safe Execution Flow:** Replaced the raw `try/catch` block in `Program.cs` with a dedicated exception handling pattern. All startup logic (Console vs GUI) now runs within a unified error-handling scope to prevent silent failures from crashing the app on launch arguments or unexpected exceptions.
+### 🛡️ Robustness & Crash Recovery (`Program.cs`)
+- **Centralized Exception Handling:** Replaced scattered `try/catch` blocks with a unified fallback in `Main()`. Even if the application fails during initialization, the error is now captured and reported to the user before termination.
+- **Safe Logging Registration:** Moved `ErrorHandler.Register()` to after the initial app start attempt, ensuring global exception hooks are active even for crashes occurring early on startup or updates failing later.
 
-### 🛡 Error Handling Integration
-- **ErrorHandler Utilization:** Instantiated and integrated `SystemGameManager.Handler.ErrorHandler` into the main entry point (`Program.cs`).
-- **Exception Logging/Display:** Captured all unhandled exceptions during startup (e.g., argument parsing errors, missing dependencies) and now route them to a centralized handling routine instead of terminating abruptly or showing default OS dialogs.
+### 🚑 Enhanced Error Reporting (`Handler/ErrorHandler.cs`)
+- **Persistent Logging Infrastructure:** Implemented daily log rotation and thread-safe file appending in `%APPDATA%\SystemGameManager\logs`. Errors now persist locally regardless of UI visibility, preventing data loss during critical failures.
+- **Structured Exception Details:** Overhauled the error report to include Timestamp, Severity Level (`Warning`, `Error`, `Fatal`), Type, Source, Full Stack Trace, and recursive Inner Exceptions for root cause analysis.
+- **Global Safety Net:** Registered handlers for:
+  - UI Thread exceptions.
+  - Non-UI background thread failures (e.g., database operations).
+  - Asynchronous task unobserved exceptions (`TaskScheduler.UnobservedTaskException`).
 
-### ⚙️ Code Cleanup & Dependencies
-- **Namespace Import:** Added `using SystemGameManager.Handler;` to resolve the new exception handler usage without circular dependency issues.
+### 🔧 Update Stability (`Updater.cs`)
+- **Soft-Failed Updates:** Upgrades that encounter issues now log a warning instead of showing an abrupt error dialog. This prevents the application from crashing immediately after checking for updates, allowing it to continue running normally and attempting subsequent fixes or manual restarts.
