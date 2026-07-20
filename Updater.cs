@@ -4,6 +4,7 @@ using Velopack;
 using Velopack.Sources;
 using System;
 using System.Threading.Tasks;
+using SystemGameManager.Handler;
 
 public class Updater
 {
@@ -28,8 +29,7 @@ public class Updater
         }
         catch (Exception ex)
         {
-            ConsoleError($"Fehler beim automatischen Update: {ex.Message}");
-            System.Windows.Forms.MessageBox.Show($"Ein Fehler ist beim automatischen Update aufgetreten:\n\n{ex.Message}", "Update-Fehler", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+            ErrorHandler.Handle(ex, ErrorSeverity.Warning);
         }
     }
 }

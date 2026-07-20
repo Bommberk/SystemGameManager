@@ -19,7 +19,15 @@ internal static class Program
     [STAThread]
     private static async Task Main(string[] args)
     {
-        VelopackApp.Build().Run();
+        try
+        {
+            VelopackApp.Build().Run();
+        }
+        catch (Exception ex)
+        {
+            // ErrorHandler.Handle works without Register() having been called first.
+            ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
+        }
 
         ErrorHandler.Register();
 
