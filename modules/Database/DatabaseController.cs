@@ -50,7 +50,8 @@ class DatabaseController
 
     protected static SqliteConnection GetSqlConnection()
     {
-        var dbFile = Path.Combine(AppContext.BaseDirectory, "modules", "database", "systemgamemanager.db");
+        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SystemGameManager");
+        var dbFile = Path.Combine(appDataPath, "systemgamemanager.db");
         var templateFile = Path.Combine(AppContext.BaseDirectory, "modules", "database", "template-systemgamemanager.db");
 
         var dbDirectory = Path.GetDirectoryName(dbFile);
