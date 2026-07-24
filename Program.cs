@@ -19,6 +19,10 @@ internal static class Program
     [STAThread]
     private static async Task Main(string[] args)
     {
+        #if DEBUG
+        new GlobalDevConfig();
+        #endif
+
         try
         {
             VelopackApp.Build().Run();
@@ -33,6 +37,8 @@ internal static class Program
 
         await new Updater().AutoUpdate();
 
+
+
         try
         {
             if (args.Length > 0 && args[0] == "--console")
@@ -41,7 +47,7 @@ internal static class Program
             }
             else
             {
-                // GetInfoAsync();
+                GetInfoAsync();
                 runForm();
             }
         }

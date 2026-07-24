@@ -7,10 +7,10 @@ using System.Text.Json;
 public class AppConfig
 {
     public string AppName { get; set; } = "SystemGameManager";
-    public string Version { get; set; } = "1.0.0";
-    public string Environment { get; set; } = "Production";
+    public string Version { get; set; } = "0.5.7";
+    public string Environment { get; set; } = "production";
     public string RepositoryUrl { get; set; } = "https://github.com/Bommberk/SystemGameManager";
-    public string Author { get; set; } = "Bommberk";
+    public string Author { get; set; } = "Krassheiten";
     public string LogLevel { get; set; } = "Info";
     public string Language { get; set; } = "de-DE";
 }
@@ -18,6 +18,7 @@ public class AppConfig
 public class DatabaseConfig
 {
     public string ConnectionString { get; set; } = "Data Source=modules/database/systemgamemanager.db";
+    public string DatabaseFile { get; set; } = Path.Combine(GetAppdataPath(),"systemgamemanager.db");
     public bool BackupEnabled { get; set; } = true;
 }
 
@@ -53,16 +54,6 @@ public static class GlobalConfig
             }
             return _settings!;
         }
-    }
-
-    // Explizite Funktion zum Abrufen der Einstellungen (wie von dir gewünscht)
-    public static AppSettings GetSettings()
-    {
-        if (_settings == null)
-        {
-            Load();
-        }
-        return _settings!;
     }
 
     public static void Load()

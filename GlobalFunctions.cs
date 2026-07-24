@@ -8,7 +8,7 @@ using Microsoft.Data.Sqlite;
 class GlobalFunctions
 {
     private static int clogCount = 0;
-    public static void ConsoleLog(string message)
+    public static void log(string message)
     {
         Console.WriteLine(message);
     }
@@ -112,5 +112,21 @@ class GlobalFunctions
             }
         }
         Console.WriteLine($"{indentStr}}}");
+    }
+
+    public static string GetAppdataPath()
+    {
+        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string appFolder = Path.Combine(appData, "SystemGameManager");
+        if (!Directory.Exists(appFolder))
+        {
+            Directory.CreateDirectory(appFolder);
+        }
+        return appFolder;
+    }
+
+    public static string GetCurrentDirectory()
+    {
+        return Directory.GetCurrentDirectory();
     }
 }

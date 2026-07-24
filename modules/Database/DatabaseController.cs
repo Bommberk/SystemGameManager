@@ -7,6 +7,8 @@ using SystemGameManager.Games.Entity;
 
 class DatabaseController
 {
+    readonly static string databaseFile = GlobalConfig.Settings.DatabaseConfig.DatabaseFile;
+
     protected SqliteConnection dbConnection;
 
     public DatabaseController()
@@ -50,11 +52,9 @@ class DatabaseController
 
     protected static SqliteConnection GetSqlConnection()
     {
-        string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SystemGameManager");
-        var dbFile = Path.Combine(appDataPath, "systemgamemanager.db");
         var templateFile = Path.Combine(AppContext.BaseDirectory, "modules", "database", "template-systemgamemanager.db");
 
-        var dbDirectory = Path.GetDirectoryName(dbFile);
+        var dbDirectory = Path.GetDirectoryName(databaseFile);
         if (!string.IsNullOrWhiteSpace(dbDirectory) && !Directory.Exists(dbDirectory))
         {
             Directory.CreateDirectory(dbDirectory);
@@ -67,17 +67,17 @@ class DatabaseController
                 SyncEntitiesToTemplate(templateFile);
             }
 
-            if (!File.Exists(dbFile) && File.Exists(templateFile))
+            if (!File.Exists(databaseFile) && File.Exists(templateFile))
             {
-                File.Copy(templateFile, dbFile);
+                File.Copy(templateFile, databaseFile);
             }
-            else if (File.Exists(dbFile) && File.Exists(templateFile))
+            else if (File.Exists(databaseFile) && File.Exists(templateFile))
             {
-                SyncSchemaFromTemplate(dbFile, templateFile);
+                SyncSchemaFromTemplate(databaseFile, templateFile);
             }
         }
 
-        var connection = new SqliteConnection($"Data Source={dbFile}");
+        var connection = new SqliteConnection($"Data Source={databaseFile}");
         connection.Open();
 
         using var pragma = connection.CreateCommand();

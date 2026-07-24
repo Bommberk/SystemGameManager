@@ -15,7 +15,7 @@ public class MainForm : Form
     private readonly Label statusLabel = new Label();
     // private readonly GameViewService gameViewService = new GameViewService();
     // private readonly GameInfoView gameInfoView;
-    private readonly GameAudioView gameAudioView = new GameAudioView();
+    // private readonly GameAudioView gameAudioView = new GameAudioView();
     private GameAudioController? gameAudioController;
     private readonly ViewService viewService = new ViewService();
     public static Navbar navbar = new Navbar(); 
@@ -50,104 +50,11 @@ public class MainForm : Form
         };
         body.Controls.Add(container);
 
+        // Initialize pages
         var menuPage = new GameManager();
         new MenuPage();
         new Settings();
         new Info();
 
-        // menuPage.page.BringToFront();
-
-
-
-
-        return;
-        
-        // gameViewService = new GameViewService();
-        // gameInfoView = new GameInfoView(gameViewService.Artwork, ViewService.OpenGameDirectory);
-        // gameAudioView = new GameAudioView();
-
-        // var toolbar = new Panel()
-        // {
-        //     Dock = DockStyle.Top,
-        //     Height = 60,
-        //     Padding = new Padding(12),
-        //     BackColor = Color.Transparent
-        // };
-
-        // btnLoadInfo = UIHelpers.CreatePrimaryButton("Infos laden", 125);
-        // btnLoadInfo.Dock = DockStyle.Left;
-
-        // statusLabel = new Label()
-        // {
-        //     Text = "Bereit",
-        //     Dock = DockStyle.Fill,
-        //     Padding = new Padding(14, 7, 0, 0),
-        //     TextAlign = ContentAlignment.MiddleLeft,
-        //     ForeColor = ColorThemes.GetSecondaryTextColor(),
-        // };
-        
-        // btnLoadInfo.Click += BtnLoadInfo_Click;
-        // Shown += async (_, _) => await LoadInfoAsync();
-
-        // toolbar.Controls.Add(statusLabel);
-        // toolbar.Controls.Add(btnLoadInfo);
-        // container.Controls.Add(toolbar);
-
-        return;
-
-        // var tabs = new ThemedTabControl()
-        // {
-        //     Dock = DockStyle.Fill,
-        //     Padding = new Point(18, 8)
-        // };
-
-        // tabs.TabPages.Add(gameInfoView.CreateTab());
-        // tabs.TabPages.Add(gameAudioView.CreateTab());
-
-        // container.Controls.Add(tabs);
-        // gameInfoView.ShowLoadingState();
-        // gameAudioView.ShowLoadingState();
     }
-
-    // private async void BtnLoadInfo_Click(object? sender, EventArgs e)
-    // {
-    //     await LoadInfoAsync();
-    // }
-
-    // private async Task LoadInfoAsync()
-    // {
-    //     btnLoadInfo.Enabled = false;
-    //     statusLabel.Text = "Lade Informationen...";
-    //     gameInfoView.ShowLoadingState();
-    //     gameAudioView.ShowLoadingState();
-
-    //     try
-    //     {
-    //         var viewData = await Task.Run(BuildViewData);
-    //         gameInfoView.Populate(viewData.GameManager);
-    //         gameAudioView.RefreshGames();
-    //         gameAudioController ??= new GameAudioController();
-    //         statusLabel.Text = "Informationen geladen.";
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         gameInfoView.ShowErrorState(ex.Message);
-    //         gameAudioView.ShowErrorState(ex.Message);
-    //         statusLabel.Text = "Fehler beim Laden.";
-    //     }
-    //     finally
-    //     {
-    //         btnLoadInfo.Enabled = true;
-    //     }
-    // }
-
-
-    // private MainViewData BuildViewData()
-    // {
-    //     _ = new GameInfoController();
-
-    //     return new MainViewData(gameViewService.BuildViewData());
-    // }
-
-    // private sealed record MainViewData(GameViewService.GameManagerViewData GameManager);
 }
