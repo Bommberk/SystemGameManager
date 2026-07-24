@@ -1,17 +1,17 @@
-# System & Game Manager – Changelog (v0.5.7)
+# System & Game Manager – Changelog (v0.5.8)
 
-### 🏗 Architecture Refactoring & Code Cleanup
-*   **UI Module Restructuring:** Removed legacy view classes (`GameInfoView`, `GameAudioView`) from the codebase, simplifying the main application flow in `/view/MainForm.cs`.
-*   **Config Migration:** Eliminated external `appsettings.json` configuration file. Application settings are now strictly defined via C# classes and hardcoded defaults for better type safety.
-    *   Updated versioning logic (`AppConfig.Version`) to `0.5.7`.
-    *   Unified author attribution under "Krassheiten".
-*   **Dev Environment:** Introduced new `/config/global-dev-config.cs` class to handle dynamic environment switching (e.g., forcing database paths in Debug builds) without configuration file changes.
+### 🛠 Architecture Refactoring & Code Cleanup
+*   **Legacy View Removal:** Removed legacy view classes (`GameInfoView`, `GameAudioView`) to streamline the application flow and reduce bloat in `/view/MainForm.cs`. UI initialization logic was significantly simplified by commenting out unused controls and loading states.
+*   **Configuration Migration:** Eliminated external `appsettings.json` configuration file. Application settings are now strictly defined via C# classes (`AppConfig`, `DatabaseConfig`) for better type safety and deployment consistency.
+*   **Environment Handling:** Introduced new `/config/global-dev-config.cs` class to dynamically handle environment switching (e.g., forcing specific database paths in Debug builds) without requiring external config file changes.
+*   **Author Attribution:** Unified author attribution from "Bommberk" to **"Krassheiten"** across configuration classes and release metadata.
 
-### 💾 Database & File Handling
-*   **Path Logic Update:** Centralized app data path retrieval via `GlobalFunctions.GetAppdataPath()`.
-    *   The SQLite database is now explicitly located in `%APPDATA%\SystemGameManager\` instead of the install directory, ensuring better portability and user isolation.
-*   **Database Initialization:** Refactored `/modules/Database/DatabaseController.cs` to use dynamic file paths derived from `GlobalConfig`, making template syncing logic more robust across environments.
+### 🧹 Path Logic & Database Handling
+*   **Path Management Centralization:** Added helper methods `GlobalFunctions.GetAppdataPath()` and `GetCurrentDirectory()` to standardize directory retrieval logic.
+*   **Database Relocation:** Explicitly moved the SQLite database location from the installation directory (`modules/database/`) to `%APPDATA%\SystemGameManager\`. This ensures user privacy, prevents installation conflicts, and isolates game data in the standard Windows AppData directory.
+*   **Template Syncing Robustness:** Refactored `/modules/Database/DatabaseController.cs` to utilize dynamic file paths derived from `GlobalConfig`, making template importing and schema synchronization more robust across different environments.
 
-### 🧹 Maintenance & Optimization
-*   **Log Helper Simplification:** Renamed static logging method in `GlobalFunctions.cs` from ConsoleLog() to lowercase `log()` for consistency with C# naming conventions and cleaner CLI output handling (including startup messages like "Audio-Monitoring").
-*   **Startup Flow Cleanup:** Removed commented-out code blocks regarding launcher badges and game cards initialization, streamlining the entry point (`Program.cs`).
+### 🧹 Utility & Startup Flow Optimization
+*   **Logging Helper Simplification:** Renamed static logging method in `GlobalFunctions.cs` from verbose `ConsoleLog()` to lowercase `log()`. This improves consistency with C# naming conventions and cleans up CLI output handling (fixing startup messages like "Audio-Monitoring").
+*   **Startup Flow Cleanup:** Removed commented-out code blocks regarding launcher badges and game card initialization, streamlining the entry point (`Program.cs`).
+*   **Debug Mode Config:** Implemented conditional logic in `Program.Main` to instantiate new debug configuration handlers only when building/debugging.
