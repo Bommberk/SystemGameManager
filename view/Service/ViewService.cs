@@ -7,23 +7,10 @@ using SystemGameManager.Games.Entity;
 
 class ViewService
 {
-    public static string GetVersionFromReleases()
+    public static string GetVersionFromConfig()
     {
-        try
-        {
-            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            if (version != null)
-            {
-                if (version.Revision > 0)
-                {
-                    return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-                }
-                return $"{version.Major}.{version.Minor}.{version.Build}";
-            }
-        }
-        catch { }
-        
-        return "Unknown";
+        var version = GlobalConfig.Settings.AppConfig.Version;
+        return version ?? "unknown";
     }
 
     // public static void OpenGameDirectory(string path)

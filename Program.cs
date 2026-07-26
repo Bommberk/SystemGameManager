@@ -47,7 +47,10 @@ internal static class Program
             }
             else
             {
-                GetInfoAsync();
+                if(GlobalConfig.Settings.AppConfig.Environment != "dev")
+                {
+                    GetInfoAsync();
+                }
                 runForm();
             }
         }

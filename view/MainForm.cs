@@ -24,7 +24,7 @@ public class MainForm : Form
 
     public MainForm()
     {
-        Text = $"System & Game Manager (v{ViewService.GetVersionFromReleases()})";
+        Text = $"System & Game Manager (v{ViewService.GetVersionFromConfig()})";
         StartPosition = FormStartPosition.CenterScreen;
         MinimumSize = new Size(980, 640);
         Width = 1180;

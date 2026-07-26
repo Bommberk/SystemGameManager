@@ -336,17 +336,27 @@ class GameManager : Page
             FlowDirection = FlowDirection.LeftToRight,
             WrapContents = true,
         };
+        int gameCardWidth = 300;
         foreach (var game in games)
         {
             var gameCard = CardControls.GetSectionCard(5);
             gameCard.AutoSize = true;
             gameCard.Margin = new Padding(5);
+            gameCard.MaximumSize = new Size(gameCardWidth, 0);
+            gameCard.Width = gameCardWidth;
+            gameCard.MinimumSize = new Size(gameCardWidth, 0);
+            gameCard.AutoSizeMode  = AutoSizeMode.GrowAndShrink;
             var gameWallpaper = new PictureBox()
             {
                 Image = UIHelpers.LoadImage(game.GameImage ?? "assets/bild.jpg"),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Size = new Size(280, 158),
-                BackColor = ColorThemes.GetSecondaryBackgroundColor(),
+                SizeMode = PictureBoxSizeMode.Zoom,
+
+                Width = gameCardWidth - 20,
+                Height = (int)((gameCardWidth - 20) * 9.0 / 16.0),
+
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
+
+                // BackColor = ColorThemes.GetSecondaryBackgroundColor(),
                 Margin = new Padding(0, 0, 0, 10),
             };
 
@@ -372,7 +382,7 @@ class GameManager : Page
             {
                 Text = game.Name,
                 AutoSize = true,
-                MaximumSize = new Size(280, 0),
+                MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = ColorThemes.GetPrimaryTextColor(),
                 Margin = new Padding(0, 0, 0, 5),
@@ -381,7 +391,7 @@ class GameManager : Page
             {
                 Text = $"Playtime: Nicht erkannt", // Placeholder, da Playtime-erkennung kommt erst mit smarthome update/integration
                 AutoSize = true,
-                MaximumSize = new Size(280, 0),
+                MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetPrimaryTextColor(),
             };
@@ -389,7 +399,7 @@ class GameManager : Page
             {
                 Text = $"Volume:",
                 AutoSize = true,
-                MaximumSize = new Size(280, 0),
+                MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetPrimaryTextColor(),
             };
@@ -397,7 +407,7 @@ class GameManager : Page
             {
                 Text = $"Game: {game.GameVolumePercent}% | Music: {game.MusicVolumePercent}%",
                 AutoSize = true,
-                MaximumSize = new Size(280, 0),
+                MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetSecondaryTextColor(),
             };
@@ -405,7 +415,7 @@ class GameManager : Page
             {
                 Text = $"Audio Output:",
                 AutoSize = true,
-                MaximumSize = new Size(280, 0),
+                MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetPrimaryTextColor(),
             };
@@ -413,7 +423,7 @@ class GameManager : Page
             {
                 Text = $"{game.AudioOutputDevice ?? "(Standard-Gerät)"}",
                 AutoSize = true,
-                MaximumSize = new Size(280, 0),
+                MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetSecondaryTextColor(),
             };
@@ -421,6 +431,7 @@ class GameManager : Page
             {
                 Text = "Installpath:",
                 AutoSize = true,
+                MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetPrimaryTextColor(),
             };
@@ -428,15 +439,17 @@ class GameManager : Page
             {
                 Text = game.ExePath,
                 AutoSize = true,
-                MaximumSize = new Size(280, 20),
+                MaximumSize = new Size(gameCardWidth - 20, 20),
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetSecondaryTextColor(),
             };
             var openGameDirectoryButton = new NormalButton()
             {
                 Text = "Ordner öffnen",
-                AutoSize = true,
+                AutoSize = false,
                 Dock = DockStyle.Bottom,
+                Height = 30,
+                Margin = new Padding(0, 5, 0, 0),
             };
 
             gameBindings.Add(new GameSelectionBinding(game, gameSelectCheckBox, volume, audioOutputDevice));
