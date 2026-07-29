@@ -138,6 +138,10 @@ class GameService
         // Search recursively for image files in the Pictures folder
         foreach (Game game in Game.InstalledGames ?? Array.Empty<Game>())
         {
+            // Skip if the game already has an image
+            if (!string.IsNullOrEmpty(game.GameImage) && File.Exists(game.GameImage))
+                continue;
+
             // Entfernt alle Sonderzeichen aus einem String (behält nur Buchstaben, Ziffern, Leerzeichen, Bindestrich, Unterstrich)
             static string StripSpecialChars(string s) =>
                 new string(s.Where(c => char.IsLetterOrDigit(c) || c == ' ' || c == '-' || c == '_').ToArray());

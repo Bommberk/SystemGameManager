@@ -378,13 +378,78 @@ class GameManager : Page
                 GameManagerViewService.SelectGame(gameWallpaper, gameSelectCheckBox, selectAllGamesButton);
             
 
+            // Search and set Game Image
+            var gameMenuButton = new NormalButton()
+            {
+                Image = UIHelpers.LoadIcon("assets/icons/ellipsis-vertical-solid-full.svg", new Size(25, 25)),
+                Size = new Size(33, 33),
+                BackColor = ColorThemes.GetSecondaryBackgroundColorHover(),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+            };
+            gameMenuButton.Location = new Point(gameWallpaper.Width - gameMenuButton.Width - 5, 5);
+            gameWallpaper.Controls.Add(gameMenuButton);
+
+            // Create Game Menu
+            var gameMenu = new FlowLayoutPanel()
+            {
+                AutoSize = true,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                BackColor = Color.Transparent,
+                Padding = new Padding(0,0,15,0),
+                Visible = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+            };
+            gameMenu.Location = new Point(gameWallpaper.Width - gameMenu.Width - 5, 10);
+            // Game Menu Items
+            var openGameDirectoryButton = new NormalButton()
+            {
+                Text = "Spielordner öffnen",
+                AutoSize = true,
+                Size = new Size(gameMenu.Width, 0),
+                BackColor = ColorThemes.GetQuaternaryBackgroundColor(),
+                Margin = new Padding(0),
+            };
+            openGameDirectoryButton.SetHoverColor(UIHelpers.Darker(ColorThemes.GetQuaternaryBackgroundColor(), 0.85f));
+            var changeGameImageButton = new NormalButton()
+            {
+                Text = "Spielbild ändern",
+                AutoSize = true,
+                Size = new Size(gameMenu.Width, 0),
+                Margin = new Padding(0),
+                BackColor = ColorThemes.GetQuaternaryBackgroundColor(),
+            };
+            changeGameImageButton.SetHoverColor(UIHelpers.Darker(ColorThemes.GetQuaternaryBackgroundColor(), 0.85f));
+            var removeGameButton = new NormalButton()
+            {
+                Text = "Spiel entfernen",
+                AutoSize = true,
+                Size = new Size(gameMenu.Width, 0),
+                Margin = new Padding(0),
+                BackColor = ColorThemes.GetErrorBackgroundColor(),
+            };
+            removeGameButton.SetHoverColor(Color.FromArgb(163, 26, 44));
+
+            // Attach event handlers for user activities
+            GameManagerViewService.OpenGameDirectory(openGameDirectoryButton, game);
+            GameManagerViewService.ChangeGameImage(changeGameImageButton, game, gameCard, gameWallpaper);
+            GameManagerViewService.RemoveGame(removeGameButton, game, gameCard);
+
+            // Add gamemenu to GameCard
+            gameMenu.Controls.Add(openGameDirectoryButton);
+            gameMenu.Controls.Add(changeGameImageButton);
+            gameMenu.Controls.Add(removeGameButton);
+            gameWallpaper.Controls.Add(gameMenu);
+            GameManagerViewService.ToggleGameMenu(gameMenuButton, gameMenu);
+
+            // Game Infos
             var gameName = new Label()
             {
                 Text = game.Name,
                 AutoSize = true,
                 MaximumSize = new Size(gameCardWidth - 20, 0),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                ForeColor = ColorThemes.GetPrimaryTextColor(),
+                ForeColor = UIHelpers.Lighter(ColorThemes.GetPrimaryTextColor(), 0.1f),
                 Margin = new Padding(0, 0, 0, 5),
             };
             var gamePlayTime = new Label()
@@ -443,14 +508,6 @@ class GameManager : Page
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 ForeColor = ColorThemes.GetSecondaryTextColor(),
             };
-            var openGameDirectoryButton = new NormalButton()
-            {
-                Text = "Ordner öffnen",
-                AutoSize = false,
-                Dock = DockStyle.Bottom,
-                Height = 30,
-                Margin = new Padding(0, 5, 0, 0),
-            };
 
             gameBindings.Add(new GameSelectionBinding(game, gameSelectCheckBox, volume, audioOutputDevice));
 
@@ -463,7 +520,6 @@ class GameManager : Page
             gameCard.Controls.Add(volume);
             gameCard.Controls.Add(audioOutputDeviceLabel);
             gameCard.Controls.Add(audioOutputDevice);
-            gameCard.Controls.Add(openGameDirectoryButton);
             gameContainer.Controls.Add(gameCard);
         }
         section.Controls.Add(gameContainer);

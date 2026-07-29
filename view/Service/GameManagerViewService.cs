@@ -112,4 +112,84 @@ class GameManagerViewService
         bool allChecked = page.gameBindings.Count > 0 && page.gameBindings.All(b => b.CheckBox.Checked);
         selectAllGamesButton.Text = allChecked ? "Alle abwählen" : "Alle auswählen";
     }
+
+    public void ToggleGameMenu(NormalButton gameMenuButton, Panel gameMenuPanel)
+    {
+        gameMenuButton.Click += (sender, e) =>
+        {
+            if (gameMenuPanel != null)
+            {
+                gameMenuPanel.Visible = !gameMenuPanel.Visible;
+            }
+        };
+
+        page.page.Click += (sender, e) =>
+        {
+            if (!gameMenuPanel.Visible)
+                return;
+
+            // Mausposition relativ zum gameMenuPanel
+            Point mousePosition = gameMenuPanel.PointToClient(Cursor.Position);
+
+            if (!gameMenuPanel.ClientRectangle.Contains(mousePosition))
+            {
+                gameMenuPanel.Visible = false;
+            }
+        };
+    }
+
+    public void OpenGameDirectory(NormalButton openGameDirectoryButton, Game game)
+    {
+        openGameDirectoryButton.Click += (sender, e) =>
+        {
+            if (game != null && !string.IsNullOrEmpty(game.InstallFolderPath) && Directory.Exists(game.InstallFolderPath))
+            {
+                System.Diagnostics.Process.Start("explorer.exe", game.InstallFolderPath);
+            }
+            else
+            {
+                MessageBox.Show("Das Spielverzeichnis existiert nicht.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        };
+    }
+
+    public void ChangeGameImage(NormalButton changeGameImageButton, Game game, TableLayoutPanel gameCard, PictureBox gameWallpaper)
+    {
+        changeGameImageButton.Click += (sender, e) =>
+        {
+            if (game == null) return;
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Bilddateien (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|Alle Dateien (*.*)|*.*";
+                openFileDialog.Title = "Wähle ein neues Spielbild aus";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedImagePath = openFileDialog.FileName;
+                    game.GameImage = selectedImagePath;
+                    Game.UpdateGame(game);
+                    MessageBox.Show("Spielbild wurde erfolgreich geändert.", "Erfolg", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            gameCard.Controls.Remove(gameWallpaper);
+            gameWallpaper.Image = UIHelpers.LoadImage(game.GameImage ?? "assets/bild.jpg");
+            gameCard.Controls.Add(gameWallpaper,0,0);
+        };
+    }
+    public void RemoveGame(NormalButton removeGameButton, Game game, TableLayoutPanel gameCard)
+    {
+        return; // Temporarily disable the remove game functionality
+        removeGameButton.Click += (sender, e) =>
+        {
+            if (game == null) return;
+
+            var result = MessageBox.Show($"Bist du sicher, dass du '{game.Name}' entfernen möchtest?", "Spiel entfernen", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.Yes)
+            {
+                page.RefreshGameAndLauncherInfo();
+                MessageBox.Show($"'{game.Name}' wurde erfolgreich entfernt.", "Erfolg", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        };
+    }
 }

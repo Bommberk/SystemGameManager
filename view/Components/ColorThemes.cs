@@ -33,6 +33,14 @@ public class ColorThemes
     {
         return CurrentTheme.SecondaryBackgroundColorHover;
     }
+    public static Color GetTertiaryBackgroundColor()
+    {
+        return CurrentTheme.TertiaryBackgroundColor;
+    }
+    public static Color GetQuaternaryBackgroundColor()
+    {
+        return CurrentTheme.QuaternaryBackgroundColor;
+    }
     public static Color GetCardBackgroundColor()
     {
         return CurrentTheme.CardBackgroundColor;
@@ -45,6 +53,10 @@ public class ColorThemes
     {
         return CurrentTheme.SecondaryTextColor;
     }
+    public static Color GetErrorBackgroundColor()
+    {
+        return Color.FromArgb(195, 32, 56);
+    }
 }
 
 class StandardDarkTheme : ITheme
@@ -53,6 +65,7 @@ class StandardDarkTheme : ITheme
     public Color SecondaryBackgroundColor => Color.FromArgb(59, 67, 49);
     public Color SecondaryBackgroundColorHover => Color.FromArgb(38, 43, 32);
     public Color TertiaryBackgroundColor => Color.FromArgb(15, 15, 15);
+    public Color QuaternaryBackgroundColor => Color.FromArgb(152, 177, 100);
     public Color CardBackgroundColor => Color.FromArgb(35, 36, 36);
     public Color PrimaryTextColor => Color.FromArgb(233, 235, 236);
     public Color SecondaryTextColor => Color.FromArgb(152, 177, 100);
@@ -69,6 +82,7 @@ class StandardLightTheme : ITheme
     public Color SecondaryBackgroundColor => Color.FromArgb(113, 123, 89);
     public Color SecondaryBackgroundColorHover => Color.FromArgb(92, 99, 73);
     public Color TertiaryBackgroundColor => Color.FromArgb(255, 255, 255);
+    public Color QuaternaryBackgroundColor => Color.FromArgb(59, 67, 49);
     public Color CardBackgroundColor => Color.FromArgb(242, 242, 242);
     public Color PrimaryTextColor => Color.FromArgb(30, 30, 30);
     public Color SecondaryTextColor => Color.FromArgb(152, 177, 100);
@@ -79,12 +93,14 @@ class StandardLightTheme : ITheme
     }
 }
 
+
 public interface ITheme
 {
     Color PrimaryBackgroundColor { get; }
     Color SecondaryBackgroundColor { get; }
     Color SecondaryBackgroundColorHover { get; }
     Color TertiaryBackgroundColor { get; }
+    Color QuaternaryBackgroundColor { get; }
     Color CardBackgroundColor { get; }
     Color PrimaryTextColor { get; }
     Color SecondaryTextColor { get; }

@@ -17,7 +17,7 @@ using SystemGameManager.View;
 internal static class Program
 {
     [STAThread]
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
         #if DEBUG
         new GlobalDevConfig();
@@ -29,29 +29,28 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            // ErrorHandler.Handle works without Register() having been called first.
             ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
         }
 
         ErrorHandler.Register();
 
-        await new Updater().AutoUpdate();
-
-
-
         try
         {
+            // Update abschließen, ohne Main vom STA-Thread wegzuführen
+            new Updater().AutoUpdate().GetAwaiter().GetResult();
+
             if (args.Length > 0 && args[0] == "--console")
             {
-                runConsole();
+                RunConsole();
             }
             else
             {
-                if(GlobalConfig.Settings.AppConfig.Environment != "dev")
+                if (GlobalConfig.Settings.AppConfig.Environment != "dev")
                 {
                     GetInfoAsync();
                 }
-                runForm();
+
+                RunForm();
             }
         }
         catch (Exception ex)
@@ -60,11 +59,12 @@ internal static class Program
         }
     }
 
-    private static void runConsole()
+    private static void RunConsole()
     {
         GetInfoAsync();
 
         using var shutdownSignal = new ManualResetEventSlim(false);
+
         Console.WriteLine("Audio-Monitoring läuft. Mit Strg+C beenden.");
 
         Console.CancelKeyPress += (_, eventArgs) =>
@@ -75,12 +75,14 @@ internal static class Program
 
         shutdownSignal.Wait();
     }
-    private static void runForm()
+
+    private static void RunForm()
     {
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm());
     }
-    private static void writeHeadline()
+
+    private static void WriteHeadline()
     {
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("==============================");
@@ -92,12 +94,10 @@ internal static class Program
     private static void GetInfoAsync()
     {
         var dbController = new DatabaseController();
-        // var pcInfo = new PcInfoController();
         var gameInfo = new GameInfoController();
-        // var gameAudio = new GameAudioController();
-        writeHeadline();
-        // pcInfo.Write();
-        // gameInfo.Write();
+
+        WriteHeadline();
+
         Game.WriteGamesFromDatabase();
     }
 }

@@ -41,6 +41,11 @@ class Game
         var databaseController = new DatabaseController();
         databaseController.GetDatabaseService().RecordManager(InstalledGames);
     }
+    public static void UpdateGame(Game game)
+    {
+        var databaseController = new DatabaseController();
+        databaseController.GetDatabaseService().UpdateRecordByName(TABLE_NAME, game.Name, game);
+    }
     public static Game[] GetGames()
     {
         var databaseController = new DatabaseController();

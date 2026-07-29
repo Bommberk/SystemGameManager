@@ -97,6 +97,24 @@ class DatabaseService
         command.ExecuteNonQuery();
     }
 
+    public void UpdateRecordByName(string tableName, string recordName, object updatedRecord)
+    {
+        if (string.IsNullOrWhiteSpace(tableName) || string.IsNullOrWhiteSpace(recordName) || updatedRecord is null)
+            return;
+
+        var recordType = GetRecordType(updatedRecord);
+        if (recordType is null) return;
+
+        var properties = GetPersistedProperties(recordType);
+        if (properties.Length == 0) return;
+
+        currentRecord = updatedRecord;
+        currentRecordProperties = properties;
+        currentRecordName = recordName;
+
+        UpdateRecord(tableName);
+    }
+
     private void DeleteRecord(string tableName)
     {
         if (string.IsNullOrWhiteSpace(currentRecordName)) return;

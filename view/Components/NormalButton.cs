@@ -17,4 +17,9 @@ class NormalButton : Button
         FlatAppearance.MouseDownBackColor = ColorThemes.GetSecondaryBackgroundColorHover();
         FlatAppearance.MouseOverBackColor = ColorThemes.GetSecondaryBackgroundColorHover();
     }
+
+    public void SetHoverColor(Color hoverColor)
+    {
+        FlatAppearance.MouseOverBackColor = hoverColor;
+    }
 }
