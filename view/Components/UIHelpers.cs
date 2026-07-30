@@ -150,4 +150,86 @@ internal static class UIHelpers
             (int)(color.B + (255 - color.B) * factor)
         );
     }
+    public static Color Transparentize(Color color, float factor)
+    {
+        factor = Math.Clamp(factor, 0f, 1f);
+
+        return Color.FromArgb(
+            (int)(color.A * (1 - factor)),
+            color.R,
+            color.G,
+            color.B
+        );
+    }
+    public static Color HoverColor(Color baseColor, float factor)
+    {
+        if (factor < 0)
+        {
+            return Darker(baseColor, -factor);
+        }
+        else
+        {
+            return Lighter(baseColor, factor);
+        }
+    }
+    public static void RoundPictureBox(
+        PictureBox pictureBox,
+        int topLeft = 0,
+        int topRight = 0,
+        int bottomRight = 0,
+        int bottomLeft = 0)
+    {
+        void UpdateRegion()
+        {
+            var path = new GraphicsPath();
+
+            // Oben links
+            if (topLeft > 0)
+                path.AddArc(0, 0, topLeft * 2, topLeft * 2, 180, 90);
+            else
+                path.AddLine(0, 0, 0, 0);
+
+            // Oben rechts
+            if (topRight > 0)
+                path.AddArc(pictureBox.Width - topRight * 2, 0, topRight * 2, topRight * 2, 270, 90);
+            else
+                path.AddLine(pictureBox.Width, 0, pictureBox.Width, 0);
+
+            // Unten rechts
+            if (bottomRight > 0)
+                path.AddArc(
+                    pictureBox.Width - bottomRight * 2,
+                    pictureBox.Height - bottomRight * 2,
+                    bottomRight * 2,
+                    bottomRight * 2,
+                    0,
+                    90);
+            else
+                path.AddLine(pictureBox.Width, pictureBox.Height, pictureBox.Width, pictureBox.Height);
+
+            // Unten links
+            if (bottomLeft > 0)
+                path.AddArc(
+                    0,
+                    pictureBox.Height - bottomLeft * 2,
+                    bottomLeft * 2,
+                    bottomLeft * 2,
+                    90,
+                    90);
+            else
+                path.AddLine(0, pictureBox.Height, 0, pictureBox.Height);
+
+            path.CloseFigure();
+
+            pictureBox.Region?.Dispose();
+            pictureBox.Region = new Region(path);
+        }
+
+        pictureBox.Resize += (_, _) => UpdateRegion();
+        UpdateRegion();
+    }
+    public static void SetSvgBoxShadow(SvgDocument svgDocument, Color shadowColor, float blurRadius, float offsetX, float offsetY)
+    {
+        
+    }
 }

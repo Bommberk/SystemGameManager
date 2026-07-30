@@ -57,7 +57,7 @@ class ViewService
 
         panel.Region = new Region(path);
     }
-    public static TableLayoutPanel GetNewSection(string title)
+    public static TableLayoutPanel GetNewSection(string title, bool isDropdown = false)
     {
         var section = new TableLayoutPanel()
         {

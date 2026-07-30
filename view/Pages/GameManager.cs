@@ -350,15 +350,13 @@ class GameManager : Page
             {
                 Image = UIHelpers.LoadImage(game.GameImage ?? "assets/bild.jpg"),
                 SizeMode = PictureBoxSizeMode.Zoom,
-
                 Width = gameCardWidth - 20,
                 Height = (int)((gameCardWidth - 20) * 9.0 / 16.0),
-
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
-
-                // BackColor = ColorThemes.GetSecondaryBackgroundColor(),
+                BackColor = ColorThemes.GetSecondaryCardBackgroundColor(),
                 Margin = new Padding(0, 0, 0, 10),
             };
+            UIHelpers.SetRoundedRegion(gameWallpaper, 5);
 
             // Checkbox oben links auf dem Bild hinzufügen
             var gameSelectCheckBox = new CheckBox()
@@ -383,9 +381,10 @@ class GameManager : Page
             {
                 Image = UIHelpers.LoadIcon("assets/icons/ellipsis-vertical-solid-full.svg", new Size(25, 25)),
                 Size = new Size(33, 33),
-                BackColor = ColorThemes.GetSecondaryBackgroundColorHover(),
+                BackColor = Color.Transparent,
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
             };
+            gameMenuButton.SetHoverColor(ColorThemes.GetCardBackgroundColor());
             gameMenuButton.Location = new Point(gameWallpaper.Width - gameMenuButton.Width - 5, 5);
             gameWallpaper.Controls.Add(gameMenuButton);
 

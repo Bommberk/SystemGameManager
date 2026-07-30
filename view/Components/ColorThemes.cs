@@ -45,6 +45,10 @@ public class ColorThemes
     {
         return CurrentTheme.CardBackgroundColor;
     }
+    public static Color GetSecondaryCardBackgroundColor()
+    {
+        return CurrentTheme.SecondaryCardBackgroundColor;
+    }
     public static Color GetPrimaryTextColor()
     {
         return CurrentTheme.PrimaryTextColor;
@@ -67,6 +71,7 @@ class StandardDarkTheme : ITheme
     public Color TertiaryBackgroundColor => Color.FromArgb(15, 15, 15);
     public Color QuaternaryBackgroundColor => Color.FromArgb(152, 177, 100);
     public Color CardBackgroundColor => Color.FromArgb(35, 36, 36);
+    public Color SecondaryCardBackgroundColor => Color.FromArgb(84, 89, 89);
     public Color PrimaryTextColor => Color.FromArgb(233, 235, 236);
     public Color SecondaryTextColor => Color.FromArgb(152, 177, 100);
 
@@ -84,9 +89,9 @@ class StandardLightTheme : ITheme
     public Color TertiaryBackgroundColor => Color.FromArgb(255, 255, 255);
     public Color QuaternaryBackgroundColor => Color.FromArgb(59, 67, 49);
     public Color CardBackgroundColor => Color.FromArgb(242, 242, 242);
+    public Color SecondaryCardBackgroundColor => Color.FromArgb(200, 200, 200);
     public Color PrimaryTextColor => Color.FromArgb(30, 30, 30);
     public Color SecondaryTextColor => Color.FromArgb(152, 177, 100);
-
     public Color GetHoveredColor(Color baseColor)
     {
         return UIHelpers.Lighter(baseColor, 0.1f);
@@ -102,6 +107,7 @@ public interface ITheme
     Color TertiaryBackgroundColor { get; }
     Color QuaternaryBackgroundColor { get; }
     Color CardBackgroundColor { get; }
+    Color SecondaryCardBackgroundColor { get; }
     Color PrimaryTextColor { get; }
     Color SecondaryTextColor { get; }
     Color GetHoveredColor(Color baseColor);
