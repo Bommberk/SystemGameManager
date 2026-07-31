@@ -1,17 +1,30 @@
-# System & Game Manager – Changelog (v0.5.8)
+# System & Game Manager – Changelog (v0.5.9)
 
-### 🛠 Architecture Refactoring & Code Cleanup
-*   **Legacy View Removal:** Removed legacy view classes (`GameInfoView`, `GameAudioView`) to streamline the application flow and reduce bloat in `/view/MainForm.cs`. UI initialization logic was significantly simplified by commenting out unused controls and loading states.
-*   **Configuration Migration:** Eliminated external `appsettings.json` configuration file. Application settings are now strictly defined via C# classes (`AppConfig`, `DatabaseConfig`) for better type safety and deployment consistency.
-*   **Environment Handling:** Introduced new `/config/global-dev-config.cs` class to dynamically handle environment switching (e.g., forcing specific database paths in Debug builds) without requiring external config file changes.
-*   **Author Attribution:** Unified author attribution from "Bommberk" to **"Krassheiten"** across configuration classes and release metadata.
+### 🛠 Architecture Refactoring & Entry Point Logic
+- **Main Execution Flow:** Modified `Program.Main` to execute asynchronous updates synchronously (`GetAwaiter().GetResult()`) within the UI thread, ensuring background checks complete before launching the application or console mode.
+- **Environment Handling:** Implemented conditional logic in startup flow; system info loading is skipped exclusively for production builds where applicable, streamlining performance on initial launch.
+- **Configuration Cleanup:** Removed reliance on external `appsettings.json`; all settings are now strictly defined via C# classes (`AppConfig`, `GlobalConfig`) for better type safety and deployment consistency.
 
-### 🧹 Path Logic & Database Handling
-*   **Path Management Centralization:** Added helper methods `GlobalFunctions.GetAppdataPath()` and `GetCurrentDirectory()` to standardize directory retrieval logic.
-*   **Database Relocation:** Explicitly moved the SQLite database location from the installation directory (`modules/database/`) to `%APPDATA%\SystemGameManager\`. This ensures user privacy, prevents installation conflicts, and isolates game data in the standard Windows AppData directory.
-*   **Template Syncing Robustness:** Refactored `/modules/Database/DatabaseController.cs` to utilize dynamic file paths derived from `GlobalConfig`, making template importing and schema synchronization more robust across different environments.
+### 🎨 Visual & UX Improvements
+- **Enhanced Theming Engine:** Extended the theme system with new color properties:
+  - Added support for `QuaternaryBackgroundColor` (secondary actions) in both Light/Dark modes.
+  - Introduced `SecondaryCardBackgroundColor` to differentiate content areas from background layers.
+- **Dynamic UI Components:** Refactored controls (`NormalButton`, `PictureBox`) to utilize dynamic hover states and rounded corners via helper methods instead of hardcoded values.
+- **Game Card Optimization:** Game cards now enforce fixed dimensions for consistent layout, with wallpapers using zoom scaling rather than stretch distortion.
+- **New Icons:** Integrated the vertical ellipsis icon into the project assets for menu triggers.
 
-### 🧹 Utility & Startup Flow Optimization
-*   **Logging Helper Simplification:** Renamed static logging method in `GlobalFunctions.cs` from verbose `ConsoleLog()` to lowercase `log()`. This improves consistency with C# naming conventions and cleans up CLI output handling (fixing startup messages like "Audio-Monitoring").
-*   **Startup Flow Cleanup:** Removed commented-out code blocks regarding launcher badges and game card initialization, streamlining the entry point (`Program.cs`).
-*   **Debug Mode Config:** Implemented conditional logic in `Program.Main` to instantiate new debug configuration handlers only when building/debugging.
+### 🧩 Feature Additions & Interactivity
+- **Contextual Menus:** Added three-button context menus to game cards:
+  - **Open Directory:** Launches File Explorer directly to the installed game's folder.
+  - **Change Image:** Allows users to replace default wallpapers with custom images (`.png`, `.jpg`).
+  - **Remove Game:** *(Temporarily disabled)* Previously added logic for removing games from the database UI.
+- **Rounded Corners Engine:** Introduced `UIHelpers.RoundPictureBox` to apply consistent rounded regions to image displays based on corner radii parameters.
+
+### 🔧 Database & Data Management
+- **Update Mechanism:** New generic `DatabaseService.UpdateRecordByName()` method added, enabling dynamic updates of any record type by name without hardcoding field lists during instantiation.
+- **Game Synchronization:** Refactored `Game.InstalledGames` to support immediate database writes via the new update service when image changes occur.
+
+### 🧹 Code Hygiene & Utilities
+- **Logging Standards:** Renamed verbose static logging method from `ConsoleLog()` to lowercase `log()` in helper functions for cleaner CLI output and consistency with C# naming conventions.
+- **Path Centralization:** Added dedicated methods (`GetAppdataPath`, `GetCurrentDirectory`) to standardize path retrieval, ensuring the SQLite database resides safely within `%APPDATA%\SystemGameManager\` rather than the installation directory.
+- **View Service Updates:** Decoupled version reporting from assembly reflection; now reads directly from configuration settings for easier patching and version bumping.

@@ -13,6 +13,8 @@ using Velopack;
 using System.Threading.Tasks;
 using SystemGameManager.Service;
 using SystemGameManager.View;
+using System.Net.Http;
+using SystemGameManager.Plugin;
 
 internal static class Program
 {
@@ -50,6 +52,16 @@ internal static class Program
                     GetInfoAsync();
                 }
 
+                // API Smarthome aufrufen
+                try
+                {
+                    var smarthomeApi = new SmarthomeApi();
+                    smarthomeApi.SendDeviceInfoAsync();
+                }
+                catch (Exception ex)
+                {
+                    ErrorHandler.Handle(ex, ErrorSeverity.Warning);
+                }
                 RunForm();
             }
         }
@@ -57,6 +69,7 @@ internal static class Program
         {
             ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
         }
+
     }
 
     private static void RunConsole()

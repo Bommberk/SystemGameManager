@@ -7,7 +7,7 @@ using System.Text.Json;
 public class AppConfig
 {
     public string AppName { get; set; } = "SystemGameManager";
-    public string Version { get; set; } = "0.5.8";
+    public string Version { get; set; } = "0.5.9";
     public string Environment { get; set; } = "production";
     public string RepositoryUrl { get; set; } = "https://github.com/Bommberk/SystemGameManager";
     public string Author { get; set; } = "Krassheiten";
@@ -29,11 +29,18 @@ public class GameManagerConfig
     public bool ScanOnStartup { get; set; } = true;
 }
 
+public class SmarthomeApiConfig
+{
+    public string ApiUrl { get; set; } = "https://api.smarthome.krassheiten.de";
+    public string ApiKey { get; set; } = "testtoken123";
+}
+
 public class AppSettings
 {
     public AppConfig AppConfig { get; set; } = new();
     public DatabaseConfig DatabaseConfig { get; set; } = new();
     public GameManagerConfig GameManagerConfig { get; set; } = new();
+    public SmarthomeApiConfig SmarthomeApiConfig { get; set; } = new();
 }
 
 public static class GlobalConfig
