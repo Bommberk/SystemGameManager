@@ -52,7 +52,11 @@ internal static class UIHelpers
     public static Image LoadImage(string path)
     {
         var resolvedPath = ResolveRuntimePath(path);
-        using var image = Image.FromFile(resolvedPath);
+        var image = Image.FromFile(ResolveRuntimePath("assets/bild.jpg"));
+        if(File.Exists(resolvedPath))
+        {
+            image = Image.FromFile(resolvedPath);
+        }
         return new Bitmap(image);
     }
 
