@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using Velopack;
 using System.Threading.Tasks;
 using SystemGameManager.Service;
-using SystemGameManager.View;
+using SystemGameManager.View2;
 using System.Net.Http;
 using SystemGameManager.Plugin;
 
@@ -50,18 +50,18 @@ internal static class Program
                 if (GlobalConfig.Settings.AppConfig.Environment != "dev")
                 {
                     GetInfoAsync();
+                    // API Smarthome aufrufen
+                    try
+                    {
+                        var smarthomeApi = new SmarthomeApi();
+                        smarthomeApi.SendDeviceInfoAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorHandler.Handle(ex, ErrorSeverity.Warning);
+                    }
                 }
 
-                // API Smarthome aufrufen
-                try
-                {
-                    var smarthomeApi = new SmarthomeApi();
-                    smarthomeApi.SendDeviceInfoAsync();
-                }
-                catch (Exception ex)
-                {
-                    ErrorHandler.Handle(ex, ErrorSeverity.Warning);
-                }
                 RunForm();
             }
         }

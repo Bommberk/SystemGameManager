@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+*
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
+body
+{
+    background: var(--primary-background-color);
+    color: var(--primary-text-color);
+}
+
+#page
+{
+    margin-left: 60px;
+    padding: 15px;
+}
+
+:root
+{
+    /* Dark theme (from ColorThemes.cs - StandardDarkTheme) */
+    --primary-background-color: #171A1A;
+    --secondary-background-color: #3B4331;
+    --secondary-background-color-hover: #262B20;
+    --tertiary-background-color: #0F0F0F;
+    --quaternary-background-color: #98B164;
+    --card-background-color: #232424;
+    --card-boxshadow-color: rgba(0, 0, 0, 0.3);
+    --secondary-card-background-color: #545959;
+    --primary-text-color: #E9EBEC;
+    --secondary-text-color: #98B164;
+    --error-background-color: #C32038;
+}
+
+.light
+{
+    /* Light theme (from ColorThemes.cs - StandardLightTheme) */
+    --primary-background-color: #FCFBFB;
+    --secondary-background-color: #717B59;
+    --secondary-background-color-hover: #5C6349;
+    --tertiary-background-color: #FFFFFF;
+    --quaternary-background-color: #3B4331;
+    --card-background-color: #F2F2F2;
+    --secondary-card-background-color: #C8C8C8;
+    --primary-text-color: #1E1E1E;
+    --secondary-text-color: #98B164;
+    --error-background-color: #C32038;
+}
