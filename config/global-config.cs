@@ -7,7 +7,7 @@ using System.Text.Json;
 public class AppConfig
 {
     public string AppName { get; set; } = "SystemGameManager";
-    public string Version { get; set; } = "0.5.9";
+    public string Version { get; set; } = "0.5.10";
     public string Environment { get; set; } = "production";
     public string RepositoryUrl { get; set; } = "https://github.com/Bommberk/SystemGameManager";
     public string Author { get; set; } = "Krassheiten";
