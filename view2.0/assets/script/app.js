@@ -15,6 +15,7 @@ let launchers = [];
 /**
  * @typedef {Object} Game
  * @property {string} Name
+ * @property {string} SerializedGameName
  * @property {string} InstallFolderPath
  * @property {string} ExePath
  * @property {string} ProzessName
@@ -37,7 +38,13 @@ const api = {
         window.chrome.webview.postMessage({
             action: "getLaunchers"
         });
-    }
+    },
+    setGames(data){
+        window.chrome.webview.postMessage({
+            action: "setGames",
+            data: data
+        });
+    },
 };
 
 // Antwort von C#
@@ -108,7 +115,8 @@ function createGameList()
         const gameCard = document.createElement("div");
         gameCard.className = "game card";
         gameCard.innerHTML = `
-            <img src="${game.GameImage}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';">
+            <img src="${game.GameImage}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">
+            <input type="checkbox" name="select${game.SerializedGameName}" class="game-checkbox" data-game-name="${game.SerializedGameName}" onchange="selectGame('${game.SerializedGameName}')">
             <div class="content">
                 <h3>${game.Name}</h3>
                 <p>Installationspfad:</p>
@@ -124,7 +132,90 @@ function createGameList()
 }
 
 
+let selectedGames = new Set();
+function selectGame(gameName) {
+    if (selectedGames.has(gameName)) {
+        selectedGames.delete(gameName);
+    } else {
+        selectedGames.add(gameName);
+    }
+    document.querySelector("input[data-game-name='" + gameName + "']").checked = selectedGames.has(gameName);
+    
+    if(selectedGames.size > 0)
+    {
+        document.getElementById("selectAllGamesButton").textContent = "Alle abwählen";
+    } else {
+        document.getElementById("selectAllGamesButton").textContent = "Alle auswählen";
+    }
+}
+function selectAllGames()
+{
+    if(selectedGames.size > 0){
+        selectedGames.clear();
+        document.querySelectorAll(".game-checkbox").forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        document.getElementById("selectAllGamesButton").textContent = "Alle auswählen";
+    } else {
+        games.forEach(game => {
+            selectGame(game.SerializedGameName);
+        });
+    }
+}
+function reverseSelection()
+{
+    games.forEach(game => {
+        if (selectedGames.has(game.SerializedGameName)) {
+            selectedGames.delete(game.SerializedGameName);
+            document.querySelector("input[data-game-name='" + game.SerializedGameName + "']").checked = false;
+        } else {
+            selectedGames.add(game.SerializedGameName);
+            document.querySelector("input[data-game-name='" + game.SerializedGameName + "']").checked = true;
+        }
+    });
+}
+
+
+function saveSelectedGames()
+{
+    const gameVolume = parseInt(document.getElementById("gameVolumeSlider").value);
+    const musicVolume = parseInt(document.getElementById("musicVolumeSlider").value);
+    const audioOutputDevice = document.getElementById("audioOutputDevice").value;
+    selectedGames.forEach(gameName => {
+        const game = games.find(g => g.SerializedGameName === gameName);
+        setGameAudio(game.SerializedGameName, gameVolume, musicVolume, audioOutputDevice);
+    });
+    
+    api.setGames(games);
+    createGameList();
+}
+function setGameAudio(gameName, gameVolume, musicVolume, audioOutputDevice) 
+{
+    games.forEach(game => {
+        if (game.SerializedGameName === gameName) {
+            game.GameVolumePercent = gameVolume;
+            game.MusicVolumePercent = musicVolume;
+            game.AudioOutputDevice = audioOutputDevice;
+        }
+    });
+}
+function setGameImage(gameName, imagePath) 
+{
+    games.forEach(game => {
+        if (game.SerializedGameName === gameName) {
+            game.GameImage = imagePath;
+        }
+    });
+}
+
 function changeTheme(theme) {
     document.body.className = theme;
     localStorage.setItem('theme', theme);
 }
+
+// document.getElementById("gameVolumeSlider").addEventListener("input", function() {
+//     document.getElementById("gameVolumeValue").textContent = this.value;
+// });
+// document.getElementById("musicVolumeSlider").addEventListener("input", function() {
+//     document.getElementById("musicVolumeValue").textContent = this.value;
+// });

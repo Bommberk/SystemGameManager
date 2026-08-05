@@ -15,28 +15,28 @@
     </div>
     <div class="audiomanagement">
         <h2>Audio Einstellungen</h2>
-        <form action="" class="audiosettings-form card">
+        <form onsubmit="saveSelectedGames(); return false;" class="audiosettings-form card">
             <div class="form-group select-game">
                 <h3>Spiele auswählen</h3>
                 <div class="settings">
-                    <select name="gameSelect" id="gameSelect">
+                    <select name="audioOutputDevice" id="audioOutputDevice">
                         <option value="">-- Bitte wählen --</option>
                     </select>
-                    <button class="select-all-games">Alle auswählen</button>
-                    <button class="reverse-selection">Auswahl umkehren</button>
+                    <button type="button" class="select-all-games" onclick="selectAllGames()" id="selectAllGamesButton">Alle auswählen</button>
+                    <button type="button" class="reverse-selection" onclick="reverseSelection()">Auswahl umkehren</button>
                 </div>
             </div>
             <div class="form-group select-volume">
                 <h3>Lautstärke einstellen</h3>
                 <div class="game-volume">
                     <span>Spiel Lautstärke:</span>
-                    <input type="range" id="volumeSlider" min="0" max="100" value="50">
-                    <span id="volumeValue">50</span>%
+                    <input type="range" id="gameVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('gameVolumeValue').textContent = this.value">
+                    <span id="gameVolumeValue">100</span>%
                 </div>
                 <div class="music-volume">
                     <span>Musik Lautstärke:</span>
-                    <input type="range" id="musicVolumeSlider" min="0" max="100" value="50">
-                    <span id="musicVolumeValue">50</span>%
+                    <input type="range" id="musicVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('musicVolumeValue').textContent = this.value">
+                    <span id="musicVolumeValue">100</span>%
                 </div>
             </div>
             <button type="submit">Speichern</button>
@@ -44,6 +44,20 @@
     </div>
     <div class="games">
         <h2>Spiele</h2>
-        <div class="gamelist" expandable="true" id="gamelist"></div>
+        <div class="gamelist" expandable="true" id="gamelist">
+            <!-- <div class="game card">
+                <img src="../assets/images/bild.jpg" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.Name}')">
+                <input type="checkbox" name="select${game.Name}" id="game_${game.Name}" class="game-checkbox" data-game-name="${game.Name}" onchange="selectGame('${game.Name}')">
+                <div class="content">
+                    <h3>${game.Name}</h3>
+                    <p>Installationspfad:</p>
+                    <span id="installPath">${game.InstallFolderPath}</span>
+                    <p>Volume:</p>
+                    <span id="volume">Game: ${game.GameVolumePercent ?? 0}% | Music: ${game.MusicVolumePercent ?? 0}%</span>
+                    <p>Audio Output</p>
+                    <span id="audioOutput">${game.AudioOutputDevice ?? "N/A"}</span>
+                </div>
+            </div> -->
+        </div>
     </div>
 </div>

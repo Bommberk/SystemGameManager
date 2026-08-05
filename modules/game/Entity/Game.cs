@@ -10,6 +10,7 @@ class Game
     public const string TABLE_NAME = "Game";
     public static Game[]? InstalledGames { get; set; }
     public string Name { get; set; }
+    public string SerializedGameName { get; set; }
     public string InstallFolderPath { get; set; }
     public string ExePath { get; set; }
     public string ProzessName { get; set; } 
@@ -18,9 +19,10 @@ class Game
     public string? AudioOutputDevice { get; set; }
     public string? GameImage { get; set; }
 
-    public Game(string name, string installFolderPath, string exePath, string prozessName = "nothing found", int? musicVolumePercent = null, int? gameVolumePercent = null, string? audioOutputDevice = null, string? gameImage = null)
+    public Game(string name, string serializedGameName, string installFolderPath, string exePath, string prozessName = "nothing found", int? musicVolumePercent = null, int? gameVolumePercent = null, string? audioOutputDevice = null, string? gameImage = null)
     {
         Name = name;
+        SerializedGameName = serializedGameName;
         InstallFolderPath = installFolderPath;
         ExePath = exePath;
         ProzessName = prozessName;
@@ -40,6 +42,13 @@ class Game
     {
         var databaseController = new DatabaseController();
         databaseController.GetDatabaseService().RecordManager(InstalledGames);
+    }
+    public static void UpdateMultibleGames(Game[] games)
+    {
+        foreach (var game in games)
+        {
+            UpdateGame(game);
+        }
     }
     public static void UpdateGame(Game game)
     {

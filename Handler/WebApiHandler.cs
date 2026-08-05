@@ -16,29 +16,70 @@ public static class WebApiHandler
             if (request == null)
                 return;
 
-            switch (request.Action)
+            if (request.Action.StartsWith("get"))
             {
-                case "getGames":
-                    await GetGames(web);
-                    break;
-                case "getLaunchers":
-                    await GetLaunchers(web);
-                    break;
-                default:
-                    MessageBox.Show($"Unknown action: {request.Action}");
-                    break;
+                await getMethod(request, web);
+            }
+            else if (request.Action.StartsWith("set"))
+            {
+                await setMethod(request);
+            }else
+            {
+                MessageBox.Show($"Unknown action: {request.Action}");
             }
         };
+    }
+
+    private static async Task setMethod(ApiRequest request)
+    {
+        switch (request.Action)
+        {
+            case "setGames":
+                await SetGames(request);
+                break;
+            case "setLaunchers":
+                await SetLaunchers(request);
+                break;
+            default:
+                MessageBox.Show($"Unknown set action: {request.Action}");
+                break;
+        }
+    }
+    private static async Task getMethod(ApiRequest request, WebView2 web)
+    {
+        switch (request.Action)
+        {
+            case "getGames":
+                await GetGames(web);
+                break;
+            case "getLaunchers":
+                await GetLaunchers(web);
+                break;
+            default:
+                MessageBox.Show($"Unknown get action: {request.Action}");
+                break;
+        }
     }
 
     private static async Task GetGames(WebView2 web)
     {
         await Send(web, "getGames", Game.GetGames());
     }
-
     private static async Task GetLaunchers(WebView2 web)
     {
         await Send(web, "getLaunchers", Launcher.GetLaunchers());
+    }
+    
+    private static async Task SetGames(ApiRequest request)
+    {
+        Game[] games = JsonSerializer.Deserialize<List<Game>>(request.Data?.ToString() ?? "[]").ToArray();
+        Game.UpdateMultibleGames(games);
+        MessageBox.Show("Games were updated", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
+    private static async Task SetLaunchers(ApiRequest request)
+    {
+        
     }
 
     private static async Task Send(WebView2 web, string action, object data)
@@ -58,5 +99,7 @@ public static class WebApiHandler
     {
         [JsonPropertyName("action")]
         public string? Action { get; set; }
+        [JsonPropertyName("data")]
+        public object? Data { get; set; }
     }
 }

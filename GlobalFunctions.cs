@@ -28,6 +28,13 @@ class GlobalFunctions
         }
         Environment.Exit(0);
     }
+    public static void msgbox(string? message = null)
+    {
+        if (message != null)
+        {
+            MessageBox.Show(message);
+        }
+    }
 
     /// <summary>
     /// Gibt eine Trennlinie in der Konsole aus, um Debug-Logs oder wichtige Informationen hervorzuheben.

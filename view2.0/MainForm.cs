@@ -14,6 +14,8 @@ public partial class MainForm : Form
             Dock = DockStyle.Fill
         };
 
+        WindowState = FormWindowState.Maximized;
+
         Controls.Add(web);
 
         Load += async (_, _) =>

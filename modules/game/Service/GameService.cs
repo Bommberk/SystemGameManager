@@ -50,8 +50,9 @@ class GameService
                         continue;
 
                     string gameName = Path.GetFileName(gameDir);
+                    string serializedGameName = new string(gameName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ToArray()).ToLower();
                     string exePath = GetGameExe(gameDir);
-                    games.Add(new Game(gameName, gameDir, exePath));
+                    games.Add(new Game(gameName, serializedGameName, gameDir, exePath));
                 }
             }
         }
@@ -94,7 +95,8 @@ class GameService
 
                     string exePath = GetGameExe(installPath);
                     string processName = GetProcessName(resolvedGameName, exePath);
-                    games.Add(new Game(resolvedGameName, installPath, exePath, processName));
+                    string serializedGameName = new string(resolvedGameName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ToArray()).ToLower();   
+                    games.Add(new Game(resolvedGameName, serializedGameName, installPath, exePath, processName));
                 }
             }
         }
