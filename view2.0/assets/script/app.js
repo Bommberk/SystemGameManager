@@ -1,7 +1,30 @@
-// Globaler State
-const state = {
-    games: []
-};
+/**
+ * @typedef {Object} Launcher
+ * @property {string} Name
+ * @property {string} SearchName
+ * @property {string} StdInstallPath
+ * @property {string} InstallPath
+ * @property {string} StdGameFoldersPath
+ * @property {(string[]|null)} GameFolderPath
+ * @property {(string|null)} StdLibraryFilePath
+ * @property {(string|null)} DirectRegistryKey
+ */
+/** @type {Launcher[]} */
+let launchers = [];
+
+/**
+ * @typedef {Object} Game
+ * @property {string} Name
+ * @property {string} InstallFolderPath
+ * @property {string} ExePath
+ * @property {string} ProzessName
+ * @property {(number|null)} MusicVolumePercent
+ * @property {(number|null)} GameVolumePercent
+ * @property {(string|null)} AudioOutputDevice
+ * @property {(string|null)} GameImage
+ */
+/** @type {Game[]} */
+let games = [];
 
 // API
 const api = {
@@ -9,26 +32,68 @@ const api = {
         window.chrome.webview.postMessage({
             action: "getGames"
         });
+    },
+    getLaunchers() {
+        window.chrome.webview.postMessage({
+            action: "getLaunchers"
+        });
     }
 };
 
 // Antwort von C#
 window.apiResponse = function (response) {
 
-    if (response.action === "getGames") {
-
-        state.games = response.data;
-
-        document.getElementById("gameAmount").textContent = state.games.length;
-        document.getElementById("gameManagerImage").setAttribute("src", state.games[0]["GameImage"]);
-
-        // Hier kannst du direkt dein HTML bauen
-        // renderGames();
+    try{
+        switch (response.action) {
+            case "getGames":
+                games = response.data;
+                handleGames();
+                break;
+            case "getLaunchers":
+                launchers = response.data;
+                handleLaunchers();
+                break;
+            default:
+                console.error(`Unknown action: ${response.action}`);
+        }
+    }catch (error) {
+        console.error("Error handling response:", error);
     }
 };
 
 // Anfrage schicken
 api.getGames();
+api.getLaunchers();
 
 loadSidebar();
 loadPage("gamemanager");
+
+
+// Handle C# Responses
+function handleGames()
+{
+    document.getElementById("gameAmount").textContent = games.length;
+    document.getElementById("gameManagerImage").setAttribute("src", games[0]["GameImage"]);
+}
+
+function handleLaunchers()
+{
+    document.getElementById("launcherAmount").textContent = launchers.length;
+    console.log("Launchers:", launchers);
+    // Launcherlist
+    const launcherList = document.getElementById("launcherlist");
+    launcherList.innerHTML = "";
+    launchers.forEach(launcher => {
+        const launcherCard = document.createElement("div");
+        launcherCard.className = "launcher card";
+        let logoPath = `../assets/images/launcher_logos/${launcher.SearchName}-logo.png`;
+        launcherCard.innerHTML = `
+            <img src="${logoPath}" alt="${launcher.Name} logo" onerror="this.src='../assets/images/launcher_logos/placeholder-logo.png';">
+            <div class="content">
+                <h3>${launcher.Name}</h3>
+                <p class="installpath">${launcher.InstallPath}</p>
+            </div>
+        `;
+        launcherList.appendChild(launcherCard);
+    });
+}

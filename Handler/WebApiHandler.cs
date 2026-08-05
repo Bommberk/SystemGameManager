@@ -21,6 +21,9 @@ public static class WebApiHandler
                 case "getGames":
                     await GetGames(web);
                     break;
+                case "getLaunchers":
+                    await GetLaunchers(web);
+                    break;
                 default:
                     MessageBox.Show($"Unknown action: {request.Action}");
                     break;
@@ -31,6 +34,11 @@ public static class WebApiHandler
     private static async Task GetGames(WebView2 web)
     {
         await Send(web, "getGames", Game.GetGames());
+    }
+
+    private static async Task GetLaunchers(WebView2 web)
+    {
+        await Send(web, "getLaunchers", Launcher.GetLaunchers());
     }
 
     private static async Task Send(WebView2 web, string action, object data)

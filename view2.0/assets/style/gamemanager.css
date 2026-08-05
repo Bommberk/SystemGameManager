@@ -1,4 +1,22 @@
 .gamemanager.container
 {
     margin-top: 20px;
+    .launchers
+    {
+        margin-top: 20px;
+        .launcherlist{
+            margin-top: 10px;   
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            .launcher{
+                width: fit-content;
+                img{
+                    margin-right: 10px;
+                    width: 40px;
+                    border-radius: 50%;
+                }
+            }
+        }
+    }
 }
