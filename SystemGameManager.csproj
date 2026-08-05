@@ -30,6 +30,12 @@
     <None Update="config\appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="assets\game\knownLaunchersWithPath.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\game\knownLaunchers.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="modules\database\systemgamemanager.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
