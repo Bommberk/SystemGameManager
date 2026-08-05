@@ -1,6 +1,5 @@
 <link rel="stylesheet" href="../assets/style/gamemanager.css">
 
-<h1>Game Manager</h1>
 <div class="gamemanager container">
     <div class="head card">
         <img id="gameManagerImage" src="" alt="Game Manager">
@@ -12,7 +11,39 @@
     </div>
     <div class="launchers">
         <h2>Launcher</h2>
-        <div class="launcherlist" expandable="true" id="launcherlist">
-        </div>
+        <div class="launcherlist" expandable="true" id="launcherlist"></div>
+    </div>
+    <div class="audiomanagement">
+        <h2>Audio Einstellungen</h2>
+        <form action="" class="audiosettings-form card">
+            <div class="form-group select-game">
+                <h3>Spiele auswählen</h3>
+                <div class="settings">
+                    <select name="gameSelect" id="gameSelect">
+                        <option value="">-- Bitte wählen --</option>
+                    </select>
+                    <button class="select-all-games">Alle auswählen</button>
+                    <button class="reverse-selection">Auswahl umkehren</button>
+                </div>
+            </div>
+            <div class="form-group select-volume">
+                <h3>Lautstärke einstellen</h3>
+                <div class="game-volume">
+                    <span>Spiel Lautstärke:</span>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                    <span id="volumeValue">50</span>%
+                </div>
+                <div class="music-volume">
+                    <span>Musik Lautstärke:</span>
+                    <input type="range" id="musicVolumeSlider" min="0" max="100" value="50">
+                    <span id="musicVolumeValue">50</span>%
+                </div>
+            </div>
+            <button type="submit">Speichern</button>
+        </form>
+    </div>
+    <div class="games">
+        <h2>Spiele</h2>
+        <div class="gamelist" expandable="true" id="gamelist"></div>
     </div>
 </div>

@@ -1,6 +1,6 @@
 #sidebar
 {
-    position: absolute;
+    position: fixed;
     width: 60px;
     height: 100%;
     background: var(--secondary-background-color);

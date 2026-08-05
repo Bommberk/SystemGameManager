@@ -49,3 +49,48 @@ body
     --secondary-text-color: #98B164;
     --error-background-color: #C32038;
 }
+.red
+{
+    /* Red theme (from ColorThemes.cs - RedTheme) */
+    --primary-background-color: #990f0f;
+    --secondary-background-color: #8d2222;
+    --secondary-background-color-hover: #440a0a;
+    --tertiary-background-color: #5e1212;
+    --quaternary-background-color: #C32038;
+    --card-background-color: #630000;
+    --card-boxshadow-color: rgba(219, 0, 0, 0.473);
+    --secondary-card-background-color: #545959;
+    --primary-text-color: #E9EBEC;
+    --secondary-text-color: #C32038;
+    --error-background-color: #C32038;
+}
+.pink
+{mehrere
+    /* Pink theme */
+    --primary-background-color: #4a0e2e;
+    --secondary-background-color: #8b2e6b;
+    --secondary-background-color-hover: #6b1f52;
+    --tertiary-background-color: #2d0d1f;
+    --quaternary-background-color: #e91e63;
+    --card-background-color: #3d1a3d;
+    --card-boxshadow-color: rgba(233, 30, 99, 0.3);
+    --secondary-card-background-color: #545959;
+    --primary-text-color: #E9EBEC;
+    --secondary-text-color: #e91e63;
+    --error-background-color: #C32038;
+}
+.yellow
+{
+    /* Yellow theme */
+    --primary-background-color: #4a4410;
+    --secondary-background-color: #8b7e1f;
+    --secondary-background-color-hover: #6b6217;
+    --tertiary-background-color: #2d2a0d;
+    --quaternary-background-color: #ffeb3b;
+    --card-background-color: #3d3a1a;
+    --card-boxshadow-color: rgba(255, 235, 59, 0.3);
+    --secondary-card-background-color: #545959;
+    --primary-text-color: #E9EBEC;
+    --secondary-text-color: #ffeb3b;
+    --error-background-color: #C32038;
+}

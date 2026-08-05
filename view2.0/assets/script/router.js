@@ -10,6 +10,8 @@ async function loadPage(page)
         previous.classList.remove("active");
     }
     document.querySelector("#"+sidebarButton)?.classList.add("active");
+    handleGames();
+    handleLaunchers();
 }
 
 async function loadSidebar()

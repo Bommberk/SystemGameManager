@@ -73,14 +73,17 @@ loadPage("gamemanager");
 function handleGames()
 {
     document.getElementById("gameAmount").textContent = games.length;
-    document.getElementById("gameManagerImage").setAttribute("src", games[0]["GameImage"]);
+    createGameList();
 }
 
 function handleLaunchers()
 {
     document.getElementById("launcherAmount").textContent = launchers.length;
-    console.log("Launchers:", launchers);
-    // Launcherlist
+    createLauncherList();
+}
+
+function createLauncherList()
+{
     const launcherList = document.getElementById("launcherlist");
     launcherList.innerHTML = "";
     launchers.forEach(launcher => {
@@ -96,4 +99,32 @@ function handleLaunchers()
         `;
         launcherList.appendChild(launcherCard);
     });
+}
+function createGameList()
+{
+    const gameList = document.getElementById("gamelist");
+    gameList.innerHTML = "";
+    games.forEach(game => {
+        const gameCard = document.createElement("div");
+        gameCard.className = "game card";
+        gameCard.innerHTML = `
+            <img src="${game.GameImage}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';">
+            <div class="content">
+                <h3>${game.Name}</h3>
+                <p>Installationspfad:</p>
+                <span id="installPath">${game.InstallFolderPath}</span>
+                <p>Volume:</p>
+                <span id="volume">Game: ${game.GameVolumePercent ?? 0}% | Music: ${game.MusicVolumePercent ?? 0}%</span>
+                <p>Audio Output</p>
+                <span id="audioOutput">${game.AudioOutputDevice ?? "N/A"}</span>
+            </div>
+        `;
+        gameList.appendChild(gameCard);
+    });
+}
+
+
+function changeTheme(theme) {
+    document.body.className = theme;
+    localStorage.setItem('theme', theme);
 }
