@@ -2,11 +2,14 @@ using System.Text.Json;
 using Microsoft.Web.WebView2.WinForms;
 using SystemGameManager.Games.Entity;
 using SystemGameManager.Handler;
+using SystemGameManager.Games.Controller;
 
 namespace SystemGameManager.View2;
 
 public partial class MainForm : Form
 {
+    private readonly GameAudioController gameAudioController = new ();
+
     public MainForm()
     {
         var web = new WebView2
@@ -41,5 +44,7 @@ public partial class MainForm : Form
 
             web.Source = new Uri("https://systemgamemanager/index.html");
         };
+
+        FormClosed += (_, _) => gameAudioController.Dispose();
     }
 }
