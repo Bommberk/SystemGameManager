@@ -40,6 +40,7 @@ internal static class Program
         {
             // Update abschließen, ohne Main vom STA-Thread wegzuführen
             new Updater().AutoUpdate().GetAwaiter().GetResult();
+            GetInfoAsync();
 
             if (args.Length > 0 && args[0] == "--console")
             {
@@ -49,7 +50,6 @@ internal static class Program
             {
                 if (GlobalConfig.Settings.AppConfig.Environment != "dev")
                 {
-                    GetInfoAsync();
                     // API Smarthome aufrufen
                     try
                     {
@@ -74,8 +74,6 @@ internal static class Program
 
     private static void RunConsole()
     {
-        GetInfoAsync();
-
         using var shutdownSignal = new ManualResetEventSlim(false);
 
         Console.WriteLine("Audio-Monitoring läuft. Mit Strg+C beenden.");
