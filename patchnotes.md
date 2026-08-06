@@ -1,23 +1,20 @@
-# System & Game Manager – Changelog (v0.5.10 → v0.6.0)
+# System & Game Manager – Changelog (v2.0 Audio Filtering Update)
 
-### 🏗 Architecture Refactoring
-- **WebView2 Integration:** Introduced a modern web-based frontend (`view2.0/`) utilizing `Microsoft.Web.WebView2`. The main application now embeds an HTML/CSS/JS interface for managing games and launchers.
-- **Web API Handler:** Implemented bidirectional communication between the C# backend and the WebView via `Handler/WebApiHandler`, handling actions like `getGames`, `setLaunchers`, and audio configuration remotely from JS.
-- **View Module Migration:** Updated project structure to support the new view hierarchy (`SystemGameManager.View` → `SystemGameManager.View2`) while maintaining legacy compatibility paths in build configurations.
+### 🔊 New Audio Device Management
+- **Feature Implementation:** Added support for dynamically detecting and populating system audio output devices via `SystemAudioService`.
+- **UI Enhancement:** Integrated a search bar into the "Game Manager" audio settings page to filter games by:
+  - Name
+  - Install Path
+  - Assigned Audio Output Device
 
-### 🎨 Visual & UX Improvements
-- **Modern UI Framework:** Replaced traditional WinForms controls with a responsive web-based interface featuring:
-  - Sidebar navigation (Menu, Dashboard, Game Manager, Settings).
-  - Card-based layouts for games and launchers using CSS Grid/Flexbox.
-  - Real-time list rendering of installed applications via JavaScript data binding.
-- **Theming Engine:** Native support for multiple color themes (**Dark**, **Light**, **Red**, **Pink**, **Yellow**) applied globally to the WebView content, respecting system settings where applicable.
-- **Dynamic Asset Loading:** Optimized image handling with fallback logic and new launcher logos (Steam, Ubisoft Connect) integrated into `view2.0/assets/`.
+### 📜 API & Service Expansion (`Handler/WebApiHandler.cs`, `modules/game/Service/SystemAudioService.cs`)
+- **New Endpoint:** Introduced `getAudioDevices` action in the Webview2 handler.
+- **Refactoring:** Converted internal methods like `GetAudioOutputDeviceNames()` to `static` for improved testability and reusability across modules.
 
-### 📦 Data & API Enhancements
-- **Serialized Game Names:** Added `SerializedGameName` property to the `Game` entity for safe JSON transmission between C# and JavaScript without special character encoding issues.
-- **Smarthome Integration (Optional):** Refactored startup logic in `Program.cs` to conditionally initialize optional Smarthone API calls, ensuring stability even if external services are unavailable.
-- **Utility Functions:** Introduced a centralized message box helper (`GlobalFunctions.msgbox`) for consistent user feedback across the application and WebView communication errors.
+### 🎨 Frontend Logic Updates (`view2.0/assets/script/app.js`, `gamemanager.html`)
+- **Search Functionality:** Implemented real-time filtering logic in JavaScript to sort the game list based on user input within dropdown contexts (Name, Path, or Audio Device).
+- **Device Population:** Automated the populating of the `<select id="audioOutputDevice">` element with system-detected device names.
 
-### 🧹 Code Hygiene & Build Updates
-- **Project Configuration:** Streamlined `SystemGameManager.csproj` by updating icon asset patterns to support wildcards in `assets/icons/**/*` and properly registering new files under `view2.0`.
-- **Asset Cleanup:** Removed obsolete static SVG icons from direct project copy lists, replacing them with web-based assets where appropriate for the new UI layer.
+### 🛠 View Layer Refactoring (`view2.0/MainForm.cs`, `GameManager.cs`)
+- **Controller Injection:** Initialized a dedicated `GameAudioController` instance within `MainForm`. Resources are now properly disposed of via the `FormClosed` event to prevent memory leaks in debug builds.
+- **Code Cleanup:** Commented out legacy direct service calls in `GameManager.cs` as logic has migrated toward the controller pattern and new filtering utilities.
