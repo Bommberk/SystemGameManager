@@ -39,6 +39,11 @@ const api = {
             action: "getLaunchers"
         });
     },
+    getAudioDevices() {
+        window.chrome.webview.postMessage({
+            action: "getAudioDevices"
+        });
+    },
     setGames(data){
         window.chrome.webview.postMessage({
             action: "setGames",
@@ -60,6 +65,9 @@ window.apiResponse = function (response) {
                 launchers = response.data;
                 handleLaunchers();
                 break;
+            case "getAudioDevices":
+                handleAudioDevices(response.data);
+                break;
             default:
                 console.error(`Unknown action: ${response.action}`);
         }
@@ -71,6 +79,7 @@ window.apiResponse = function (response) {
 // Anfrage schicken
 api.getGames();
 api.getLaunchers();
+api.getAudioDevices();
 
 loadSidebar();
 loadPage("gamemanager");
@@ -87,6 +96,18 @@ function handleLaunchers()
 {
     document.getElementById("launcherAmount").textContent = launchers.length;
     createLauncherList();
+}
+function handleAudioDevices(devices)
+{
+    const audioDeviceSelection = document.getElementById("audioOutputDevice");
+    // audioDeviceSelection.innerHTML = "";
+    devices.forEach(device => {
+        const option = document.createElement("option");
+        option.value = device;
+        option.textContent = device;
+        audioDeviceSelection.appendChild(option);
+    });
+    console.log("Audio Devices:", devices);
 }
 
 function createLauncherList()
@@ -107,11 +128,11 @@ function createLauncherList()
         launcherList.appendChild(launcherCard);
     });
 }
-function createGameList()
+function createGameList(gameArray = null)
 {
     const gameList = document.getElementById("gamelist");
     gameList.innerHTML = "";
-    games.forEach(game => {
+    (gameArray ?? games).forEach(game => {
         const gameCard = document.createElement("div");
         gameCard.className = "game card";
         gameCard.innerHTML = `
@@ -207,6 +228,25 @@ function setGameImage(gameName, imagePath)
         }
     });
 }
+
+function filterGames(searchTerm)
+{
+    let filter = document.getElementById("selectFilter").value;
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const filteredGames = games.filter(game => {
+        if (filter === "name") {
+            return game.Name.toLowerCase().includes(lowerCaseSearchTerm);
+        } else if (filter === "installpath") {
+            return game.InstallFolderPath.toLowerCase().includes(lowerCaseSearchTerm);
+        } else if (filter === "audioDevice") {
+            return (game.AudioOutputDevice ?? "N/A").toLowerCase().includes(lowerCaseSearchTerm);
+        }
+        return false;
+    });
+
+    createGameList(filteredGames);
+}
+
 
 function changeTheme(theme) {
     document.body.className = theme;

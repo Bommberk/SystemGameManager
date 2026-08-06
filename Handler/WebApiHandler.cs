@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Web.WebView2.WinForms;
 using SystemGameManager.Games.Entity;
-
+using SystemGameManager.Games.Service;
 public static class WebApiHandler
 {
     public static void Initialize(WebView2 web)
@@ -55,6 +55,9 @@ public static class WebApiHandler
             case "getLaunchers":
                 await GetLaunchers(web);
                 break;
+            case "getAudioDevices":
+                await GetAudioDevices(web);
+                break;
             default:
                 MessageBox.Show($"Unknown get action: {request.Action}");
                 break;
@@ -68,6 +71,10 @@ public static class WebApiHandler
     private static async Task GetLaunchers(WebView2 web)
     {
         await Send(web, "getLaunchers", Launcher.GetLaunchers());
+    }
+    private static async Task GetAudioDevices(WebView2 web)
+    {
+        await Send(web, "getAudioDevices", SystemAudioService.GetAudioOutputDeviceNames());
     }
     
     private static async Task SetGames(ApiRequest request)

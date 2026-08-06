@@ -190,10 +190,10 @@ class GameManager : Page
             Width = 200,
         };
         audioDeviceSelection.Items.Add("(Standard-Gerät)");
-        foreach(var device in systemAudioService.GetAudioOutputDeviceNames())
-        {
-            audioDeviceSelection.Items.Add(device);
-        }
+        // foreach(var device in systemAudioService.GetAudioOutputDeviceNames())
+        // {
+        //     audioDeviceSelection.Items.Add(device);
+        // }
         audioDeviceSelection.SelectedIndex = 0;
         selectAllGamesButton = new NormalButton()
         {

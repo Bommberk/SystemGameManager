@@ -162,7 +162,7 @@ public class SystemAudioService
             return false;
         }
     }
-    public List<string> GetAudioOutputDeviceNames()
+    public static List<string> GetAudioOutputDeviceNames()
     {
         try
         {
