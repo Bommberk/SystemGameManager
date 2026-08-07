@@ -21,3 +21,9 @@ async function loadSidebar()
 
     document.getElementById("sidebar").innerHTML = html;
 }
+
+let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+if(!isDarkMode)
+{
+    document.body.classList.add("light");
+}
