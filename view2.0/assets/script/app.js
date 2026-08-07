@@ -1,90 +1,10 @@
-/**
- * @typedef {Object} Launcher
- * @property {string} Name
- * @property {string} SearchName
- * @property {string} StdInstallPath
- * @property {string} InstallPath
- * @property {string} StdGameFoldersPath
- * @property {(string[]|null)} GameFolderPath
- * @property {(string|null)} StdLibraryFilePath
- * @property {(string|null)} DirectRegistryKey
- */
-/** @type {Launcher[]} */
-let launchers = [];
-
-/**
- * @typedef {Object} Game
- * @property {string} Name
- * @property {string} SerializedGameName
- * @property {string} InstallFolderPath
- * @property {string} ExePath
- * @property {string} ProzessName
- * @property {(number|null)} MusicVolumePercent
- * @property {(number|null)} GameVolumePercent
- * @property {(string|null)} AudioOutputDevice
- * @property {(string|null)} GameImage
- */
-/** @type {Game[]} */
-let games = [];
-
-// API
-const api = {
-    getGames() {
-        window.chrome.webview.postMessage({
-            action: "getGames"
-        });
-    },
-    getLaunchers() {
-        window.chrome.webview.postMessage({
-            action: "getLaunchers"
-        });
-    },
-    getAudioDevices() {
-        window.chrome.webview.postMessage({
-            action: "getAudioDevices"
-        });
-    },
-    setGames(data){
-        window.chrome.webview.postMessage({
-            action: "setGames",
-            data: data
-        });
-    },
-};
-
-// Antwort von C#
-window.apiResponse = function (response) {
-
-    try{
-        switch (response.action) {
-            case "getGames":
-                games = response.data;
-                handleGames();
-                break;
-            case "getLaunchers":
-                launchers = response.data;
-                handleLaunchers();
-                break;
-            case "getAudioDevices":
-                handleAudioDevices(response.data);
-                break;
-            default:
-                console.error(`Unknown action: ${response.action}`);
-        }
-    }catch (error) {
-        console.error("Error handling response:", error);
-    }
-};
-
-// Anfrage schicken
-api.getGames();
-api.getLaunchers();
-api.getAudioDevices();
-
 loadSidebar();
 loadPage("gamemanager");
 
 
+// ***************************** //
+// ******** GameManager ******** //
+// ***************************** //
 // Handle C# Responses
 function handleGames()
 {
@@ -107,7 +27,6 @@ function handleAudioDevices(devices)
         option.textContent = device;
         audioDeviceSelection.appendChild(option);
     });
-    console.log("Audio Devices:", devices);
 }
 
 function createLauncherList()
@@ -138,6 +57,29 @@ function createGameList(gameArray = null)
         gameCard.innerHTML = `
             <img src="${getGameImageUrl(game.GameImage)}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">
             <input type="checkbox" name="select${game.SerializedGameName}" class="game-checkbox" data-game-name="${game.SerializedGameName}" onchange="selectGame('${game.SerializedGameName}')">
+            <div class="game-menu">
+                <i class="fa-solid fa-ellipsis-vertical" role="button" onclick="toggleGameMenuPopup('gameMenuPopup-${game.SerializedGameName}')"></i>
+                <div class="popup" id="gameMenuPopup-${game.SerializedGameName}">
+                    <ul>
+                        <li role="button" onclick="launchGame('${game.SerializedGameName}')">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Starten</span>
+                        </li>
+                        <li role="button" onclick="startChangeGameImageProzess('${game.SerializedGameName}')">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Bild ändern</span>
+                        </li>
+                        <li role="button" onclick="openInstallFolder('${game.SerializedGameName}')">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <span>Ordner öffnen</span>
+                        </li>
+                        <li role="button" onclick="removeGame('${game.SerializedGameName}')" class="warning">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Spiel entfernen</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <div class="content">
                 <h3>${game.Name}</h3>
                 <p>Installationspfad:</p>
@@ -209,7 +151,6 @@ function reverseSelection()
     });
 }
 
-
 function saveSelectedGames()
 {
     const gameVolume = parseInt(document.getElementById("gameVolumeSlider").value);
@@ -260,6 +201,49 @@ function filterGames(searchTerm)
     createGameList(filteredGames);
 }
 
+function toggleGameMenuPopup(popupId)
+{
+    const popup = document.getElementById(popupId);
+    popup.classList.toggle("active");
+}
+function launchGame(gameName)
+{
+
+    alert("Launching game: " + getGameBySerializedName(gameName).Name);
+    alert("This feature is not yet implemented.");
+}
+function openInstallFolder(gameName)
+{
+    alert("Opening install folder for game: " + getGameBySerializedName(gameName).Name);
+    alert("This feature is not yet implemented.");
+}
+function removeGame(gameName)
+{
+    alert("Removing game: " + getGameBySerializedName(gameName).Name);
+    alert("This feature is not yet implemented.");
+}
+function startChangeGameImageProzess(gameName)
+{
+    api.changeGameImage(getGameBySerializedName(gameName));
+}
+function handleChangedGameImage(gameName, imagePath)
+{
+    setGameImage(gameName, imagePath);
+    createGameList();
+}
+
+function toggleSidebar()
+{
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("collapsed");
+    const toggleButton = document.getElementById("toggleSidebarButton");
+}
+
+
+
+// ***************************** //
+// ********* Settings ********** //
+// ***************************** //
 
 function changeTheme(theme) {
     document.body.className = theme;

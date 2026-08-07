@@ -42,6 +42,7 @@
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            justify-content: space-between;
             .game{
                 display: flex;
                 padding: 10px;
@@ -49,6 +50,10 @@
                 flex-direction: column;
                 align-items: start;
                 position: relative;
+                transition: 0.4s;
+                &:hover{
+                    box-shadow: 0 0 10px 3px var(--quaternary-background-color);
+                }
                 img{
                     margin-bottom: 5px;
                     width: 100%;
@@ -70,6 +75,64 @@
                     top: 15px;
                     left: 15px;
                     cursor: pointer;
+                }
+                .game-menu
+                {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    width: calc(100% - 20px);
+                    height: calc(100% - 20px);
+                    background: transparent;
+                    z-index: 100;
+                    i.fa-ellipsis-vertical{
+                        position: absolute;
+                        right: -5px;
+                        top: 0px;
+                        font-size: 1.4em;
+                        cursor: pointer;
+                        width: 30px;
+                        height: 30px;
+                        background: transparent;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 102;
+                    }
+                    .popup
+                    {
+                        display: none;
+                        position: absolute;
+                        top: 0px;
+                        right: 0px;
+                        background: var(--secondary-background-color);
+                        border-radius: 5px;
+                        overflow: hidden;
+                        padding: 0px;
+                        flex-direction: column;
+                        z-index: 101;
+                        box-shadow: 0 0 5px var(--card-boxshadow-color);
+                        i{
+                            width: 23px;
+                        }
+                        ul{
+                            list-style: none;
+                            display: flex;
+                            flex-direction: column;
+                            li{
+                                padding: 7px 10px;
+                                &.warning{
+                                    background: var(--error-background-color);
+                                }
+                                &:hover{
+                                    text-shadow: 0 0 5px var(--text-shadow-color);
+                                }
+                            }
+                        }
+                        &.active{
+                            display: flex;
+                        }
+                    }
                 }
             }
         }

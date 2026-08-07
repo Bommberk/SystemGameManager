@@ -41,9 +41,10 @@ public partial class MainForm : Form
             web.CoreWebView2.SetVirtualHostNameToFolderMapping(
                 "systemgamemanager",
                 viewRoot,
-                Microsoft.Web.WebView2.Core.CoreWebView2HostResourceAccessKind.Allow);
+                CoreWebView2HostResourceAccessKind.Allow);
 
             ConfigureLocalImageRequests(web.CoreWebView2);
+            
             web.Source = new Uri("https://systemgamemanager/index.html");
         };
 

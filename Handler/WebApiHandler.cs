@@ -25,7 +25,14 @@ public static class WebApiHandler
                 await setMethod(request);
             }else
             {
-                MessageBox.Show($"Unknown action: {request.Action}");
+                if(request.Action == "changeGameImage")
+                {
+                    await ChangeGameImage(request, web);
+                }
+                else
+                {
+                    MessageBox.Show($"Unknown action: {request.Action}");
+                }
             }
         };
     }
@@ -89,12 +96,40 @@ public static class WebApiHandler
         
     }
 
+    private static async Task ChangeGameImage(ApiRequest request, WebView2 web)
+    {
+        using var dialog = new OpenFileDialog
+        {
+            Filter = "Bilder|*.png;*.jpg;*.jpeg;*.webp;*.gif|Alle Dateien|*.*"
+        };
+
+        try{
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                string path = dialog.FileName;
+                if(request == null || request.Data == null)
+                {
+                    ErrorHandler.Handle(new Exception("No game data provided for changing image."), ErrorSeverity.Error);
+                    return;
+                }
+                Game game = JsonSerializer.Deserialize<Game>(request.Data?.ToString() ?? "{}");
+                game.GameImage = path;
+                Game.UpdateGame(game);
+                await Send(web, "gameImageChanged", new { SerializedGameName = game.SerializedGameName, GameImage = game.GameImage });
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, ErrorSeverity.Error);
+        }
+    }
+
     private static async Task Send(WebView2 web, string action, object data)
     {
         var json = JsonSerializer.Serialize(new
         {
             action,
-            data
+            data,
         });
 
         await web.ExecuteScriptAsync($"""

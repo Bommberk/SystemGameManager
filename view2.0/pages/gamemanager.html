@@ -38,12 +38,12 @@
                 <h3>Lautstärke einstellen</h3>
                 <div class="game-volume">
                     <span>Spiel Lautstärke:</span>
-                    <input type="range" id="gameVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('gameVolumeValue').textContent = this.value">
+                    <input class="slider" type="range" id="gameVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('gameVolumeValue').textContent = this.value">
                     <span id="gameVolumeValue">100</span>%
                 </div>
                 <div class="music-volume">
                     <span>Musik Lautstärke:</span>
-                    <input type="range" id="musicVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('musicVolumeValue').textContent = this.value">
+                    <input class="slider" type="range" id="musicVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('musicVolumeValue').textContent = this.value">
                     <span id="musicVolumeValue">100</span>%
                 </div>
             </div>
@@ -53,9 +53,32 @@
     <div class="games">
         <h2>Spiele</h2>
         <div class="gamelist" expandable="true" id="gamelist">
-            <!-- <div class="game card">
-                <img src="../assets/images/bild.jpg" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.Name}')">
-                <input type="checkbox" name="select${game.Name}" id="game_${game.Name}" class="game-checkbox" data-game-name="${game.Name}" onchange="selectGame('${game.Name}')">
+            <div class="game card">
+                <img src="${getGameImageUrl(game.GameImage)}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">
+                <input type="checkbox" name="select${game.SerializedGameName}" class="game-checkbox" data-game-name="${game.SerializedGameName}" onchange="selectGame('${game.SerializedGameName}')">
+                <div class="game-menu">
+                    <i class="fa-solid fa-ellipsis-vertical" role="button" onclick="toggleGameMenuPopup('gameMenuPopup-${game.SerializedGameName}')"></i>
+                    <div class="popup" id="gameMenuPopup-${game.SerializedGameName}">
+                        <ul>
+                            <li role="button" onclick="launchGame('${game.SerializedGameName}')">
+                                <i class="fa-solid fa-play"></i>
+                                <span>Starten</span>
+                            </li>
+                            <li role="button" onclick="startChangeGameImageProzess('${game.SerializedGameName}')">
+                                <i class="fa-solid fa-gear"></i>
+                                <span>Bild ändern</span>
+                            </li>
+                            <li role="button" onclick="openInstallFolder('${game.SerializedGameName}')">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <span>Ordner öffnen</span>
+                            </li>
+                            <li role="button" onclick="removeGame('${game.SerializedGameName}')" class="warning">
+                                <i class="fa-solid fa-trash"></i>
+                                <span>Spiel entfernen</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="content">
                     <h3>${game.Name}</h3>
                     <p>Installationspfad:</p>
@@ -65,7 +88,7 @@
                     <p>Audio Output</p>
                     <span id="audioOutput">${game.AudioOutputDevice ?? "N/A"}</span>
                 </div>
-            </div> -->
+            </div>
         </div>
     </div>
 </div>
