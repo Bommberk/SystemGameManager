@@ -136,7 +136,7 @@ function createGameList(gameArray = null)
         const gameCard = document.createElement("div");
         gameCard.className = "game card";
         gameCard.innerHTML = `
-            <img src="${game.GameImage}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">
+            <img src="${getGameImageUrl(game.GameImage)}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">
             <input type="checkbox" name="select${game.SerializedGameName}" class="game-checkbox" data-game-name="${game.SerializedGameName}" onchange="selectGame('${game.SerializedGameName}')">
             <div class="content">
                 <h3>${game.Name}</h3>
@@ -150,6 +150,19 @@ function createGameList(gameArray = null)
         `;
         gameList.appendChild(gameCard);
     });
+}
+
+function getGameImageUrl(imagePath)
+{
+    if (!imagePath) {
+        return "../assets/images/bild.jpg";
+    }
+
+    if (/^(?:[a-zA-Z]:[\\/]|\\\\)/.test(imagePath)) {
+        return `https://local-image/${encodeURIComponent(imagePath)}`;
+    }
+
+    return imagePath;
 }
 
 
