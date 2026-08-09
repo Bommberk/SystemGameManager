@@ -54,15 +54,11 @@
                 &:hover{
                     box-shadow: 0 0 10px 3px var(--quaternary-background-color);
                 }
-                input[type="checkbox"]{
-                    z-index: 104;
-                }
                 img{
                     margin-bottom: 5px;
                     width: 100%;
                     height: auto;
                     border-radius: 5px;
-                    z-index: 103;
                 }
                 .content{
                     width: 100%;
@@ -88,7 +84,7 @@
                     width: calc(100% - 20px);
                     height: calc(100% - 20px);
                     background: transparent;
-                    z-index: 100;
+                    pointer-events: none;
                     i.fa-ellipsis-vertical{
                         position: absolute;
                         right: -5px;
@@ -101,7 +97,8 @@
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        z-index: 102;
+                        pointer-events: auto;
+                        z-index: 1;
                     }
                     .popup
                     {
@@ -114,7 +111,6 @@
                         overflow: hidden;
                         padding: 0px;
                         flex-direction: column;
-                        z-index: 101;
                         box-shadow: 0 0 5px var(--card-boxshadow-color);
                         i{
                             width: 23px;
