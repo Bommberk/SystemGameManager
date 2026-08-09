@@ -54,11 +54,15 @@
                 &:hover{
                     box-shadow: 0 0 10px 3px var(--quaternary-background-color);
                 }
+                input[type="checkbox"]{
+                    z-index: 104;
+                }
                 img{
                     margin-bottom: 5px;
                     width: 100%;
                     height: auto;
                     border-radius: 5px;
+                    z-index: 103;
                 }
                 .content{
                     width: 100%;
