@@ -38,15 +38,13 @@
     .games{
         margin-top: 20px;
         .gamelist{
-            margin-top: 10px;   
-            display: flex;
+            margin-top: 10px;
+            display: grid;
             gap: 15px;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             .game{
                 display: flex;
                 padding: 10px;
-                width: 350px;
                 flex-direction: column;
                 align-items: start;
                 position: relative;
