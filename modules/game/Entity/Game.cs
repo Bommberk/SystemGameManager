@@ -18,8 +18,9 @@ class Game
     public int? GameVolumePercent { get; set; } = GAME_VOLUME_PERCENT;
     public string? AudioOutputDevice { get; set; }
     public string? GameImage { get; set; }
+    public bool IsRemovedFromView { get; set; } = false;
 
-    public Game(string name, string serializedGameName, string installFolderPath, string exePath, string prozessName = "nothing found", int? musicVolumePercent = null, int? gameVolumePercent = null, string? audioOutputDevice = null, string? gameImage = null)
+    public Game(string name, string serializedGameName, string installFolderPath, string exePath, string prozessName = "nothing found", int? musicVolumePercent = null, int? gameVolumePercent = null, string? audioOutputDevice = null, string? gameImage = null, bool isRemovedFromView = false)
     {
         Name = name;
         SerializedGameName = serializedGameName;
@@ -30,6 +31,7 @@ class Game
         GameVolumePercent = gameVolumePercent;
         AudioOutputDevice = audioOutputDevice;
         GameImage = gameImage;
+        this.IsRemovedFromView = isRemovedFromView;
     }
 
     public static void WriteGamesFromDatabase()

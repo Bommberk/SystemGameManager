@@ -38,12 +38,12 @@
                 <h3>Lautstärke einstellen</h3>
                 <div class="game-volume">
                     <span>Spiel Lautstärke:</span>
-                    <input class="slider" type="range" id="gameVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('gameVolumeValue').textContent = this.value">
+                    <input class="slider" type="range" id="gameVolumeSlider" min="0" max="100" value="100" oninput="changeValue(this, 'gameVolume')">
                     <span id="gameVolumeValue">100</span>%
                 </div>
                 <div class="music-volume">
                     <span>Musik Lautstärke:</span>
-                    <input class="slider" type="range" id="musicVolumeSlider" min="0" max="100" value="100" oninput="document.getElementById('musicVolumeValue').textContent = this.value">
+                    <input class="slider" type="range" id="musicVolumeSlider" min="0" max="100" value="100" oninput="changeValue(this, 'musicVolume')">
                     <span id="musicVolumeValue">100</span>%
                 </div>
             </div>
@@ -72,7 +72,7 @@
                                 <i class="fa-solid fa-folder-open"></i>
                                 <span>Ordner öffnen</span>
                             </li>
-                            <li role="button" onclick="removeGame('${game.SerializedGameName}')" class="warning">
+                            <li role="button" onclick="removeGameFromView('${game.SerializedGameName}')" class="warning">
                                 <i class="fa-solid fa-trash"></i>
                                 <span>Spiel entfernen</span>
                             </li>

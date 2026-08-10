@@ -28,6 +28,9 @@ public static class WebApiHandler
                 if(request.Action == "changeGameImage")
                 {
                     await ChangeGameImage(request, web);
+                }else if(request.Action == "removeGameFromView")
+                {
+                    await RemoveGameFromView(request);
                 }
                 else
                 {
@@ -122,6 +125,12 @@ public static class WebApiHandler
         {
             ErrorHandler.Handle(ex, ErrorSeverity.Error);
         }
+    }
+    private static async Task RemoveGameFromView(ApiRequest request)
+    {
+        Game game = JsonSerializer.Deserialize<Game>(request.Data?.ToString() ?? "{}");
+        game.IsRemovedFromView = true;
+        Game.UpdateGame(game);
     }
 
     private static async Task Send(WebView2 web, string action, object data)

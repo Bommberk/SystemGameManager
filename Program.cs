@@ -60,6 +60,9 @@ internal static class Program
                     {
                         ErrorHandler.Handle(ex, ErrorSeverity.Warning);
                     }
+                }else if(args.Length > 0 && args[0] == "--infos")
+                {
+                    GetInfoAsync();
                 }
 
                 RunForm();

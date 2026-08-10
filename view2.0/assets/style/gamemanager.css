@@ -110,6 +110,7 @@
                         padding: 0px;
                         flex-direction: column;
                         box-shadow: 0 0 5px var(--card-boxshadow-color);
+                        pointer-events: auto;
                         i{
                             width: 23px;
                         }

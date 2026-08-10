@@ -23,6 +23,7 @@ let launchers = [];
  * @property {(number|null)} GameVolumePercent
  * @property {(string|null)} AudioOutputDevice
  * @property {(string|null)} GameImage
+ * @property {(boolean)} IsRemovedFromView
  */
 /** @type {Game[]} */
 let games = [];
@@ -53,6 +54,12 @@ const api = {
     changeGameImage(game){
         window.chrome.webview.postMessage({
             action: "changeGameImage",
+            data: game
+        });
+    },
+    removeGameFromView(game){
+        window.chrome.webview.postMessage({
+            action: "removeGameFromView",
             data: game
         });
     },

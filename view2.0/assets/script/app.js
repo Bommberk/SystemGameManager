@@ -52,6 +52,7 @@ function createGameList(gameArray = null)
     const gameList = document.getElementById("gamelist");
     gameList.innerHTML = "";
     (gameArray ?? games).forEach(game => {
+        if(game.IsRemovedFromView) return;
         const gameCard = document.createElement("div");
         gameCard.className = "game card";
         gameCard.innerHTML = `
@@ -73,7 +74,7 @@ function createGameList(gameArray = null)
                             <i class="fa-solid fa-folder-open"></i>
                             <span>Ordner öffnen</span>
                         </li>
-                        <li role="button" onclick="removeGame('${game.SerializedGameName}')" class="warning">
+                        <li role="button" onclick="removeGameFromView('${game.SerializedGameName}')" class="warning">
                             <i class="fa-solid fa-trash"></i>
                             <span>Spiel entfernen</span>
                         </li>
@@ -201,10 +202,31 @@ function filterGames(searchTerm)
     createGameList(filteredGames);
 }
 
+
+let currentPopup = null;
+let previousPopup = null;
+let isActivatedPopup = false;
+document.addEventListener("click", function(event) {
+    if(!isActivatedPopup){
+        const popups = document.querySelectorAll(".popup.active");
+        popups.forEach(popup => {
+            popup.classList.remove("active");
+        });
+    }else{
+        isActivatedPopup = false;
+    }
+});
+
 function toggleGameMenuPopup(popupId)
 {
     const popup = document.getElementById(popupId);
+    if (currentPopup && currentPopup !== popup) {
+        currentPopup.classList.remove("active");
+        previousPopup = currentPopup;
+    }
     popup.classList.toggle("active");
+    currentPopup = popup;
+    isActivatedPopup = true;
 }
 function launchGame(gameName)
 {
@@ -217,10 +239,15 @@ function openInstallFolder(gameName)
     alert("Opening install folder for game: " + getGameBySerializedName(gameName).Name);
     alert("This feature is not yet implemented.");
 }
-function removeGame(gameName)
+function removeGameFromView(gameName)
 {
-    alert("Removing game: " + getGameBySerializedName(gameName).Name);
-    alert("This feature is not yet implemented.");
+    const game = getGameBySerializedName(gameName);
+    const confirmRemove = confirm("Removing game: " + game.Name + "\nWarning: This action cannot be undone!");
+    if (confirmRemove) {
+        game.IsRemovedFromView = true;
+        api.removeGameFromView(game);
+        createGameList();
+    }
 }
 function startChangeGameImageProzess(gameName)
 {
@@ -239,6 +266,17 @@ function toggleSidebar()
     const toggleButton = document.getElementById("toggleSidebarButton");
 }
 
+/**
+ * @param {HTMLInputElement} element
+ */
+function changeValue(element, valueType)
+{
+    let value = element.value;
+    document.getElementById(valueType + "Value").textContent = value;
+
+    // slider styling
+    element.style.background = "linear-gradient(to right, var(--secondary-text-color) " + value + "%, var(--primary-text-color) " + value + "%)";
+}
 
 
 // ***************************** //
@@ -249,10 +287,3 @@ function changeTheme(theme) {
     document.body.className = theme;
     localStorage.setItem('theme', theme);
 }
-
-// document.getElementById("gameVolumeSlider").addEventListener("input", function() {
-//     document.getElementById("gameVolumeValue").textContent = this.value;
-// });
-// document.getElementById("musicVolumeSlider").addEventListener("input", function() {
-//     document.getElementById("musicVolumeValue").textContent = this.value;
-// });
