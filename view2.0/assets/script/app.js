@@ -135,7 +135,8 @@ function selectAllGames()
         document.getElementById("selectAllGamesButton").textContent = "Alle auswählen";
     } else {
         games.forEach(game => {
-            selectGame(game.SerializedGameName);
+            if(!game.IsRemovedFromView)
+                selectGame(game.SerializedGameName);
         });
     }
 }
