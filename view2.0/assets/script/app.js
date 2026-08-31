@@ -142,7 +142,8 @@ function selectAllGames()
 }
 function reverseSelection()
 {
-    games.forEach(game => {
+    games.filter(game => !game.IsRemovedFromView).forEach(game => {
+        console.log(selectedGames);
         if (selectedGames.has(game.SerializedGameName)) {
             selectedGames.delete(game.SerializedGameName);
             document.querySelector("input[data-game-name='" + game.SerializedGameName + "']").checked = false;
