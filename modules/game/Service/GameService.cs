@@ -203,9 +203,12 @@ class GameService
 
             if(gameInDb.AudioOutputDevice != null)
                 game.AudioOutputDevice = gameInDb.AudioOutputDevice;
-                
+
             if(gameInDb.GameImage != null)
                 game.GameImage = gameInDb.GameImage;
+
+            if(gameInDb.IsRemovedFromView != false)
+                game.IsRemovedFromView = true;
         }
     }
 

@@ -17,8 +17,8 @@
         <h2>Audio Einstellungen</h2>
         <form onsubmit="saveSelectedGames(); return false;" class="audiosettings-form card">
             <div class="form-group select-game">
+                <h3>Spiele auswählen</h3>
                 <div class="search" style="display: flex;">
-                    <h3>Spiele auswählen</h3>
                     <input type="search" name="searchGame" id="searchGame" placeholder="Spiel suchen..." oninput="filterGames(this.value)">
                     <select name="selectFilter" id="selectFilter" onchange="filterGames(document.getElementById('searchGame').value)">
                         <option value="name">Name</option>

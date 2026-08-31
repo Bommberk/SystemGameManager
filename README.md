@@ -1,119 +1,125 @@
 # System & Game Manager
 
-System & Game Manager is a Windows desktop app (WinForms, .NET 8) that combines system monitoring, game library discovery, and automatic game/music audio handling.
+**System & Game Manager** ist eine Windows-App zur lokalen Erkennung installierter Game-Launcher und Spiele. Sie bündelt die Bibliothek in einer eingebetteten Web-Oberfläche und erlaubt, Audio-Profile pro Spiel zu speichern. Beim Wechsel in ein erkanntes Spiel kann die App die Lautstärke einer Musik-App sowie das Standard-Audiogerät automatisch anpassen und anschließend wiederherstellen.
 
-It is built to aggregate data from multiple sources (Windows registry, launcher data files, and folder scans), store synced results in SQLite, and provide a simple UI for daily use.
+> Aktueller Entwicklungsstand: Die App konzentriert sich momentan auf Game- und Audio-Management. Die Navigation enthält zwar einen Dashboard-Einstieg, der Funktionsschwerpunkt und der standardmäßig geöffnete Bereich ist aber der Game Manager.
 
-## Working Features
+## Funktionen
 
-### 1) System Information Dashboard
-- Shows core PC data in one place:
-- Computer name, local/public IPs, MAC address, OS, CPU, RAM, GPU, battery status.
-- Storage overview per drive, including handling for virtual disk scenarios.
+### Spiele und Launcher erkennen
 
-### 2) Launcher Detection
-- Detects installed launchers based on known launcher definitions.
-- Uses Windows uninstall registry keys and launcher-specific registry paths.
-- Resolves launcher install paths and library folders automatically where possible.
+- Erkennt derzeit Steam, Epic Games Launcher, GOG Galaxy, Ubisoft Connect, EA App, Battle.net, Rockstar Games Launcher, Origin, Minecraft Launcher und CurseForge.
+- Prüft die Windows-Uninstall-Registry und, soweit vorhanden, launcher-spezifische Registry-Schlüssel.
+- Liest bei Steam zusätzliche Bibliotheksordner aus `libraryfolders.vdf`.
+- Sucht in ermittelten Spieleordnern nach ausführbaren Dateien und ergänzt Treffer aus der Registry.
+- Führt gleiche Installationspfade zusammen.
 
-### 3) Installed Games Discovery
-- Collects games from launcher game folders.
-- Reads game entries from launcher-related registry keys.
-- Merges duplicate results and normalizes the final game list.
+### Bibliothek verwalten
 
-### 4) SQLite Data Sync
-- Persists launcher and game data into a local SQLite database.
-- Reuses saved volume settings for games when data is refreshed.
-- Keeps data consistent between discovery runs and UI state.
+- Zeigt gefundene Launcher und Spiele in einer modernen, lokalen WebView2-Oberfläche.
+- Speichert Launcher- und Spieldaten in einer SQLite-Datenbank.
+- Ermöglicht die Auswahl mehrerer Spiele, Suche/Filter sowie das Übernehmen eines Audio-Profils für die Auswahl.
+- Unterstützt eigene Spielbilder. Lokale Bilddateien können über die Spielkarte ausgewählt werden.
+- Spiele lassen sich aus der Ansicht ausblenden. Die Datenbankdaten bleiben erhalten; eine Wiederherstellung über die Oberfläche gibt es derzeit noch nicht.
 
-### 5) Game Manager UI
-- Shows detected launchers and installed games in a card-based layout.
-- Provides quick access to open a game installation directory.
-- Includes loading and error states for better usability.
+### Audio-Automatisierung
 
-### 6) Audio Manager (Global + Per Game)
-- Lets you define global game/music volume values.
-- Lets you define individual game/music values per detected game.
-- Saves audio profiles persistently.
+- Für jedes Spiel lassen sich Spiel-Lautstärke, Musik-Lautstärke und ein Audioausgabegerät speichern.
+- Erkennt das aktive Vordergrundfenster über den Prozesspfad.
+- Setzt während eines erkannten Spiels die Lautstärke der konfigurierten Musik-App und kann das Windows-Standardausgabegerät wechseln.
+- Stellt die zuvor gemerkte Musiklautstärke und das frühere Ausgabegerät wieder her, sobald kein konfiguriertes Spiel mehr aktiv ist.
 
-### 7) Automatic Audio Adjustment During Gameplay
-- Monitors the active foreground process and matches it against known games.
-- Lowers/sets music volume when a configured game is active.
-- Restores previous music volume when no monitored game is running.
+## Voraussetzungen
 
-### 8) Console and GUI Modes
-- GUI mode starts by default.
-- Console mode can be started with:
-- `SystemGameManager.exe --console`
+- Windows 10 oder Windows 11
+- .NET 10 SDK für die Entwicklung
+- Microsoft Edge WebView2 Runtime (auf aktuellen Windows-Systemen normalerweise vorhanden)
+- Für den automatischen Audio-Gerätewechsel kann die verwendete Windows-Audioschnittstelle je nach Windows-Version Einschränkungen haben.
 
-### 9) Windows Integration
-- Native Windows integration via registry access and process/window APIs.
-- Designed for Windows systems (`net8.0-windows`).
+## Installation und Start
 
-## Preview
+### Release verwenden
 
-### App Artwork
-![Artwork](assets/bild.jpg)
+1. Die passende Release-Datei aus dem Repository herunterladen.
+2. Das Setup ausführen.
+3. System & Game Manager starten.
 
-### Screenshots
-- Add your current UI screenshots to `assets/screenshots/` and reference them here.
-- Suggested file names:
-- `assets/screenshots/system-manager.png`
-- `assets/screenshots/game-manager.png`
-- `assets/screenshots/audio-manager.png`
+Beim Start werden installierte Launcher und Spiele erfasst und in der lokalen Datenbank aktualisiert. Die App prüft bei einer installierten Release-Version außerdem auf Updates.
 
-## How to Use (User)
+### Aus dem Quellcode starten
 
-1. Go to the latest release of this repository.
-2. Download the setup file (`systemgamemanager_setup.exe`).
-3. Run the installer.
-4. Launch System & Game Manager.
-5. Click the load button to fetch system/game data.
-6. Configure audio values in the Game Audio Manager tab.
+```powershell
+git clone https://github.com/Bommberk/SystemGameManager.git
+cd SystemGameManager
+dotnet restore
+dotnet run
+```
 
-## How to Use (Dev)
+Für einen Release-Build:
 
-1. Clone the repository:
-	`git clone https://github.com/Bommberk/SystemGameManager`
-2. Open the solution file in Visual Studio or VS Code:
-	`SystemGameManager.sln`
-3. Restore dependencies:
-	`dotnet restore`
-4. Run in Debug:
-	`dotnet run`
-5. Optional: run console mode for audio monitoring:
-	`dotnet run -- --console`
-6. Build Release output:
-	`dotnet publish -c Release -r win-x64 --self-contained false`
-7. Optional: build installer using Inno Setup with `installer.iss`.
+```powershell
+dotnet publish -c Release -r win-x64 --self-contained false
+```
 
-## How It Works
+Die Lösung kann in Visual Studio oder VS Code über `SystemGameManager.sln` geöffnet werden.
 
-1. The app starts in GUI mode (or console mode with `--console`).
-2. Launcher definitions are loaded from JSON assets.
-3. Installed launchers are detected via Windows registry.
-4. Library and install paths are resolved for each launcher.
-5. Installed games are discovered from folders and registry entries.
-6. Data is merged and synchronized with SQLite.
-7. The UI renders system info, launcher badges, game cards, and audio controls.
-8. Audio monitoring checks the foreground process in intervals.
-9. When a configured game is active, music volume is adjusted automatically.
-10. When the game is no longer active, previous music volume is restored.
+## Bedienung
 
-## Roadmap / Coming Next
+1. Die App starten und die erkannte Bibliothek im **Gamemanager** prüfen.
+2. Spiele über Checkboxen auswählen oder nach Name, Installationspfad oder Audiogerät filtern.
+3. Spiel- und Musiklautstärke sowie optional ein Ausgabegerät auswählen.
+4. Mit **Speichern** das Profil für alle ausgewählten Spiele übernehmen.
+5. Während die App geöffnet ist, überwacht sie das Vordergrundfenster und aktiviert das Profil, wenn ein erkanntes Spiel aktiv ist.
 
-### 1) Better Detection Quality
-- Improve edge-case handling for launcher and game path detection.
-- Expand known launcher definitions and fallback strategies.
+Die Einstellungen werden beim erneuten Scan anhand des Installationspfads übernommen.
 
-### 2) More Flexible Audio Profiles
-- Add profile presets and smarter auto-rules for different game types.
-- Extend support for additional music apps.
+## Konfiguration und Daten
 
-### 3) Expanded Integrations
-- Improve external API integration workflows (for example Smart Home use cases).
-- Add cleaner export/sync options for external systems.
+- `assets/game/knownLaunchers.json` enthält die Launcher-Definitionen und kann für weitere Launcher erweitert werden.
+- `config/appsettings.json` wird beim ersten Start erstellt, falls sie noch nicht vorhanden ist.
+- Die Nutzdatenbank liegt standardmäßig unter `%AppData%\\SystemGameManager\\systemgamemanager.db`; die mitgelieferte Template-Datenbank befindet sich unter `modules/database/`.
+- In einer Produktionskonfiguration kann die App beim Start eine Gerätekennung an die konfigurierte Smart-Home-API senden. Vor einer Verteilung sollte die Konfiguration unter `SmarthomeApiConfig` geprüft und bei Bedarf angepasst oder entfernt werden.
 
-### 4) UX and Setup Improvements
-- More in-app guidance for first launch.
-- More release packaging convenience and installer improvements.
+## Kommandozeile
+
+```powershell
+SystemGameManager.exe --console
+```
+
+Der Konsolenmodus führt die Erkennung aus und bleibt anschließend geöffnet. Die Audioüberwachung wird derzeit beim Start der grafischen Oberfläche aktiviert.
+
+```powershell
+SystemGameManager.exe --infos
+```
+
+In einer Entwicklungsumgebung führt `--infos` zusätzlich die Erkennung aus, bevor die Oberfläche geöffnet wird.
+
+## Bekannte Einschränkungen
+
+- Die Menüeinträge **Starten** und **Ordner öffnen** sind in der Oberfläche sichtbar, aber noch nicht implementiert.
+- Ein ausgeblendetes Spiel kann momentan nicht direkt über die Oberfläche wieder eingeblendet werden.
+- Die automatische Musiklautstärke richtet sich derzeit ausschließlich an Spotify; der gespeicherte Wert für die Spiel-Lautstärke wird von der laufenden Überwachung noch nicht angewendet.
+- Die Launcher-Erkennung basiert auf bekannten Registry- und Standardpfaden; individuelle Installationen können daher unvollständig erkannt werden.
+
+## Projektstruktur
+
+```text
+assets/                 Launcher-Definitionen und Standardgrafiken
+config/                 Laufzeitkonfiguration
+modules/Database/       SQLite-Zugriff und Datenmodell-Synchronisierung
+modules/game/           Launcher-, Spiele- und Audio-Logik
+view2.0/                WebView2-Oberfläche (HTML, CSS, JavaScript)
+Handler/                Kommunikation zwischen Web-Oberfläche und C#
+```
+
+## Technologien
+
+- C# / .NET 10 / Windows Forms
+- Microsoft WebView2
+- SQLite (`Microsoft.Data.Sqlite`)
+- NAudio
+- Velopack für Updates
+
+## Lizenz
+
+Für dieses Repository ist derzeit keine Lizenzdatei hinterlegt.

@@ -31,7 +31,7 @@ class Game
         GameVolumePercent = gameVolumePercent;
         AudioOutputDevice = audioOutputDevice;
         GameImage = gameImage;
-        this.IsRemovedFromView = isRemovedFromView;
+        IsRemovedFromView = isRemovedFromView;
     }
 
     public static void WriteGamesFromDatabase()

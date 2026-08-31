@@ -8,7 +8,7 @@ loadPage("gamemanager");
 // Handle C# Responses
 function handleGames()
 {
-    document.getElementById("gameAmount").textContent = games.length;
+    document.getElementById("gameAmount").textContent = games.filter(game => !game.IsRemovedFromView).length;
     createGameList();
 }
 
@@ -164,7 +164,7 @@ function saveSelectedGames()
     });
     
     api.setGames(games);
-    createGameList();
+    handleGames();
 }
 function setGameAudio(gameName, gameVolume, musicVolume, audioOutputDevice) 
 {
@@ -247,7 +247,7 @@ function removeGameFromView(gameName)
     if (confirmRemove) {
         game.IsRemovedFromView = true;
         api.removeGameFromView(game);
-        createGameList();
+        handleGames();
     }
 }
 function startChangeGameImageProzess(gameName)
@@ -257,7 +257,7 @@ function startChangeGameImageProzess(gameName)
 function handleChangedGameImage(gameName, imagePath)
 {
     setGameImage(gameName, imagePath);
-    createGameList();
+    handleGames();
 }
 
 function toggleSidebar()
