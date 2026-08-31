@@ -153,26 +153,49 @@ function reverseSelection()
     });
 }
 
-function saveSelectedGames()
+function saveSelectedGamesAudioOutputDevice()
 {
-    const gameVolume = parseInt(document.getElementById("gameVolumeSlider").value);
-    const musicVolume = parseInt(document.getElementById("musicVolumeSlider").value);
     const audioOutputDevice = document.getElementById("audioOutputDevice").value;
     selectedGames.forEach(gameName => {
-        const game = games.find(g => g.SerializedGameName === gameName);
-        setGameAudio(game.SerializedGameName, gameVolume, musicVolume, audioOutputDevice);
+        setGameAudio(gameName, null, null, audioOutputDevice);
     });
-    
+
     api.setGames(games);
     handleGames();
 }
-function setGameAudio(gameName, gameVolume, musicVolume, audioOutputDevice) 
+function saveSelectedGamesGameVolume()
+{
+    const gameVolume = parseInt(document.getElementById("gameVolumeSlider").value);
+    selectedGames.forEach(gameName => {
+        setGameAudio(gameName, gameVolume, null, null);
+    });
+
+    api.setGames(games);
+    createGameList();
+}
+function saveSelectedGamesMusicVolume()
+{
+    const musicVolume = parseInt(document.getElementById("musicVolumeSlider").value);
+    selectedGames.forEach(gameName => {
+        setGameAudio(gameName, null, musicVolume, null);
+    });
+
+    api.setGames(games);
+    createGameList();
+}
+function setGameAudio(gameName, gameVolume = null, musicVolume = null, audioOutputDevice = null) 
 {
     games.forEach(game => {
         if (game.SerializedGameName === gameName) {
-            game.GameVolumePercent = gameVolume;
-            game.MusicVolumePercent = musicVolume;
-            game.AudioOutputDevice = audioOutputDevice;
+            if (gameVolume !== null) {
+                game.GameVolumePercent = gameVolume;
+            }
+            if (musicVolume !== null) {
+                game.MusicVolumePercent = musicVolume;
+            }
+            if (audioOutputDevice !== null) {
+                game.AudioOutputDevice = audioOutputDevice;
+            }
         }
     });
 }
