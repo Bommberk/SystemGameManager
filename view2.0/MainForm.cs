@@ -13,6 +13,8 @@ public partial class MainForm : Form
 
     public MainForm()
     {
+        Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
+
         var web = new WebView2
         {
             Dock = DockStyle.Fill
