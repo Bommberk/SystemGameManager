@@ -69,7 +69,7 @@
             .setting-row > span{
                 width: 50px;
             }
-            input,select,button{
+            input:not([type="range"]),select,button{
                 border-radius: 8px;
                 border: 1px solid var(--secondary-card-background-color);
                 background: transparent;
