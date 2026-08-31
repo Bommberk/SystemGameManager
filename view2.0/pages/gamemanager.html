@@ -39,7 +39,7 @@
                         <select name="audioOutputDevice" id="audioOutputDevice">
                             <option value="">-- Bitte wählen --</option>
                         </select>
-                        <button type="submit">Speichern</button>
+                        <button type="submit" class="save-btn">Speichern</button>
                     </div>
                 </form>
                 <form onsubmit="saveSelectedGamesGameVolume(); return false;" class="audio-setting-form">
@@ -47,7 +47,7 @@
                     <div class="setting-row game-volume">
                         <input class="slider" type="range" id="gameVolumeSlider" min="0" max="100" value="100" oninput="changeValue(this, 'gameVolume')">
                         <span><span id="gameVolumeValue">100</span>%</span>
-                        <button type="submit">Speichern</button>
+                        <button type="submit" class="save-btn">Speichern</button>
                     </div>
                 </form>
                 <form onsubmit="saveSelectedGamesMusicVolume(); return false;" class="audio-setting-form">
@@ -55,7 +55,7 @@
                     <div class="setting-row music-volume">
                         <input class="slider" type="range" id="musicVolumeSlider" min="0" max="100" value="100" oninput="changeValue(this, 'musicVolume')">
                         <span><span id="musicVolumeValue">100</span>%</span>
-                        <button type="submit">Speichern</button>
+                        <button type="submit" class="save-btn">Speichern</button>
                     </div>
                 </form>
             </div>

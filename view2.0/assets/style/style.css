@@ -32,6 +32,7 @@ body
     --tertiary-text-color: #badf6b;
     --text-shadow-color: #fff;
     --error-background-color: #C32038;
+    --primary-border-color: #e9ebec2b;
 
     /* Sizes */
     --sidebar-width: 60px;

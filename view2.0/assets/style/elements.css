@@ -30,3 +30,16 @@
         box-shadow: 0px 0px 5px black;
     }
 }
+
+option
+{
+    background: var(--primary-background-color);
+    color: var(--primary-text-color);
+}
+
+.save-btn
+{
+    &:hover{
+        border-color: var(--secondary-text-color) !important;
+    }
+}
