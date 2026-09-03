@@ -1,19 +1,22 @@
 # System & Game Manager – Changelog
 
-### 🛠 Architecture & API Enhancements
-- **New Web API Command:** Added `removeGameFromView` handler in `WebApiHandler.cs`. Allows users to permanently hide specific games from the dashboard without deleting database records.
-- **Command Line Interface:** Introduced `--infos` flag in `Program.cs` to quickly retrieve system/game info via terminal args.
-- **Entity Model Update:** Extended `Game` class with `IsRemovedFromView` boolean property to track hidden state across layers.
+### 🎨 UI/UX Refactoring
+- **WebView2 Layout**: Restructured the Audio Management section into distinct, scrollable cards for "Select Game", "Device Selection", "Game Volume", and "Music Volume".
+- **New Logo**: Added `sysgamemanager_logo.png` to the header for better branding consistency.
+- **Styling Updates**:
+  - Introduced dedicated `.save-btn` classes with icon animations (save/check toggle) on focus/click.
+  - Customized form elements (`input`, `select`, `button`) with rounded corners and theme-aware borders.
+  - Added a custom CSS file for `h2` margins to improve section spacing.
+- **Filtering UX**: Updated the game list header to dynamically display the count of filtered games (e.g., `(12)`).
 
-### 🎨 Visual & UX Overhauls
-- **Grid Layout Upgrade:** Replaced the flex-based game list with a responsive CSS Grid (`display: grid`) in `gamemanager.css`. Automatically adjusts columns based on window width for better responsiveness.
-- **Popup Interaction Fix:** Refactored menu popups to prevent overlap conflicts. Clicking anywhere outside a popup now correctly closes it, and active state toggling is now robust.
-- **Slider Styling:** Reduced slider height from `8px` to `3px` and added dynamic gradient styling based on value for a more modern look.
-- **Dark Mode Detection:** Automatically apply "light" theme class if the system prefers color-scheme is not dark, ensuring consistent appearance on boot.
+### 🧠 Logic & Data Handling
+- **Hidden Games Feature**: Implemented `IsRemovedFromView` flag in `Game.cs` and updated the Web API handler. Games marked as removed are excluded from the UI list (`handleGames`) but persist in the database for future restoration (if implemented).
+- **Granular Audio Saving**: Split audio saving into three separate endpoints to allow modifying individual settings (Device, Game Volume, Music Volume) without resetting others.
+- **Selection Logic**: Updated selection handlers to respect the `IsRemovedFromView` status, preventing interaction with hidden games.
 
-### 🧹 Code Hygiene & Utilities
-- **Volume Slider Helpers:** Centralized slider value handling into a new `changeValue` function, removing repetitive inline event listeners and fixing previous commented-out logic.
-- **Cleanup:** Removed unused volume slider listeners and consolidated popup state management (`currentPopup`, `isActivatedPopup`) to ensure only one popup is open at a time.
+### 🔧 Technical Fixes & Cleanup
+- **Console Messaging**: Removed the `MessageBox.Show("Games were updated")` popup from `WebApiHandler.cs` to prevent intrusive alerts during background processes or console runs.
+- **Null Handling**: Added explicit null checks (`!= false`) when loading database values into game entities to ensure consistency with boolean flags.
 
-### 📦 Asset & Data Handling
-- **Removed Games Logic:** When a game is removed from the view, its `IsRemovedFromView` flag is set to `true`. The UI renders these games as invisible, while backend data remains intact for potential future restoration or archival.
+### 📦 Assets
+- **Icons**: Replaced generic images in the header with a new custom logo asset.
