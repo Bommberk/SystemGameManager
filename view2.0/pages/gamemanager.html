@@ -2,7 +2,7 @@
 
 <div class="gamemanager container">
     <div class="head card">
-        <img id="gameManagerImage" src="" alt="Game Manager">
+        <img id="gameManagerImage" src="../assets/images/logos/sysgamemanager_logo.png" alt="Game Manager" class="game-manager-image">
         <div class="content">
             <h2>Game Manager</h2>
             <p><span id="gameAmount">0</span> Spiele - <span id="launcherAmount">0</span> Launcher</p>
@@ -20,11 +20,14 @@
                 <div class="search">
                     <h3>Spiele auswählen</h3>
                     <input type="search" name="searchGame" id="searchGame" placeholder="Spiel suchen..." oninput="filterGames(this.value)">
-                    <select name="selectFilter" id="selectFilter" onchange="filterGames(document.getElementById('searchGame').value)">
-                        <option value="name">Name</option>
-                        <option value="installpath">Installationspfad</option>
-                        <option value="audioDevice">Audio Device</option>
-                    </select>
+                    <div class="select-wrapper">
+                        <select name="selectFilter" id="selectFilter" onchange="filterGames(document.getElementById('searchGame').value)">
+                            <option value="name">Name</option>
+                            <option value="installpath">Installationspfad</option>
+                            <option value="audioDevice">Audio Device</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
                 </div>
                 <div class="settings">
                     <button type="button" class="select-all-games" onclick="selectAllGames()" id="selectAllGamesButton">Alle auswählen</button>
@@ -36,10 +39,17 @@
                 <form onsubmit="saveSelectedGamesAudioOutputDevice(); return false;" class="audio-setting-form">
                     <h3>Geräte auswählen</h3>
                     <div class="setting-row">
-                        <select name="audioOutputDevice" id="audioOutputDevice">
-                            <option value="">-- Bitte wählen --</option>
-                        </select>
-                        <button type="submit" class="save-btn">Speichern</button>
+                        <div class="select-wrapper">
+                            <select name="audioOutputDevice" id="audioOutputDevice">
+                                <option value="">-- Bitte wählen --</option>
+                            </select>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <button type="submit" class="save-btn">
+                            <i class="fa-solid fa-floppy-disk save-icon"></i>
+                            <i class="fa-solid fa-check check-icon"></i>
+                            Speichern
+                        </button>
                     </div>
                 </form>
                 <form onsubmit="saveSelectedGamesGameVolume(); return false;" class="audio-setting-form">
@@ -47,7 +57,11 @@
                     <div class="setting-row game-volume">
                         <input class="slider" type="range" id="gameVolumeSlider" min="0" max="100" value="100" oninput="changeValue(this, 'gameVolume')">
                         <span><span id="gameVolumeValue">100</span>%</span>
-                        <button type="submit" class="save-btn">Speichern</button>
+                        <button type="submit" class="save-btn">
+                            <i class="fa-solid fa-floppy-disk save-icon"></i>
+                            <i class="fa-solid fa-check check-icon"></i>
+                            Speichern
+                        </button>
                     </div>
                 </form>
                 <form onsubmit="saveSelectedGamesMusicVolume(); return false;" class="audio-setting-form">
@@ -55,14 +69,18 @@
                     <div class="setting-row music-volume">
                         <input class="slider" type="range" id="musicVolumeSlider" min="0" max="100" value="100" oninput="changeValue(this, 'musicVolume')">
                         <span><span id="musicVolumeValue">100</span>%</span>
-                        <button type="submit" class="save-btn">Speichern</button>
+                        <button type="submit" class="save-btn">
+                            <i class="fa-solid fa-floppy-disk save-icon"></i>
+                            <i class="fa-solid fa-check check-icon"></i>
+                            Speichern
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <div class="games">
-        <h2>Spiele</h2>
+        <h2>Spiele <span id="gameAmountAfterFilter"></span></h2>
         <div class="gamelist" expandable="true" id="gamelist">
             <div class="game card">
                 <img src="${getGameImageUrl(game.GameImage)}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">

@@ -1,5 +1,11 @@
 .gamemanager.container
 {
+    .game-manager-image
+    {    
+        width: 100px;
+        height: 100px;
+        margin-right: 20px;
+    }
     .launchers
     {
         margin-top: 20px;
@@ -68,22 +74,6 @@
             }
             .setting-row > span{
                 width: 50px;
-            }
-            input:not([type="range"]),select,button{
-                border-radius: 8px;
-                border: 1px solid var(--primary-border-color);
-                background: transparent;
-                color: var(--primary-text-color);
-                padding: 10px 14px;
-            }
-            input[type="search"]{
-                flex: 1;
-            }
-            select{
-                flex: 1;
-            }
-            button{
-                cursor: pointer;
             }
         }
     }

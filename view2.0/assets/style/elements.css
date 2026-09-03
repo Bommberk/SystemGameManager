@@ -35,11 +35,68 @@ option
 {
     background: var(--primary-background-color);
     color: var(--primary-text-color);
+    border-radius: 5px;
 }
 
 .save-btn
 {
+    display: flex;
+    gap: 5px;
     &:hover{
         border-color: var(--secondary-text-color) !important;
     }
+    i.save-icon{
+        transform: translateY(2px);
+    }
+    i.check-icon{
+        transform: translateY(2px);
+        display: none;
+    }
+    &:focus{
+        i.save-icon{
+            display: none;
+        }
+        i.check-icon{
+            display: block;
+        }
+    }
+}
+
+.select-wrapper
+{
+    width: 100%;
+    position: relative;
+    i.fa-chevron-down {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    select{
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+}
+
+input:not([type="range"]),select,button{
+    border-radius: 8px;
+    border: 1px solid var(--primary-border-color);
+    background: transparent;
+    color: var(--primary-text-color);
+    padding: 10px 14px;
+    transition: border-color 0.15s;
+    &:hover{
+        border-color: var(--secondary-border-color);
+    }
+}
+button
+{
+    cursor: pointer;
+}
+input[type="search"]{
+    flex: 1;
+}
+select{
+    flex: 1;
 }

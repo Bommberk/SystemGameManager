@@ -33,6 +33,7 @@ body
     --text-shadow-color: #fff;
     --error-background-color: #C32038;
     --primary-border-color: #e9ebec2b;
+    --secondary-border-color: #e9ebec77;
 
     /* Sizes */
     --sidebar-width: 60px;
@@ -53,6 +54,7 @@ body
     --secondary-text-color: #98B164;
     --tertiary-text-color: #badf6b;
     --error-background-color: #C32038;
+    --primary-border-color: #2222222b;
 }
 .red
 {

@@ -91,7 +91,7 @@ public static class WebApiHandler
     {
         Game[] games = JsonSerializer.Deserialize<List<Game>>(request.Data?.ToString() ?? "[]").ToArray();
         Game.UpdateMultibleGames(games);
-        MessageBox.Show("Games were updated", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        // MessageBox.Show("Games were updated", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     private static async Task SetLaunchers(ApiRequest request)

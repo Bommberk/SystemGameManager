@@ -225,6 +225,11 @@ function filterGames(searchTerm)
     });
 
     createGameList(filteredGames);
+    if(filteredGames.length !== games.length){
+        document.getElementById("gameAmountAfterFilter").textContent = `(${filteredGames.length})`;
+    }else{
+        document.getElementById("gameAmountAfterFilter").textContent = "";
+    }
 }
 
 
