@@ -53,6 +53,8 @@ option
         display: none;
     }
     &:focus{
+        color: var(--secondary-text-color);
+        text-shadow: 0px 0px 5px var(--secondary-text-color);
         i.save-icon{
             display: none;
         }
