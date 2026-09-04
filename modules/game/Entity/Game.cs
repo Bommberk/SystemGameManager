@@ -9,11 +9,11 @@ class Game
     public const int GAME_VOLUME_PERCENT = 100;
     public const string TABLE_NAME = "Game";
     public static Game[]? InstalledGames { get; set; }
-    public string Name { get; set; }
-    public string SerializedGameName { get; set; }
-    public string InstallFolderPath { get; set; }
-    public string ExePath { get; set; }
-    public string ProzessName { get; set; } 
+    public string Name { get; private set; }
+    public string SerializedGameName { get; private set; }
+    public string InstallFolderPath { get; private set; }
+    public string ExePath { get; private set; }
+    public string ProzessName { get; private set; } 
     public int? MusicVolumePercent { get; set; } = MUSIC_VOLUME_PERCENT;
     public int? GameVolumePercent { get; set; } = GAME_VOLUME_PERCENT;
     public string? AudioOutputDevice { get; set; }

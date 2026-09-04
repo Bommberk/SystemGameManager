@@ -11,14 +11,14 @@ class Launcher
     public static Launcher[]? InstalledLaunchers { get; set; }
     public static Launcher[]? KnownLaunchers { get; set; }
 
-    public string Name { get; set; }
-    public string SearchName { get; set; }
-    public string StdInstallPath { get; set; }
+    public string Name { get; private set; }
+    public string SearchName { get; private set; }
+    public string StdInstallPath { get; private set; }
     public string InstallPath { get; set; }
-    public string StdGameFoldersPath { get; set; }
+    public string StdGameFoldersPath { get; private set; }
     public string[]? GameFolderPath { get; set; }
-    public string? StdLibraryFilePath { get; set; }
-    public string? DirectRegistryKey { get; set; }
+    public string? StdLibraryFilePath { get; private set; }
+    public string? DirectRegistryKey { get; private set; }
 
     public Launcher(string name, string searchName, string stdInstallPath, string installPath, string stdGameFoldersPath, string[]? gameFolderPath = null, string? stdLibraryFilePath = null, string? directRegistryKey = null)
     {
