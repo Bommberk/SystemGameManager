@@ -1,21 +1,21 @@
 <link rel="stylesheet" href="../assets/style/gamemanager.css">
 
 <div class="gamemanager container">
-    <div class="head card">
+    <section class="head card">
         <img id="gameManagerImage" src="../assets/images/logos/sysgamemanager_logo.png" alt="Game Manager" class="game-manager-image">
         <div class="content">
             <h2>Game Manager</h2>
             <p><span id="gameAmount">0</span> Spiele - <span id="launcherAmount">0</span> Launcher</p>
             <p>Launcher, Spiele und schnelle Aktionen auf einen Blick.</p>
         </div>
-    </div>
-    <div class="launchers dropable">
+    </section>
+    <section class="launchers collapsable">
         <h2>Launcher</h2>
-        <div class="launcherlist" expandable="true" id="launcherlist"></div>
-    </div>
-    <div class="audiomanagement">
+        <div class="launcherlist content" id="launcherlist"></div>
+    </section>
+    <section class="audiomanagement collapsable">
         <h2>Audio Einstellungen</h2>
-        <div class="audiosettings-form card">
+        <div class="audiosettings-form card content">
             <div class="select-game">
                 <div class="search">
                     <h3>Spiele auswählen</h3>
@@ -78,11 +78,11 @@
                 </form>
             </div>
         </div>
-    </div>
-    <div class="games">
+    </section>
+    <section class="games">
         <h2>Spiele <span id="gameAmountAfterFilter"></span></h2>
-        <div class="gamelist" expandable="true" id="gamelist">
-            <div class="game card">
+        <div class="gamelist" id="gamelist">
+            <div class="game card content">
                 <img src="${getGameImageUrl(game.GameImage)}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">
                 <input type="checkbox" name="select${game.SerializedGameName}" class="game-checkbox" data-game-name="${game.SerializedGameName}" onchange="selectGame('${game.SerializedGameName}')">
                 <div class="game-menu">
@@ -108,7 +108,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="content">
+                <div class="infos">
                     <h3>${game.Name}</h3>
                     <p>Installationspfad:</p>
                     <span id="installPath">${game.InstallFolderPath}</span>
@@ -119,5 +119,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>

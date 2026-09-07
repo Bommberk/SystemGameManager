@@ -32,7 +32,7 @@ function createGameList(gameArray = null)
                     </ul>
                 </div>
             </div>
-            <div class="content">
+            <div class="infos">
                 <h3>${game.Name}</h3>
                 <p>Installationspfad:</p>
                 <span id="installPath">${game.InstallFolderPath}</span>

@@ -39,7 +39,7 @@ function createLauncherList()
         let logoPath = `../assets/images/launcher_logos/${launcher.SearchName}-logo.png`;
         launcherCard.innerHTML = `
             <img src="${logoPath}" alt="${launcher.Name} logo" onerror="this.src='../assets/images/launcher_logos/placeholder-logo.png';">
-            <div class="content">
+            <div class="infos">
                 <h3>${launcher.Name}</h3>
                 <p class="installpath">${launcher.InstallPath}</p>
             </div>
@@ -48,7 +48,21 @@ function createLauncherList()
     });
 }
 
+function createCollapsableSections()
+{
+    console.log("Creating collapsable sections");
+    const collapsableHeader = document.querySelectorAll("section.collapsable h2");
+    console.log("Found collapsable sections:", collapsableHeader);
+    collapsableHeader.forEach(header => {
+        console.log("Processing collapsable section:", header);
+        const dropIcon = '<i class="fa-solid fa-chevron-down"></i>';
+        header.insertAdjacentHTML('beforeend', dropIcon);
 
+        header.addEventListener("click", () => {
+            header.parentElement.classList.toggle("collapsed");
+        });
+    });
+}
 
 function toggleSidebar()
 {

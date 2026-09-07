@@ -4,6 +4,7 @@ async function loadPage(page)
     const html = await response.text();
 
     document.getElementById("page").innerHTML = html;
+    createCollapsableSections();
     let sidebarButton = "sidebar"+page.charAt(0).toUpperCase()+page.slice(1)+"Button";
     let previous = document.querySelector("#sidebar li.active");
     if (previous) {

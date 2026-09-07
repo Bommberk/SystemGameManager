@@ -34,6 +34,8 @@ body
     --error-background-color: #C32038;
     --primary-border-color: #e9ebec2b;
     --secondary-border-color: #e9ebec77;
+    --scrollbar-thumb-color: #545959;
+    --scrollbar-track-color: #7d8181;
 
     /* Sizes */
     --sidebar-width: 60px;
@@ -55,6 +57,8 @@ body
     --tertiary-text-color: #badf6b;
     --error-background-color: #C32038;
     --primary-border-color: #2222222b;
+    --scrollbar-thumb-color: #C8C8C8;
+    --scrollbar-track-color: #e0e0e0;
 }
 .red
 {
