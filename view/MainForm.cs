@@ -18,6 +18,7 @@ public partial class MainForm : Form
             Dock = DockStyle.Fill
         };
 
+        Text = "System Game Manager v" + GlobalConfig.Settings.AppConfig.Version;
         WindowState = FormWindowState.Maximized;
 
         Controls.Add(web);

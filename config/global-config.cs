@@ -2,7 +2,6 @@ namespace SystemGameManager.Config;
 
 using System;
 using System.IO;
-using System.Text.Json;
 
 public class AppConfig
 {
@@ -45,67 +44,5 @@ public class AppSettings
 
 public static class GlobalConfig
 {
-    private static AppSettings? _settings;
-    
-    // Pfad zur appsettings.json Datei
-    private static readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "appsettings.json");
-
-    // Eigenschaft zum Abrufen der Einstellungen
-    public static AppSettings Settings
-    {
-        get
-        {
-            if (_settings == null)
-            {
-                Load();
-            }
-            return _settings!;
-        }
-    }
-
-    public static void Load()
-    {
-        try
-        {
-            if (File.Exists(ConfigPath))
-            {
-                string jsonString = File.ReadAllText(ConfigPath);
-                _settings = JsonSerializer.Deserialize<AppSettings>(jsonString) ?? new AppSettings();
-                mlog("Konfiguration erfolgreich geladen.");
-            }
-            else
-            {
-                // Erstelle eine Standard-Konfiguration, falls keine existiert
-                mlog("Keine Konfigurationsdatei gefunden. Standard-Konfiguration wird erstellt...");
-                _settings = new AppSettings();
-                Save();
-            }
-        }
-        catch (Exception ex)
-        {
-            ConsoleError($"Fehler beim Laden der Konfiguration: {ex.Message}");
-            _settings = new AppSettings(); // Fallback auf Standardwerte
-        }
-    }
-
-    public static void Save()
-    {
-        try
-        {
-            string? dir = Path.GetDirectoryName(ConfigPath);
-            if (dir != null && !Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            string jsonString = JsonSerializer.Serialize(_settings, options);
-            File.WriteAllText(ConfigPath, jsonString);
-            mlog("Konfiguration erfolgreich gespeichert.");
-        }
-        catch (Exception ex)
-        {
-            ConsoleError($"Fehler beim Speichern der Konfiguration: {ex.Message}");
-        }
-    }
+    public static AppSettings Settings { get; } = new();
 }
