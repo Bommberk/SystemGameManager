@@ -6,7 +6,7 @@ using System.IO;
 public class AppConfig
 {
     public string AppName { get; set; } = "SystemGameManager";
-    public string Version { get; set; } = "0.6.4";
+    public string Version { get; set; } = "0.6.5";
     public string Environment { get; set; } = "production";
     public string RepositoryUrl { get; set; } = "https://github.com/Bommberk/SystemGameManager";
     public string Author { get; set; } = "Krassheiten";

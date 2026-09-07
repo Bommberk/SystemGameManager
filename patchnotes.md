@@ -1,22 +1,27 @@
 # System & Game Manager – Changelog
 
-### 🎨 UI/UX Refactoring
-- **WebView2 Layout**: Restructured the Audio Management section into distinct, scrollable cards for "Select Game", "Device Selection", "Game Volume", and "Music Volume".
-- **New Logo**: Added `sysgamemanager_logo.png` to the header for better branding consistency.
-- **Styling Updates**:
-  - Introduced dedicated `.save-btn` classes with icon animations (save/check toggle) on focus/click.
-  - Customized form elements (`input`, `select`, `button`) with rounded corners and theme-aware borders.
-  - Added a custom CSS file for `h2` margins to improve section spacing.
-- **Filtering UX**: Updated the game list header to dynamically display the count of filtered games (e.g., `(12)`).
+### 🛠 Architecture Refactoring
+- **WebView Integration:** Migrated UI from `view2.0/` to `view/` (HTML5/CSS3/JS), leveraging Microsoft WebView2 for the main rendering engine. Removed legacy WinForms heavy-hydrate controls (RichTextBox, Panel-based cards) in favor of a hybrid WebView approach.
+- **Project Structure Cleanup:** Removed `config/appsettings.json` loading logic from `GlobalConfig` (now uses default instantiation). Updated `.csproj` to exclude deleted configuration files and map new view assets correctly.
+- **Code Consolidation:** Deleted extensive WinForms boilerplate code (`PcInfoView`, `GameManager`, `Page` hierarchy) that was redundant with the new WebView implementation.
 
-### 🧠 Logic & Data Handling
-- **Hidden Games Feature**: Implemented `IsRemovedFromView` flag in `Game.cs` and updated the Web API handler. Games marked as removed are excluded from the UI list (`handleGames`) but persist in the database for future restoration (if implemented).
-- **Granular Audio Saving**: Split audio saving into three separate endpoints to allow modifying individual settings (Device, Game Volume, Music Volume) without resetting others.
-- **Selection Logic**: Updated selection handlers to respect the `IsRemovedFromView` status, preventing interaction with hidden games.
+### 🎨 Visual & UX Improvements
+- **Asset Migration:** Moved all assets (icons, game logos, images) from `view2.0/` to `view/`. Updated build configurations to copy resources correctly.
+- **Styling Updates:**
+  - Added CSS scrollbars (`::-webkit-scrollbar`) and collapsible section logic (accordion styles for Launcher/Audio/Game lists).
+  - Fixed layout overflow issues in Game Manager by adjusting container heights and adding padding.
+  - Unified color variables (added `--scrollbar-thumb-color` / `--scrollbar-track-color` for Light/Dark modes).
+- **Script Refactoring:** Split monolithic `app.js` into modular scripts (`games.js`, `router.js`) to improve maintainability and separate Game List logic from general routing.
 
-### 🔧 Technical Fixes & Cleanup
-- **Console Messaging**: Removed the `MessageBox.Show("Games were updated")` popup from `WebApiHandler.cs` to prevent intrusive alerts during background processes or console runs.
-- **Null Handling**: Added explicit null checks (`!= false`) when loading database values into game entities to ensure consistency with boolean flags.
+### 📦 Asset & Data Handling
+- **Configuration Simplification:** Replaced external JSON config loading with static default values in `GlobalConfig` for a lighter startup.
+- **Path Logic Updates:** Modified `MainForm` to detect development environments dynamically, ensuring correct mapping of the `view/` folder during builds vs. local runs.
 
-### 📦 Assets
-- **Icons**: Replaced generic images in the header with a new custom logo asset.
+### 🔧 Technical Fixes & Utilities
+- **Image Handling:** Enhanced `ConfigureLocalImageRequests` in WebView to better handle image MIME types and 404 fallbacks for missing game logos (using placeholder logic).
+- **Error Handling:** Improved error messages when accessing non-existent game directories or loading invalid image paths.
+- **Cleanup:** Removed unused classes (`ColorThemes`, `CardControls`, `HoverShadowPanel`, `NormalButton`) that were specific to the previous WinForms card system, as their functionality was abstracted or moved away from direct UI manipulation.
+
+### 🧹 Code Hygiene
+- **Namespace Renaming:** Aligned file paths and namespaces (`SystemGameManager.View` vs `SystemGameManager.View2`) with the new folder structure.
+- **File Consolidation:** Deleted intermediate pages (`Info`, `MenuPage`, `Settings` placeholders) and services (`GameManagerViewService`, `ViewService`) that were no longer strictly necessary for the WebView-based routing system.
