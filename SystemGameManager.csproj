@@ -39,7 +39,7 @@
     <None Update="modules\database\systemgamemanager.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="view2.0\**\*">
+    <None Update="view\**\*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

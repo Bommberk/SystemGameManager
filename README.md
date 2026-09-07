@@ -108,7 +108,7 @@ assets/                 Launcher-Definitionen und Standardgrafiken
 config/                 Laufzeitkonfiguration
 modules/Database/       SQLite-Zugriff und Datenmodell-Synchronisierung
 modules/game/           Launcher-, Spiele- und Audio-Logik
-view2.0/                WebView2-Oberfläche (HTML, CSS, JavaScript)
+view/                WebView2-Oberfläche (HTML, CSS, JavaScript)
 Handler/                Kommunikation zwischen Web-Oberfläche und C#
 ```
 
