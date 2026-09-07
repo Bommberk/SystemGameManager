@@ -8,6 +8,18 @@
     align-items: center;
 }
 
+.dropable
+{
+    max-height: 400px !important;
+    overflow-y: auto;
+    transition: max-height 0.7s ease-in-out;
+    .collapsed{
+        max-height: 0 !important;
+        overflow: hidden;
+        padding: 0;
+    }
+}
+
 .slider
 {
     -webkit-appearance: none;
@@ -53,13 +65,15 @@ option
         display: none;
     }
     &:focus{
-        color: var(--secondary-text-color);
-        text-shadow: 0px 0px 5px var(--secondary-text-color);
+        /* color: var(--secondary-text-color); */
+        /* text-shadow: 0px 0px 5px var(--secondary-text-color); */
         i.save-icon{
             display: none;
         }
         i.check-icon{
             display: block;
+            color: var(--secondary-text-color);
+            text-shadow: 0px 0px 5px var(--secondary-text-color);
         }
     }
 }
