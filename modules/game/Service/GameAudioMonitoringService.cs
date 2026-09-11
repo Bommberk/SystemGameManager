@@ -17,7 +17,11 @@ class GameAudioMonitoringService
     private bool isGameMusicOverrideActive;
     private string? previousAudioOutputDeviceId;
     private string? lastAppliedAudioOutputDeviceId;
+    private readonly object currentRunningGameSync = new();
+    private Game? currentRunningGame;
     private readonly AudioManagerController audioManagerController = new();
+
+    public bool IsCurrentlySpeech => audioManagerController.IsCurrentlySpeech;
 
     public void StartAudioMonitoring(int intervalMs = AUDIO_CHECK_INTERVAL_MS)
     {
@@ -28,8 +32,8 @@ class GameAudioMonitoringService
         {
             try
             {
-                SetAudioWhenGameStarts();
-                audioManagerController.StartCaptureMonitoring();
+                Game? runningGame = SetAudioWhenGameStarts();
+                audioManagerController.StartCaptureMonitoring(runningGame?.ProzessName);
             }
             catch
             {
@@ -37,16 +41,17 @@ class GameAudioMonitoringService
         }, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(effectiveInterval));
     }
 
-    public void SetAudioWhenGameStarts()
+    public Game? SetAudioWhenGameStarts()
     {
         if (Interlocked.Exchange(ref isCheckingAudio, 1) == 1)
         {
-            return;
+            return GetCurrentRunningGame();
         }
 
         try
         {
             Game? runningGame = GetGameProcess.GetRunningOpenGame();
+            SetCurrentRunningGame(runningGame);
             int? currentMusicAppVolume = systemAudioService.GetMusicAppVolume(DEFAULT_MUSIC_APP_NAME);
 
             if (runningGame is not null)
@@ -76,7 +81,7 @@ class GameAudioMonitoringService
                     && currentMusicAppVolume == targetMusicVolume
                     && !audioOutputChanged)
                 {
-                    return;
+                    return runningGame;
                 }
 
                 SetAudio(musicVolume: targetMusicVolume);
@@ -90,12 +95,13 @@ class GameAudioMonitoringService
 
                 lastAppliedGamePath = currentGamePath;
                 lastAppliedMusicVolume = targetMusicVolume;
-                return;
+                return runningGame;
             }
 
             if (!isGameMusicOverrideActive)
             {
-                return;
+                SetCurrentRunningGame(null);
+                return null;
             }
 
             int restoreMusicVolume = previousMusicAppVolume ?? Game.MUSIC_VOLUME_PERCENT;
@@ -114,10 +120,28 @@ class GameAudioMonitoringService
             previousMusicAppVolume = null;
             previousAudioOutputDeviceId = null;
             isGameMusicOverrideActive = false;
+            SetCurrentRunningGame(null);
+            return null;
         }
         finally
         {
             Interlocked.Exchange(ref isCheckingAudio, 0);
+        }
+    }
+
+    private Game? GetCurrentRunningGame()
+    {
+        lock (currentRunningGameSync)
+        {
+            return currentRunningGame;
+        }
+    }
+
+    private void SetCurrentRunningGame(Game? runningGame)
+    {
+        lock (currentRunningGameSync)
+        {
+            currentRunningGame = runningGame;
         }
     }
 

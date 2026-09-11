@@ -7,6 +7,7 @@ internal sealed class GameAudioController : IDisposable
     private readonly GameAudioMonitoringService gameMonitoringService = new();
 
     private bool disposed;
+    public bool IsCurrentlySpeech => gameMonitoringService.IsCurrentlySpeech;
 
     public GameAudioController()
     {

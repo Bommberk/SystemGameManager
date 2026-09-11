@@ -71,6 +71,7 @@ class GetGameProcess
             {
                 if (MatchesGamePath(game, normalizedProcessPath))
                 {
+                    game.ProzessName = process.ProcessName;
                     return game;
                 }
             }
