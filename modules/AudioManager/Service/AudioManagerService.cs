@@ -49,7 +49,7 @@ class AudioManagerService
         return new WasapiLoopbackCapture(device);
     }
 
-    public void SaveWavAudioFileFromCapture(WasapiCapture capture, string filePath)
+    public void SaveWavAudioFileFromCapture(WasapiCapture capture, string filePath, Action<byte[], int, WaveFormat>? onDataAvailable = null)
     {
         if(capture == null)
             throw new ArgumentNullException(nameof(capture));
@@ -59,6 +59,7 @@ class AudioManagerService
         capture.DataAvailable += (s, e) =>
         {
             writer.Write(e.Buffer, 0, e.BytesRecorded);
+            onDataAvailable?.Invoke(e.Buffer, e.BytesRecorded, capture.WaveFormat);
         };
         capture.RecordingStopped += (s, e) =>
         {
