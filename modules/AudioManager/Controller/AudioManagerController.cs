@@ -6,8 +6,6 @@ using SystemGameManager.AudioManager.Service;
 
 class AudioManagerController
 {
-    private const string OUTPUT_FILE_PATH = "capture.wav";
-
     private readonly AudioManagerService audioManagerService = new AudioManagerService();
     private readonly InGameConversationRecognitionService conversationRecognitionService = new();
     private WasapiCapture? activeCapture;
@@ -41,7 +39,7 @@ class AudioManagerController
         if (isPlayingAudio && activeCapture == null)
         {
             activeCapture = audioManagerService.CreateSystemLoopbackCapture();
-            audioManagerService.SaveWavAudioFileFromCapture(activeCapture, OUTPUT_FILE_PATH, conversationRecognitionService.ProcessAudioBuffer);
+            audioManagerService.StartCaptureProcessing(activeCapture, conversationRecognitionService.ProcessAudioBuffer);
             mlog($"Capture für aktives Programm gestartet: {programName}");
         }
         else if (!isPlayingAudio && activeCapture != null)

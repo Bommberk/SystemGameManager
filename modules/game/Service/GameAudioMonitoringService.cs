@@ -17,6 +17,7 @@ class GameAudioMonitoringService
     private bool isGameMusicOverrideActive;
     private string? previousAudioOutputDeviceId;
     private string? lastAppliedAudioOutputDeviceId;
+    private readonly object currentRunningGameSync = new();
     private Game? currentRunningGame;
     private readonly AudioManagerController audioManagerController = new();
 
@@ -44,13 +45,13 @@ class GameAudioMonitoringService
     {
         if (Interlocked.Exchange(ref isCheckingAudio, 1) == 1)
         {
-            return currentRunningGame;
+            return GetCurrentRunningGame();
         }
 
         try
         {
             Game? runningGame = GetGameProcess.GetRunningOpenGame();
-            currentRunningGame = runningGame;
+            SetCurrentRunningGame(runningGame);
             int? currentMusicAppVolume = systemAudioService.GetMusicAppVolume(DEFAULT_MUSIC_APP_NAME);
 
             if (runningGame is not null)
@@ -99,7 +100,7 @@ class GameAudioMonitoringService
 
             if (!isGameMusicOverrideActive)
             {
-                currentRunningGame = null;
+                SetCurrentRunningGame(null);
                 return null;
             }
 
@@ -119,12 +120,28 @@ class GameAudioMonitoringService
             previousMusicAppVolume = null;
             previousAudioOutputDeviceId = null;
             isGameMusicOverrideActive = false;
-            currentRunningGame = null;
+            SetCurrentRunningGame(null);
             return null;
         }
         finally
         {
             Interlocked.Exchange(ref isCheckingAudio, 0);
+        }
+    }
+
+    private Game? GetCurrentRunningGame()
+    {
+        lock (currentRunningGameSync)
+        {
+            return currentRunningGame;
+        }
+    }
+
+    private void SetCurrentRunningGame(Game? runningGame)
+    {
+        lock (currentRunningGameSync)
+        {
+            currentRunningGame = runningGame;
         }
     }
 

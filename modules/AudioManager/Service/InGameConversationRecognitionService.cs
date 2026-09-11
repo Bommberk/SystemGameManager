@@ -5,6 +5,8 @@ using NAudio.Wave;
 
 internal sealed class InGameConversationRecognitionService
 {
+    private static readonly Guid IEEE_FLOAT_SUBFORMAT = new("00000003-0000-0010-8000-00aa00389b71");
+    private static readonly Guid PCM_SUBFORMAT = new("00000001-0000-0010-8000-00aa00389b71");
     private const int FFT_SIZE = 1024;
     private const double MIN_SPEECH_CANDIDATE_MS = 450;
     private const double MIN_SILENCE_MS = 1400;
@@ -124,7 +126,7 @@ internal sealed class InGameConversationRecognitionService
         int frameCount;
         float[] monoSamples;
 
-        if ((waveFormat.Encoding == WaveFormatEncoding.IeeeFloat || waveFormat.Encoding == WaveFormatEncoding.Extensible) && waveFormat.BitsPerSample == 32)
+        if (Is32BitFloatFormat(waveFormat))
         {
             int sampleCount = bytesRecorded / sizeof(float);
             if (sampleCount == 0)
@@ -152,7 +154,7 @@ internal sealed class InGameConversationRecognitionService
             return monoSamples;
         }
 
-        if (waveFormat.BitsPerSample == 32)
+        if (Is32BitPcmFormat(waveFormat))
         {
             int sampleCount = bytesRecorded / sizeof(int);
             frameCount = sampleCount / channels;
@@ -197,6 +199,38 @@ internal sealed class InGameConversationRecognitionService
         }
 
         return [];
+    }
+
+    private static bool Is32BitFloatFormat(WaveFormat waveFormat)
+    {
+        if (waveFormat.BitsPerSample != 32)
+        {
+            return false;
+        }
+
+        if (waveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
+        {
+            return true;
+        }
+
+        return waveFormat is WaveFormatExtensible extensibleFormat
+            && extensibleFormat.SubFormat == IEEE_FLOAT_SUBFORMAT;
+    }
+
+    private static bool Is32BitPcmFormat(WaveFormat waveFormat)
+    {
+        if (waveFormat.BitsPerSample != 32)
+        {
+            return false;
+        }
+
+        if (waveFormat.Encoding == WaveFormatEncoding.Pcm)
+        {
+            return true;
+        }
+
+        return waveFormat is WaveFormatExtensible extensibleFormat
+            && extensibleFormat.SubFormat == PCM_SUBFORMAT;
     }
 
     private static float CalculateRmsLevel(float[] samples)
