@@ -71,8 +71,7 @@ class GetGameProcess
             {
                 if (MatchesGamePath(game, normalizedProcessPath))
                 {
-                    game.ProzessName = process.ProcessName;
-                    return game;
+                    return CreateDetectedGame(game, process.ProcessName);
                 }
             }
         }
@@ -153,6 +152,21 @@ class GetGameProcess
 
         _ = GetWindowThreadProcessId(foregroundWindow, out uint processId);
         return processId == 0 ? null : processId;
+    }
+
+    private static Game CreateDetectedGame(Game game, string processName)
+    {
+        return new Game(
+            game.Name,
+            game.SerializedGameName,
+            game.InstallFolderPath,
+            game.ExePath,
+            processName,
+            game.MusicVolumePercent,
+            game.GameVolumePercent,
+            game.AudioOutputDevice,
+            game.GameImage,
+            game.IsRemovedFromView);
     }
 
     [DllImport("user32.dll")]

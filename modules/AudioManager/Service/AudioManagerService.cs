@@ -62,6 +62,10 @@ class AudioManagerService
         };
         capture.RecordingStopped += (s, e) =>
         {
+            if (e.Exception is not null)
+            {
+                mlog($"Capture-Fehler beim Stoppen: {e.Exception}");
+            }
             capture.Dispose();
         };
         capture.StartRecording();
@@ -81,6 +85,10 @@ class AudioManagerService
         };
         capture.RecordingStopped += (s, e) =>
         {
+            if (e.Exception is not null)
+            {
+                mlog($"Capture-Fehler beim Speichern: {e.Exception}");
+            }
             writer.Dispose();
             capture.Dispose();
         };

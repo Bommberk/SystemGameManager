@@ -33,13 +33,14 @@ internal sealed class InGameConversationRecognitionService
 
     public void ProcessAudioBuffer(byte[] buffer, int bytesRecorded, WaveFormat waveFormat)
     {
-        if (bytesRecorded <= 0)
+        int validBytesRecorded = GetCompleteFrameBytes(bytesRecorded, waveFormat);
+        if (validBytesRecorded <= 0)
         {
             RegisterSilence();
             return;
         }
 
-        float[] monoSamples = ConvertToMonoSamples(buffer, bytesRecorded, waveFormat);
+        float[] monoSamples = ConvertToMonoSamples(buffer, validBytesRecorded, waveFormat);
         if (monoSamples.Length == 0)
         {
             RegisterSilence();
@@ -231,6 +232,22 @@ internal sealed class InGameConversationRecognitionService
 
         return waveFormat is WaveFormatExtensible extensibleFormat
             && extensibleFormat.SubFormat == PCM_SUBFORMAT;
+    }
+
+    private static int GetCompleteFrameBytes(int bytesRecorded, WaveFormat waveFormat)
+    {
+        if (bytesRecorded <= 0)
+        {
+            return 0;
+        }
+
+        int blockAlign = waveFormat.BlockAlign;
+        if (blockAlign <= 0)
+        {
+            return bytesRecorded;
+        }
+
+        return bytesRecorded - (bytesRecorded % blockAlign);
     }
 
     private static float CalculateRmsLevel(float[] samples)

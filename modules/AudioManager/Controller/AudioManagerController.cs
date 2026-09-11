@@ -9,6 +9,7 @@ class AudioManagerController
     private readonly AudioManagerService audioManagerService = new AudioManagerService();
     private readonly InGameConversationRecognitionService conversationRecognitionService = new();
     private WasapiCapture? activeCapture;
+    private int captureSessionId;
     private string? activeProgramName;
 
     public bool IsCurrentlySpeech => conversationRecognitionService.IsCurrentlySpeech;
@@ -39,7 +40,17 @@ class AudioManagerController
         if (isPlayingAudio && activeCapture == null)
         {
             activeCapture = audioManagerService.CreateSystemLoopbackCapture();
-            audioManagerService.StartCaptureProcessing(activeCapture, conversationRecognitionService.ProcessAudioBuffer);
+            WasapiCapture capture = activeCapture;
+            int sessionId = Interlocked.Increment(ref captureSessionId);
+            audioManagerService.StartCaptureProcessing(capture, (buffer, bytesRecorded, waveFormat) =>
+            {
+                if (sessionId != Volatile.Read(ref captureSessionId) || !ReferenceEquals(activeCapture, capture))
+                {
+                    return;
+                }
+
+                conversationRecognitionService.ProcessAudioBuffer(buffer, bytesRecorded, waveFormat);
+            });
             mlog($"Capture für aktives Programm gestartet: {programName}");
         }
         else if (!isPlayingAudio && activeCapture != null)
@@ -56,6 +67,7 @@ class AudioManagerController
     private void StopActiveCapture()
     {
         // StopRecording löst RecordingStopped aus, wodurch Writer/Capture erst dort finalisiert und disposed werden
+        Interlocked.Increment(ref captureSessionId);
         activeCapture?.StopRecording();
         activeCapture = null;
         conversationRecognitionService.Reset();
