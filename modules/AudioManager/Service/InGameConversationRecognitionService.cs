@@ -6,8 +6,10 @@ using NAudio.Wave;
 internal sealed class InGameConversationRecognitionService
 {
     private const int FFT_SIZE = 1024;
-    private const double MIN_SPEECH_CANDIDATE_MS = 900;
+    private const double MIN_SPEECH_CANDIDATE_MS = 450;
     private const double MIN_SILENCE_MS = 1400;
+    private const double SPEECH_CONFIDENCE_BUILD_DIVIDER = 650d;
+    private const double SPEECH_CONFIDENCE_TRIGGER = 0.55d;
     private const float MIN_RMS_LEVEL = 0.02f;
     private const float MIN_PEAK_LEVEL = 0.06f;
     private const float MIN_SPEECH_BAND_RATIO = 0.52f;
@@ -79,9 +81,9 @@ internal sealed class InGameConversationRecognitionService
         {
             speechCandidateDurationMs += bufferDurationMs;
             silenceDurationMs = 0;
-            speechConfidence = Math.Min(1, speechConfidence + (bufferDurationMs / 1000d));
+            speechConfidence = Math.Min(1, speechConfidence + (bufferDurationMs / SPEECH_CONFIDENCE_BUILD_DIVIDER));
 
-            if (speechCandidateDurationMs >= MIN_SPEECH_CANDIDATE_MS && speechConfidence >= 0.85d)
+            if (speechCandidateDurationMs >= MIN_SPEECH_CANDIDATE_MS && speechConfidence >= SPEECH_CONFIDENCE_TRIGGER)
             {
                 SetSpeechState(true);
             }
