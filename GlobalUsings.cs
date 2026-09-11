@@ -3,3 +3,4 @@ global using SystemGameManager.Database.Controller;
 global using SystemGameManager.Games.Controller;
 global using SystemGameManager.Pc.Controller;
 global using SystemGameManager.Config;
+global using SystemGameManager.AudioManager.Controller;

@@ -15,6 +15,7 @@ using SystemGameManager.Service;
 using SystemGameManager.View2;
 using System.Net.Http;
 using SystemGameManager.Plugin;
+using SystemGameManager.AudioManager.Controller;
 
 internal static class Program
 {
@@ -82,6 +83,7 @@ internal static class Program
         using var shutdownSignal = new ManualResetEventSlim(false);
 
         Console.WriteLine("Audio-Monitoring läuft. Mit Strg+C beenden.");
+        var gameAudioController = new GameAudioController();
 
         Console.CancelKeyPress += (_, eventArgs) =>
         {
@@ -90,6 +92,7 @@ internal static class Program
         };
 
         shutdownSignal.Wait();
+        gameAudioController.Dispose();
     }
 
     private static void RunForm()
