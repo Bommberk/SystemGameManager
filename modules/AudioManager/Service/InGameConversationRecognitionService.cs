@@ -6,16 +6,24 @@ using NAudio.Wave;
 internal sealed class InGameConversationRecognitionService
 {
     private const int FFT_SIZE = 1024;
-    private const int MIN_SPEECH_FRAMES = 2;
-    private const int MAX_SILENCE_FRAMES = 4;
-    private const float MIN_RMS_LEVEL = 0.015f;
-    private const float MIN_PEAK_LEVEL = 0.04f;
-    private const float MIN_SPEECH_BAND_RATIO = 0.45f;
+    private const double MIN_SPEECH_CANDIDATE_MS = 900;
+    private const double MIN_SILENCE_MS = 1400;
+    private const float MIN_RMS_LEVEL = 0.02f;
+    private const float MIN_PEAK_LEVEL = 0.06f;
+    private const float MIN_SPEECH_BAND_RATIO = 0.52f;
+    private const float MAX_LOW_BAND_RATIO = 0.40f;
+    private const float MAX_HIGH_BAND_RATIO = 0.34f;
+    private const float MIN_ZERO_CROSSING_RATE = 0.015f;
+    private const float MAX_ZERO_CROSSING_RATE = 0.22f;
+    private const float MAX_CREST_FACTOR = 5.5f;
     private const float SPEECH_BAND_START_HZ = 300f;
     private const float SPEECH_BAND_END_HZ = 3400f;
+    private const float LOW_BAND_END_HZ = 250f;
+    private const float HIGH_BAND_START_HZ = 4000f;
 
-    private int consecutiveSpeechFrames;
-    private int consecutiveSilenceFrames;
+    private double speechCandidateDurationMs;
+    private double silenceDurationMs;
+    private double speechConfidence;
 
     public bool IsCurrentlySpeech { get; private set; }
 
@@ -36,30 +44,44 @@ internal sealed class InGameConversationRecognitionService
 
         float rmsLevel = CalculateRmsLevel(monoSamples);
         float peakLevel = CalculatePeakLevel(monoSamples);
-        float speechBandRatio = CalculateSpeechBandRatio(monoSamples, waveFormat.SampleRate);
+        float zeroCrossingRate = CalculateZeroCrossingRate(monoSamples);
+        float crestFactor = rmsLevel <= float.Epsilon ? float.MaxValue : peakLevel / rmsLevel;
+        FrequencyBandProfile bandProfile = CalculateFrequencyBandProfile(monoSamples, waveFormat.SampleRate);
+        double bufferDurationMs = GetBufferDurationMs(monoSamples.Length, waveFormat.SampleRate);
 
-        bool looksLikeSpeech = rmsLevel >= MIN_RMS_LEVEL
-            && peakLevel >= MIN_PEAK_LEVEL
-            && speechBandRatio >= MIN_SPEECH_BAND_RATIO;
+        int speechScore = 0;
+        if (rmsLevel >= MIN_RMS_LEVEL) speechScore++;
+        if (peakLevel >= MIN_PEAK_LEVEL) speechScore++;
+        if (bandProfile.SpeechBandRatio >= MIN_SPEECH_BAND_RATIO) speechScore += 2;
+        if (bandProfile.LowBandRatio <= MAX_LOW_BAND_RATIO) speechScore++;
+        if (bandProfile.HighBandRatio <= MAX_HIGH_BAND_RATIO) speechScore++;
+        if (zeroCrossingRate >= MIN_ZERO_CROSSING_RATE && zeroCrossingRate <= MAX_ZERO_CROSSING_RATE) speechScore++;
+        if (crestFactor <= MAX_CREST_FACTOR) speechScore++;
 
-        UpdateSpeechState(looksLikeSpeech);
+        bool looksLikeSpeech = speechScore >= 7
+            && bandProfile.SpeechBandRatio > bandProfile.LowBandRatio
+            && bandProfile.SpeechBandRatio > bandProfile.HighBandRatio;
+
+        UpdateSpeechState(looksLikeSpeech, bufferDurationMs);
     }
 
     public void Reset()
     {
-        consecutiveSpeechFrames = 0;
-        consecutiveSilenceFrames = 0;
+        speechCandidateDurationMs = 0;
+        silenceDurationMs = 0;
+        speechConfidence = 0;
         SetSpeechState(false);
     }
 
-    private void UpdateSpeechState(bool looksLikeSpeech)
+    private void UpdateSpeechState(bool looksLikeSpeech, double bufferDurationMs)
     {
         if (looksLikeSpeech)
         {
-            consecutiveSpeechFrames++;
-            consecutiveSilenceFrames = 0;
+            speechCandidateDurationMs += bufferDurationMs;
+            silenceDurationMs = 0;
+            speechConfidence = Math.Min(1, speechConfidence + (bufferDurationMs / 1000d));
 
-            if (consecutiveSpeechFrames >= MIN_SPEECH_FRAMES)
+            if (speechCandidateDurationMs >= MIN_SPEECH_CANDIDATE_MS && speechConfidence >= 0.85d)
             {
                 SetSpeechState(true);
             }
@@ -67,15 +89,17 @@ internal sealed class InGameConversationRecognitionService
             return;
         }
 
-        RegisterSilence();
+        RegisterSilence(bufferDurationMs);
     }
 
-    private void RegisterSilence()
+    private void RegisterSilence(double bufferDurationMs = 0)
     {
-        consecutiveSpeechFrames = 0;
-        consecutiveSilenceFrames++;
+        speechCandidateDurationMs = 0;
+        silenceDurationMs += bufferDurationMs;
+        double decayDivider = IsCurrentlySpeech ? 2200d : 1100d;
+        speechConfidence = Math.Max(0, speechConfidence - (bufferDurationMs / decayDivider));
 
-        if (consecutiveSilenceFrames >= MAX_SILENCE_FRAMES)
+        if (silenceDurationMs >= MIN_SILENCE_MS || speechConfidence <= 0.15d)
         {
             SetSpeechState(false);
         }
@@ -201,12 +225,33 @@ internal sealed class InGameConversationRecognitionService
         return peak;
     }
 
-    private static float CalculateSpeechBandRatio(float[] samples, int sampleRate)
+    private static float CalculateZeroCrossingRate(float[] samples)
+    {
+        if (samples.Length < 2)
+        {
+            return 0;
+        }
+
+        int zeroCrossings = 0;
+        for (int index = 1; index < samples.Length; index++)
+        {
+            bool previousNegative = samples[index - 1] < 0;
+            bool currentNegative = samples[index] < 0;
+            if (previousNegative != currentNegative)
+            {
+                zeroCrossings++;
+            }
+        }
+
+        return zeroCrossings / (float)(samples.Length - 1);
+    }
+
+    private static FrequencyBandProfile CalculateFrequencyBandProfile(float[] samples, int sampleRate)
     {
         int fftSize = GetLargestPowerOfTwo(Math.Min(samples.Length, FFT_SIZE));
         if (fftSize < 256 || sampleRate <= 0)
         {
-            return 0;
+            return default;
         }
 
         Complex[] fftBuffer = new Complex[fftSize];
@@ -221,6 +266,8 @@ internal sealed class InGameConversationRecognitionService
 
         double totalEnergy = 0;
         double speechBandEnergy = 0;
+        double lowBandEnergy = 0;
+        double highBandEnergy = 0;
         double binWidth = (double)sampleRate / fftSize;
 
         for (int index = 1; index < fftSize / 2; index++)
@@ -229,18 +276,31 @@ internal sealed class InGameConversationRecognitionService
             totalEnergy += magnitude;
 
             double frequency = index * binWidth;
+            if (frequency <= LOW_BAND_END_HZ)
+            {
+                lowBandEnergy += magnitude;
+            }
+
             if (frequency >= SPEECH_BAND_START_HZ && frequency <= SPEECH_BAND_END_HZ)
             {
                 speechBandEnergy += magnitude;
+            }
+
+            if (frequency >= HIGH_BAND_START_HZ)
+            {
+                highBandEnergy += magnitude;
             }
         }
 
         if (totalEnergy <= double.Epsilon)
         {
-            return 0;
+            return default;
         }
 
-        return (float)(speechBandEnergy / totalEnergy);
+        return new FrequencyBandProfile(
+            (float)(speechBandEnergy / totalEnergy),
+            (float)(lowBandEnergy / totalEnergy),
+            (float)(highBandEnergy / totalEnergy));
     }
 
     private static int GetLargestPowerOfTwo(int value)
@@ -253,4 +313,16 @@ internal sealed class InGameConversationRecognitionService
 
         return power;
     }
+
+    private static double GetBufferDurationMs(int sampleCount, int sampleRate)
+    {
+        if (sampleCount <= 0 || sampleRate <= 0)
+        {
+            return 0;
+        }
+
+        return sampleCount * 1000d / sampleRate;
+    }
+
+    private readonly record struct FrequencyBandProfile(float SpeechBandRatio, float LowBandRatio, float HighBandRatio);
 }
