@@ -19,6 +19,12 @@ class GameAudioMonitoringService
     private string? lastAppliedAudioOutputDeviceId;
     private readonly AudioManagerController audioManagerController = new();
 
+    /// <summary>
+    /// true, sobald im Audio des aktuell laufenden Spiels Sprache erkannt wird. Läuft pro Spiel,
+    /// da immer nur das gerade aktive (im Vordergrund laufende) Spiel überwacht wird.
+    /// </summary>
+    public bool IsCurrentlySpeech => audioManagerController.IsCurrentlySpeech;
+
     public void StartAudioMonitoring(int intervalMs = AUDIO_CHECK_INTERVAL_MS)
     {
         int effectiveInterval = Math.Max(500, intervalMs);
@@ -28,8 +34,12 @@ class GameAudioMonitoringService
         {
             try
             {
-                SetAudioWhenGameStarts();
-                audioManagerController.StartCaptureMonitoring();
+                // Einmal pro Tick ermitteln, welches Spiel gerade aktiv ist, damit Lautstärke-Anpassung
+                // und Aufnahme-/Sprecherkennungs-Überwachung konsistent für dasselbe Spiel laufen
+                // (kein hartkodiertes Programm, sondern immer das aktuell aktive Spiel).
+                Game? runningGame = GetGameProcess.GetRunningOpenGame();
+                SetAudioWhenGameStarts(runningGame);
+                audioManagerController.StartCaptureMonitoring(runningGame?.ProzessName);
             }
             catch
             {
@@ -37,7 +47,7 @@ class GameAudioMonitoringService
         }, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(effectiveInterval));
     }
 
-    public void SetAudioWhenGameStarts()
+    public void SetAudioWhenGameStarts(Game? runningGame = null)
     {
         if (Interlocked.Exchange(ref isCheckingAudio, 1) == 1)
         {
@@ -46,7 +56,7 @@ class GameAudioMonitoringService
 
         try
         {
-            Game? runningGame = GetGameProcess.GetRunningOpenGame();
+            runningGame ??= GetGameProcess.GetRunningOpenGame();
             int? currentMusicAppVolume = systemAudioService.GetMusicAppVolume(DEFAULT_MUSIC_APP_NAME);
 
             if (runningGame is not null)

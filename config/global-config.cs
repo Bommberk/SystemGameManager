@@ -34,12 +34,21 @@ public class SmarthomeApiConfig
     public string ApiKey { get; set; } = "testtoken123";
 }
 
+public class SpeechDetectionConfig
+{
+    // AccessKey wird kostenlos über die Picovoice Console (https://console.picovoice.ai/) erstellt
+    // und wird von Cobra zur Initialisierung benötigt. Ohne gültigen AccessKey bleibt die
+    // Spracherkennung deaktiviert (isCurrentlySpeech bleibt dauerhaft false).
+    public string AccessKey { get; set; } = "";
+}
+
 public class AppSettings
 {
     public AppConfig AppConfig { get; set; } = new();
     public DatabaseConfig DatabaseConfig { get; set; } = new();
     public GameManagerConfig GameManagerConfig { get; set; } = new();
     public SmarthomeApiConfig SmarthomeApiConfig { get; set; } = new();
+    public SpeechDetectionConfig SpeechDetectionConfig { get; set; } = new();
 }
 
 public static class GlobalConfig
