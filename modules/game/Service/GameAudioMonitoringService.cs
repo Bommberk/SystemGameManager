@@ -3,6 +3,7 @@ namespace SystemGameManager.Games.Service;
 using System.Threading;
 using SystemGameManager.AudioManager.Controller;
 using SystemGameManager.Games.Entity;
+using SystemGameManager.Plugin;
 
 class GameAudioMonitoringService
 : GameAudioService, IDisposable
@@ -18,6 +19,7 @@ class GameAudioMonitoringService
     private string? previousAudioOutputDeviceId;
     private string? lastAppliedAudioOutputDeviceId;
     private readonly AudioManagerController audioManagerController = new();
+    private readonly LivelyWallpaper livelyWallpaper = new();
 
     /// <summary>
     /// true, sobald im Audio des aktuell laufenden Spiels Sprache erkannt wird. Läuft pro Spiel,
@@ -39,6 +41,7 @@ class GameAudioMonitoringService
                 // (kein hartkodiertes Programm, sondern immer das aktuell aktive Spiel).
                 Game? runningGame = GetGameProcess.GetRunningOpenGame();
                 SetAudioWhenGameStarts(runningGame);
+                livelyWallpaper.SetWallpaperForRunningGame(runningGame?.GameImage);
                 audioManagerController.StartCaptureMonitoring(runningGame?.ProzessName);
             }
             catch
