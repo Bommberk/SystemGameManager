@@ -28,14 +28,21 @@ class LivelyWallpaper
 
     private void SetWallpaper(string path)
     {
+        mlog("asdf1");
         var livelyExePath = getLivelyWallpaperPath();
-        if (livelyExePath is null)
+        if (livelyExePath is null){
+            mlog("Lively Wallpaper executable not found.");
             return;
+        }
 
+        mlog("asdf2");
         var monitorNumber = lastAppliedMonitorNumber;
         
         if (lastAppliedMonitorNumber < 1 || !File.Exists(path))
             return;
+
+
+        mlog("asdf3");
 
         var startInfo = new ProcessStartInfo
         {
@@ -91,7 +98,7 @@ class LivelyWallpaper
 
     private string? getLivelyWallpaperPath()
     {
-        var livelyExePath = "P:\\Lively Wallpaper\\livelycu";
+        var livelyExePath = "P:\\Lively Wallpaper\\livelycu.exe";
         if (File.Exists(livelyExePath))
         {
             return livelyExePath;
