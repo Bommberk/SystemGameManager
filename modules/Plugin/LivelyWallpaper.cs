@@ -28,14 +28,14 @@ class LivelyWallpaper
 
     private void SetWallpaper(string path)
     {
-        var livelyExePath = "P:\\Lively Wallpaper\\livelycu";
+        var livelyExePath = getLivelyWallpaperPath();
+        if (livelyExePath is null)
+            return;
+
         var monitorNumber = lastAppliedMonitorNumber;
         
-
         if (lastAppliedMonitorNumber < 1 || !File.Exists(path))
-        {
             return;
-        }
 
         var startInfo = new ProcessStartInfo
         {
@@ -87,5 +87,15 @@ class LivelyWallpaper
     private int getAmountOfMonitors()
     {
         return System.Windows.Forms.Screen.AllScreens.Length;
+    }
+
+    private string? getLivelyWallpaperPath()
+    {
+        var livelyExePath = "P:\\Lively Wallpaper\\livelycu";
+        if (File.Exists(livelyExePath))
+        {
+            return livelyExePath;
+        }
+        return null;
     }
 }
