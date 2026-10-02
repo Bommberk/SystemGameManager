@@ -19,8 +19,9 @@ class Game
     public string? AudioOutputDevice { get; set; }
     public string? GameImage { get; set; }
     public bool IsRemovedFromView { get; set; } = false;
+    public int? LivelyWallpaperScreen { get; set; }
 
-    public Game(string name, string serializedGameName, string installFolderPath, string exePath, string prozessName = "nothing found", int? musicVolumePercent = null, int? gameVolumePercent = null, string? audioOutputDevice = null, string? gameImage = null, bool isRemovedFromView = false)
+    public Game(string name, string serializedGameName, string installFolderPath, string exePath, string prozessName = "nothing found", int? musicVolumePercent = null, int? gameVolumePercent = null, string? audioOutputDevice = null, string? gameImage = null, bool isRemovedFromView = false, int? livelyWallpaperScreen = null)
     {
         Name = name;
         SerializedGameName = serializedGameName;
@@ -32,6 +33,7 @@ class Game
         AudioOutputDevice = audioOutputDevice;
         GameImage = gameImage;
         IsRemovedFromView = isRemovedFromView;
+        LivelyWallpaperScreen = livelyWallpaperScreen;
     }
 
     public static void WriteGamesFromDatabase()

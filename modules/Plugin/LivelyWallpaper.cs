@@ -8,15 +8,19 @@ class LivelyWallpaper
 {
     private const string DefaultWallpaperPath = "C:\\Users\\jimsm\\Pictures\\MSI Wallpaper\\MSI_MEG_ACE.jpg";
     private string? lastAppliedWallpaperPath = DefaultWallpaperPath;
-    public void SetWallpaperForRunningGame(string? gameWallpaper = null)
+    private int lastAppliedMonitorNumber = 1;
+    public void SetWallpaperForRunningGame(Game? game, string? gameWallpaper = null)
     {
         if(string.IsNullOrWhiteSpace(gameWallpaper) && lastAppliedWallpaperPath != DefaultWallpaperPath)
         {
+            mlog("Reverting to default wallpaper.");
             lastAppliedWallpaperPath = DefaultWallpaperPath;
             SetWallpaper(DefaultWallpaperPath);
             return;
         }else if(!string.IsNullOrWhiteSpace(gameWallpaper) && lastAppliedWallpaperPath == DefaultWallpaperPath){
+            mlog($"Setting wallpaper for running game: {gameWallpaper}");
             lastAppliedWallpaperPath = gameWallpaper;
+            lastAppliedMonitorNumber = game?.LivelyWallpaperScreen ?? 1;
             SetWallpaper(gameWallpaper);
             return;
         }
@@ -25,9 +29,10 @@ class LivelyWallpaper
     private void SetWallpaper(string path)
     {
         var livelyExePath = "P:\\Lively Wallpaper\\livelycu";
-        var monitorNumber = 1;
+        var monitorNumber = lastAppliedMonitorNumber;
+        
 
-        if (monitorNumber < 1 || !File.Exists(path))
+        if (lastAppliedMonitorNumber < 1 || !File.Exists(path))
         {
             return;
         }

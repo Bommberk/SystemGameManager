@@ -209,6 +209,9 @@ class GameService
 
             if(gameInDb.IsRemovedFromView != false)
                 game.IsRemovedFromView = true;
+                
+            if(gameInDb.LivelyWallpaperScreen != null)
+                game.LivelyWallpaperScreen = gameInDb.LivelyWallpaperScreen;
         }
     }
 

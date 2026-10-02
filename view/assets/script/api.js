@@ -24,6 +24,7 @@ let launchers = [];
  * @property {(string|null)} AudioOutputDevice
  * @property {(string|null)} GameImage
  * @property {(boolean)} IsRemovedFromView
+ * @property {(number)} LivelyWallpaperScreen
  */
 /** @type {Game[]} */
 let games = [];
@@ -63,6 +64,23 @@ const api = {
             data: game
         });
     },
+    getScreens(){
+        window.chrome.webview.postMessage({
+            action: "getScreens"
+        });
+    },
+    getScreenForGame(game){
+        window.chrome.webview.postMessage({
+            action: "getScreenForGame",
+            data: game
+        });
+    },
+    setScreenForGame(game){
+        window.chrome.webview.postMessage({
+            action: "setScreenForGame",
+            data: game
+        });
+    },
 };
 
 // Antwort von C#
@@ -84,6 +102,12 @@ window.apiResponse = function (response) {
             case "gameImageChanged":
                 handleChangedGameImage(response.data.SerializedGameName, response.data.GameImage);
                 break;
+            case "getScreens":
+                handleScreens(response.data);
+                break;
+            case "getScreenForGame":
+                openSelectWallpaperScreenModal(response.data);
+                break;
             default:
                 console.error(`Unknown action: ${response.action}`);
         }
@@ -101,3 +125,4 @@ function getGameBySerializedName(serializedName)
 api.getGames();
 api.getLaunchers();
 api.getAudioDevices();
+api.getScreens();

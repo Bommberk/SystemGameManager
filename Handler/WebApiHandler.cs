@@ -50,6 +50,9 @@ public static class WebApiHandler
             case "setLaunchers":
                 await SetLaunchers(request);
                 break;
+            case "setScreenForGame":
+                await SetScreenForGame(request);
+                break;
             default:
                 MessageBox.Show($"Unknown set action: {request.Action}");
                 break;
@@ -67,6 +70,12 @@ public static class WebApiHandler
                 break;
             case "getAudioDevices":
                 await GetAudioDevices(web);
+                break;
+            case "getScreens":
+                await GetScreens(web);
+                break;
+            case "getScreenForGame":
+                await GetScreenForGame(request, web);
                 break;
             default:
                 MessageBox.Show($"Unknown get action: {request.Action}");
@@ -86,6 +95,15 @@ public static class WebApiHandler
     {
         await Send(web, "getAudioDevices", SystemAudioService.GetAudioOutputDeviceNames());
     }
+    private static async Task GetScreens(WebView2 web)
+    {
+        await Send(web, "getScreens", Screen.AllScreens);
+    }
+    private static async Task GetScreenForGame(ApiRequest request, WebView2 web)
+    {
+        Game game = JsonSerializer.Deserialize<Game>(request.Data?.ToString() ?? "{}");
+        await Send(web, "getScreenForGame", new { SerializedGameName = game.SerializedGameName, ScreenNumber = game.LivelyWallpaperScreen });   
+    }
     
     private static async Task SetGames(ApiRequest request)
     {
@@ -97,6 +115,12 @@ public static class WebApiHandler
     private static async Task SetLaunchers(ApiRequest request)
     {
         
+    }
+    private static async Task SetScreenForGame(ApiRequest request)
+    {
+        Game game = JsonSerializer.Deserialize<Game>(request.Data?.ToString() ?? "{}");
+        Game.UpdateGame(game);
+        msgbox("Screen for game set successfully.");
     }
 
     private static async Task ChangeGameImage(ApiRequest request, WebView2 web)

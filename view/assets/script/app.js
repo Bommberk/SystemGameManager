@@ -28,6 +28,20 @@ function handleAudioDevices(devices)
         audioDeviceSelection.appendChild(option);
     });
 }
+// Screens
+let screens = [];
+function handleScreens(screenData)
+{
+    screens = screenData;
+    console.log(screens);
+}
+function getScreens()
+{
+    return screens;
+}
+function startOpenWallpaperScreenModal(serializedGameName){
+    api.getScreenForGame(getGameBySerializedName(serializedGameName));
+}
 
 function createLauncherList()
 {

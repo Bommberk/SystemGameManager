@@ -97,6 +97,10 @@
                                 <i class="fa-solid fa-gear"></i>
                                 <span>Bild ändern</span>
                             </li>
+                            <li role="button" onclick="openSelectWallpaperScreenModal('${game.SerializedGameName}')">
+                                <i class="fa-solid fa-display"></i>
+                                <span>Wallpaper Bildschirm wählen</span>
+                            </li>
                             <li role="button" onclick="openInstallFolder('${game.SerializedGameName}')">
                                 <i class="fa-solid fa-folder-open"></i>
                                 <span>Ordner öffnen</span>
@@ -106,6 +110,14 @@
                                 <span>Spiel entfernen</span>
                             </li>
                         </ul>
+                    </div>
+                    <div class="modal select-wallpaper-scree-modal" id="select-wallpaper-screen-modal-${game.SerializedGameName}">
+                        <h3 class="modal-title">Wähle den Bildschirm für das Live-Wallpaper</h3>
+                        <div class="wallpaper-screens" id="wallpaper-screens-${game.SerializedGameName}">
+                            <span class="screen" id="screen-1" onclick="setScreenForGame(1, '${game.SerializedGameName}')">1</span>
+                            <span class="screen" id="screen-2" onclick="setScreenForGame(3, '${game.SerializedGameName}')">3</span>
+                            <span class="screen" id="screen-3" onclick="setScreenForGame(2, '${game.SerializedGameName}')">2</span>
+                        </div>
                     </div>
                 </div>
                 <div class="infos">

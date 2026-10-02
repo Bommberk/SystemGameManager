@@ -36,6 +36,7 @@ body
     --secondary-border-color: #e9ebec77;
     --scrollbar-thumb-color: #545959;
     --scrollbar-track-color: #7d8181;
+    --accent-color: #98B164;
 
     /* Sizes */
     --sidebar-width: 60px;
@@ -59,6 +60,7 @@ body
     --primary-border-color: #2222222b;
     --scrollbar-thumb-color: #C8C8C8;
     --scrollbar-track-color: #e0e0e0;
+    --accent-color: #98B164;
 }
 .red
 {
@@ -75,6 +77,7 @@ body
     --secondary-text-color: #C32038;
     --tertiary-text-color: #ff6b6b;
     --error-background-color: #C32038;
+    --accent-color: #C32038;
 }
 .pink
 {
@@ -91,6 +94,7 @@ body
     --secondary-text-color: #e91e63;
     --tertiary-text-color: #ff69b4;
     --error-background-color: #C32038;
+    --accent-color: #e91e63;
 }
 .yellow
 {
@@ -107,4 +111,5 @@ body
     --secondary-text-color: #ffeb3b;
     --tertiary-text-color: #ffff66;
     --error-background-color: #C32038;
+    --accent-color: #ffeb3b;
 }

@@ -80,12 +80,33 @@
 }
 #page
 {
+    --page-offset: var(--sidebar-width);
     margin-left: var(--sidebar-width);
     padding: 15px;
     transition: 0.2s ease-out;
 }
 #sidebar.collapsed + #page
 {
+    --page-offset: var(--sidebar-width-collapsed);
     margin-left: var(--sidebar-width-collapsed);
     transition: 0.2s;
+}
+
+.modal
+{
+    position: fixed;
+    top: 50%;
+    left: calc(var(--page-offset) + (100vw - var(--page-offset)) / 2);
+    transform: translate(-50%, -50%);
+    background: var(--card-background-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none;
+    transition: 0.2s ease-out;
+    pointer-events: auto;
+}
+.modal.active{
+    display: block;
 }

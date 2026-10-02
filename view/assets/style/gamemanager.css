@@ -189,6 +189,27 @@
                             display: flex;
                         }
                     }
+                    .modal .wallpaper-screens
+                    {
+                        display: flex;
+                        gap: 10px;
+                        .screen{
+                            background: var(--secondary-background-color);
+                            width: 150px;
+                            aspect-ratio: 16 / 9;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            text-align: center;
+                            margin-top: 20px;
+                            border: solid 1px var(--primary-background-color);
+                            border-radius: 5px;
+                            cursor: pointer;
+                            &.active{
+                                border: solid 2px var(--accent-color);
+                            }
+                        }
+                    }
                 }
             }
         }

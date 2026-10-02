@@ -21,6 +21,10 @@ function createGameList(gameArray = null)
                             <i class="fa-solid fa-gear"></i>
                             <span>Bild ändern</span>
                         </li>
+                        <li role="button" onclick="startOpenWallpaperScreenModal('${game.SerializedGameName}')">
+                            <i class="fa-solid fa-display"></i>
+                            <span>Wallpaper Bildschirm wählen</span>
+                        </li>
                         <li role="button" onclick="openInstallFolder('${game.SerializedGameName}')">
                             <i class="fa-solid fa-folder-open"></i>
                             <span>Ordner öffnen</span>
@@ -30,6 +34,13 @@ function createGameList(gameArray = null)
                             <span>Spiel entfernen</span>
                         </li>
                     </ul>
+                </div>
+                <div class="modal select-wallpaper-scree-modal" id="select-wallpaper-screen-modal-${game.SerializedGameName}">
+                    <h3 class="modal-title">Wähle den Bildschirm für das Live-Wallpaper</h3>
+                    <div class="wallpaper-screens" id="wallpaper-screens-${game.SerializedGameName}">
+
+                    </div>
+                    <i class="fa-solid fa-x close-modal" role="button" onclick="closeSelectWallpaperScreenModal('${game.SerializedGameName}')"></i>
                 </div>
             </div>
             <div class="infos">
@@ -238,4 +249,33 @@ function handleChangedGameImage(gameName, imagePath)
 {
     setGameImage(gameName, imagePath);
     handleGames();
+}
+
+function openSelectWallpaperScreenModal(data)
+{
+    console.log(data);
+    const serializedGameName = data.SerializedGameName;
+    const screenNumber = data.ScreenNumber;
+    console.log(screenNumber);
+    const screens = getScreens();
+    const modal = document.getElementById(`select-wallpaper-screen-modal-${serializedGameName}`);
+    modal.classList.add("active");
+    const wallpaperScreensContainer = document.getElementById(`wallpaper-screens-${serializedGameName}`);
+    wallpaperScreensContainer.innerHTML = "";
+    wallpaperScreensContainer.innerHTML = screens.map((screen, index) => `
+        <span class="screen ${index + 1 == screenNumber ? 'active' : ''}" id="screen-${index + 1}" onclick="setScreenForGame(${index + 1}, '${serializedGameName}')" >${index + 1}</span>
+    `).join("");
+}
+function closeSelectWallpaperScreenModal(serializedGameName)
+{
+    const modal = document.querySelector(`#select-wallpaper-screen-modal-${serializedGameName}`);
+    console.log(modal);
+    modal.classList.remove("active");
+}
+function setScreenForGame(screenNumber, serializedGameName)
+{
+    const game = getGameBySerializedName(serializedGameName);
+    game.LivelyWallpaperScreen = screenNumber;
+    api.setScreenForGame(game);
+    closeSelectWallpaperScreenModal(serializedGameName);
 }

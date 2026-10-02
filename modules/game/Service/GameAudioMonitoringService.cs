@@ -41,7 +41,7 @@ class GameAudioMonitoringService
                 // (kein hartkodiertes Programm, sondern immer das aktuell aktive Spiel).
                 Game? runningGame = GetGameProcess.GetRunningOpenGame();
                 SetAudioWhenGameStarts(runningGame);
-                livelyWallpaper.SetWallpaperForRunningGame(runningGame?.GameImage);
+                livelyWallpaper.SetWallpaperForRunningGame(runningGame, runningGame?.GameImage);
                 audioManagerController.StartCaptureMonitoring(runningGame?.ProzessName);
             }
             catch
