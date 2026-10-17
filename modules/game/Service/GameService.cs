@@ -107,104 +107,114 @@ class GameService
         return games;
     }
 
+    private static readonly Dictionary<string, string> MinecraftStoreTitles = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Microsoft.MinecraftUWP"] = "Minecraft: Bedrock Edition",
+        ["Microsoft.Lovika"] = "Minecraft Dungeons",
+        ["Microsoft.Studios.Odin"] = "Minecraft Legends",
+        ["Microsoft.MinecraftEducationEdition"] = "Minecraft Education"
+    };
+
+    private static string DefaultMinecraftDirectory => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        ".minecraft");
+
     private IEnumerable<Game> GetMinecraftGames()
     {
-        List<Game> games = new();
-        string minecraftDirectory = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            ".minecraft");
-        HashSet<string> javaInstallDirectories = new(StringComparer.OrdinalIgnoreCase);
+        return GetMinecraftJavaGames().Concat(GetMinecraftStoreGames());
+    }
 
-        AddJavaInstallIfPresent(minecraftDirectory, javaInstallDirectories, games);
+    private static IEnumerable<Game> GetMinecraftJavaGames()
+    {
+        var gameDirectories = new[] { DefaultMinecraftDirectory }
+            .Concat(GetMinecraftProfileDirectories())
+            .Distinct(StringComparer.OrdinalIgnoreCase);
 
-        string launcherProfilesPath = Path.Combine(minecraftDirectory, "launcher_profiles.json");
-        if (File.Exists(launcherProfilesPath))
+        foreach (var gameDirectory in gameDirectories)
         {
-            try
+            if (!HasMinecraftVersions(gameDirectory))
+                continue;
+
+            bool isDefaultDirectory = string.Equals(gameDirectory, DefaultMinecraftDirectory, StringComparison.OrdinalIgnoreCase);
+            string gameName = isDefaultDirectory
+                ? "Minecraft: Java Edition"
+                : $"Minecraft: Java Edition ({Path.GetFileName(gameDirectory)})";
+
+            yield return new Game(gameName, SerializeGameName(gameName), gameDirectory, string.Empty, "javaw");
+        }
+    }
+
+    // Launcher profiles can point to their own game folder via "gameDir"
+    private static IEnumerable<string> GetMinecraftProfileDirectories()
+    {
+        string launcherProfilesPath = Path.Combine(DefaultMinecraftDirectory, "launcher_profiles.json");
+        if (!File.Exists(launcherProfilesPath))
+            return [];
+
+        var directories = new List<string>();
+        try
+        {
+            using var profilesDocument = JsonDocument.Parse(File.ReadAllText(launcherProfilesPath));
+            if (!profilesDocument.RootElement.TryGetProperty("profiles", out var profiles)
+                || profiles.ValueKind != JsonValueKind.Object)
             {
-                using var profilesDocument = JsonDocument.Parse(File.ReadAllText(launcherProfilesPath));
-                if (profilesDocument.RootElement.TryGetProperty("profiles", out var profiles)
-                    && profiles.ValueKind == JsonValueKind.Object)
-                {
-                    foreach (var profile in profiles.EnumerateObject())
-                    {
-                        if (profile.Value.ValueKind != JsonValueKind.Object
-                            || !profile.Value.TryGetProperty("gameDir", out var gameDirectory)
-                            || gameDirectory.ValueKind != JsonValueKind.String)
-                        {
-                            continue;
-                        }
-
-                        string? configuredDirectory = gameDirectory.GetString();
-                        if (string.IsNullOrWhiteSpace(configuredDirectory))
-                            continue;
-
-                        if (!Path.IsPathRooted(configuredDirectory))
-                            configuredDirectory = Path.Combine(minecraftDirectory, configuredDirectory);
-
-                        AddJavaInstallIfPresent(configuredDirectory, javaInstallDirectories, games);
-                    }
-                }
+                return directories;
             }
-            catch (JsonException exception)
+
+            foreach (var profile in profiles.EnumerateObject())
             {
-                mlog($"Minecraft launcher profile file could not be read: {exception.Message}");
+                if (profile.Value.ValueKind != JsonValueKind.Object
+                    || !profile.Value.TryGetProperty("gameDir", out var gameDirectory)
+                    || gameDirectory.ValueKind != JsonValueKind.String)
+                {
+                    continue;
+                }
+
+                string? directory = gameDirectory.GetString();
+                if (string.IsNullOrWhiteSpace(directory))
+                    continue;
+
+                directories.Add(Path.IsPathRooted(directory)
+                    ? directory
+                    : Path.Combine(DefaultMinecraftDirectory, directory));
             }
         }
-
-        var minecraftStoreTitles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        catch (JsonException exception)
         {
-            ["Microsoft.MinecraftUWP"] = "Minecraft: Bedrock Edition",
-            ["Microsoft.Lovika"] = "Minecraft Dungeons",
-            ["Microsoft.Studios.Odin"] = "Minecraft Legends",
-            ["Microsoft.MinecraftEducationEdition"] = "Minecraft Education"
-        };
+            mlog($"Minecraft launcher profile file could not be read: {exception.Message}");
+        }
 
+        return directories;
+    }
+
+    private static bool HasMinecraftVersions(string gameDirectory)
+    {
+        string versionsDirectory = Path.Combine(gameDirectory, "versions");
+        return Directory.Exists(versionsDirectory)
+            && Directory.EnumerateDirectories(versionsDirectory).Any();
+    }
+
+    // Bedrock, Dungeons, Legends and Education are Microsoft Store packages
+    private static IEnumerable<Game> GetMinecraftStoreGames()
+    {
         var packageManager = new PackageManager();
         foreach (var package in packageManager.FindPackagesForUser(string.Empty))
         {
-            if (!minecraftStoreTitles.TryGetValue(package.Id.Name, out string? gameName))
+            if (!MinecraftStoreTitles.TryGetValue(package.Id.Name, out string? gameName))
                 continue;
 
             string installPath = package.InstalledLocation.Path;
             if (string.IsNullOrWhiteSpace(installPath) || !Directory.Exists(installPath))
                 continue;
 
-            string serializedGameName = new(gameName
-                .Where(character => char.IsLetterOrDigit(character) || character is '-' or '_')
-                .ToArray());
-            serializedGameName = serializedGameName.ToLowerInvariant();
-            games.Add(new Game(gameName, serializedGameName, installPath, string.Empty, package.Id.Name));
+            yield return new Game(gameName, SerializeGameName(gameName), installPath, string.Empty, package.Id.Name);
         }
-
-        return games;
     }
 
-    private static void AddJavaInstallIfPresent(string gameDirectory, HashSet<string> knownDirectories, List<Game> games)
+    private static string SerializeGameName(string gameName)
     {
-        if (!knownDirectories.Add(gameDirectory))
-            return;
-
-        string versionsDirectory = Path.Combine(gameDirectory, "versions");
-        if (!Directory.Exists(versionsDirectory)
-            || !Directory.EnumerateDirectories(versionsDirectory).Any())
-        {
-            return;
-        }
-
-        string gameName = string.Equals(
-            gameDirectory,
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft"),
-            StringComparison.OrdinalIgnoreCase)
-            ? "Minecraft: Java Edition"
-            : $"Minecraft: Java Edition ({Path.GetFileName(gameDirectory)})";
-        string serializedGameName = new(gameName
-            .Where(character => char.IsLetterOrDigit(character) || character is '-' or '_')
-            .ToArray());
-        serializedGameName = serializedGameName.ToLowerInvariant();
-        games.Add(new Game(gameName, serializedGameName, gameDirectory, string.Empty, "javaw"));
+        return new string(gameName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ToArray()).ToLowerInvariant();
     }
-
     private string GetGameExe(string installPath)
     {
         if (!Directory.Exists(installPath))

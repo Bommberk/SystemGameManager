@@ -9,6 +9,21 @@ using SystemGameManager.Games.Entity;
 
 class GetGameProcess
 {
+    private const string JAVA_PROCESS_NAME = "javaw";
+    private static readonly string[] MinecraftCommandLineMarkers =
+    [
+        "net.minecraft",
+        "--assetIndex",
+        "--accessToken",
+        "--gameDir",
+        "com.mojang",
+        "net.fabricmc",
+        "net.minecraftforge",
+        "cpw.mods",
+        "lunar",
+        "badlion",
+        "feather"
+    ];
     public static Game? GetRunningOpenGame()
     {
         if (Game.InstalledGames == null || Game.InstalledGames.Length == 0)
@@ -76,39 +91,62 @@ class GetGameProcess
             }
 
             string processFileName = Path.GetFileNameWithoutExtension(normalizedProcessPath);
-            if (processFileName.Equals("javaw", StringComparison.OrdinalIgnoreCase)
-                || processFileName.Equals("java", StringComparison.OrdinalIgnoreCase))
+            if (IsJavaProcess(processFileName))
             {
-                string? commandLine = TryGetCommandLine(process.Id);
-                if (!string.IsNullOrEmpty(commandLine))
-                {
-                    var javaGame = installedGames
-                        .Where(game => game.ProzessName.Equals("javaw", StringComparison.OrdinalIgnoreCase)
-                                       && !string.IsNullOrWhiteSpace(game.InstallFolderPath))
-                        .OrderByDescending(game => game.InstallFolderPath.Length)
-                        .FirstOrDefault(game => commandLine.Contains(
-                            game.InstallFolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
-                            StringComparison.OrdinalIgnoreCase));
-                    if (javaGame is not null)
-                    {
-                        return javaGame;
-                    }
-                }
+                return TryGetJavaGame(process, installedGames);
             }
 
-            foreach (var game in installedGames)
-            {
-                if (string.IsNullOrWhiteSpace(game.ExePath)
-                    && !game.ProzessName.Equals("javaw", StringComparison.OrdinalIgnoreCase)
-                    && string.Equals(processFileName, game.ProzessName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return game;
-                }
-            }
+            return installedGames.FirstOrDefault(game =>
+                string.IsNullOrWhiteSpace(game.ExePath)
+                && string.Equals(processFileName, game.ProzessName, StringComparison.OrdinalIgnoreCase));
         }
         catch
         {
             return null;
+        }
+    }
+
+    private static bool IsJavaProcess(string processFileName)
+    {
+        return processFileName.Equals(JAVA_PROCESS_NAME, StringComparison.OrdinalIgnoreCase)
+            || processFileName.Equals("java", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Minecraft runs inside javaw.exe, which lives in the Java runtime folder and not in the game folder.
+    /// So the game is detected via the command line of the process.
+    /// </summary>
+    private static Game? TryGetJavaGame(Process process, IEnumerable<Game> installedGames)
+    {
+        string? commandLine = TryGetCommandLine(process.Id);
+        if (string.IsNullOrEmpty(commandLine))
+        {
+            return null;
+        }
+
+        var javaGames = installedGames
+            .Where(game => game.ProzessName.Equals(JAVA_PROCESS_NAME, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        // 1. The game folder is part of the command line (e.g. --gameDir). The longest path is the most specific one.
+        var gameWithFolderMatch = javaGames
+            .Where(game => !string.IsNullOrWhiteSpace(game.InstallFolderPath))
+            .OrderByDescending(game => game.InstallFolderPath.Length)
+            .FirstOrDefault(game => commandLine.Contains(
+                game.InstallFolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                StringComparison.OrdinalIgnoreCase));
+        if (gameWithFolderMatch is not null)
+        {
+            return gameWithFolderMatch;
+        }
+
+        // 2. Clients (Lunar, Badlion, Feather, ...) use their own game folder but still start Minecraft.
+        //    The default .minecraft entry (without brackets in the name) is preferred.
+        if (IsMinecraftCommandLine(commandLine))
+        {
+            return javaGames
+                .OrderBy(game => game.Name.Contains('(') ? 1 : 0)
+                .FirstOrDefault();
         }
 
         return null;
@@ -148,6 +186,12 @@ class GetGameProcess
         {
             return false;
         }
+    }
+
+    private static bool IsMinecraftCommandLine(string commandLine)
+    {
+        return MinecraftCommandLineMarkers.Any(marker =>
+            commandLine.Contains(marker, StringComparison.OrdinalIgnoreCase));
     }
 
     private static string? TryGetCommandLine(int processId)

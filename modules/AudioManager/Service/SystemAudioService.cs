@@ -3,6 +3,7 @@ namespace SystemGameManager.AudioManager.Service;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
 
 public class SystemAudioService
 {
@@ -81,6 +82,8 @@ public class SystemAudioService
     {
         using var enumerator = new MMDeviceEnumerator();
         var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+        int? activeVolume = null;
+        int? highestVolume = null;
 
         foreach (var device in devices)
         {
@@ -89,14 +92,18 @@ public class SystemAudioService
             {
                 var session = sessions[i];
                 var processName = GetProcessName(session.GetProcessID);
-                if (!string.IsNullOrWhiteSpace(processName) && processName.Equals(musicAppName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return (int)Math.Round(session.SimpleAudioVolume.Volume * 100f);
-                }
+                if (string.IsNullOrWhiteSpace(processName) || !processName.Equals(musicAppName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                int volume = (int)Math.Round(session.SimpleAudioVolume.Volume * 100f);
+                highestVolume = Math.Max(highestVolume ?? 0, volume);
+                // Stale sessions of the same app can keep an old volume, so the active session wins
+                if (session.State == AudioSessionState.AudioSessionStateActive)
+                    activeVolume = Math.Max(activeVolume ?? 0, volume);
             }
         }
 
-        return null;
+        return activeVolume ?? highestVolume;
     }
 
     public string? GetProcessName(uint processId)
