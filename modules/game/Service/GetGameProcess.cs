@@ -74,6 +74,37 @@ class GetGameProcess
                     return game;
                 }
             }
+
+            string processFileName = Path.GetFileNameWithoutExtension(normalizedProcessPath);
+            if (processFileName.Equals("javaw", StringComparison.OrdinalIgnoreCase)
+                || processFileName.Equals("java", StringComparison.OrdinalIgnoreCase))
+            {
+                string? commandLine = TryGetCommandLine(process.Id);
+                if (!string.IsNullOrEmpty(commandLine))
+                {
+                    var javaGame = installedGames
+                        .Where(game => game.ProzessName.Equals("javaw", StringComparison.OrdinalIgnoreCase)
+                                       && !string.IsNullOrWhiteSpace(game.InstallFolderPath))
+                        .OrderByDescending(game => game.InstallFolderPath.Length)
+                        .FirstOrDefault(game => commandLine.Contains(
+                            game.InstallFolderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                            StringComparison.OrdinalIgnoreCase));
+                    if (javaGame is not null)
+                    {
+                        return javaGame;
+                    }
+                }
+            }
+
+            foreach (var game in installedGames)
+            {
+                if (string.IsNullOrWhiteSpace(game.ExePath)
+                    && !game.ProzessName.Equals("javaw", StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(processFileName, game.ProzessName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return game;
+                }
+            }
         }
         catch
         {
@@ -117,6 +148,24 @@ class GetGameProcess
         {
             return false;
         }
+    }
+
+    private static string? TryGetCommandLine(int processId)
+    {
+        try
+        {
+            using var searcher = new System.Management.ManagementObjectSearcher(
+                $"SELECT CommandLine FROM Win32_Process WHERE ProcessId = {processId}");
+            foreach (var result in searcher.Get())
+            {
+                return result["CommandLine"] as string;
+            }
+        }
+        catch
+        {
+        }
+
+        return null;
     }
 
     private static string? TryGetProcessPath(Process process)
