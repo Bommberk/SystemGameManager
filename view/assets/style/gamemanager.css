@@ -75,6 +75,50 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            .voicechat-toggle-row{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+            .toggle-switch{
+                position: relative;
+                display: inline-block;
+                width: 51px;
+                height: 31px;
+                flex-shrink: 0;
+            }
+            .toggle-switch input{
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .toggle-slider{
+                position: absolute;
+                inset: 0;
+                cursor: pointer;
+                background: #78788052;
+                border-radius: 31px;
+                transition: background 0.25s;
+            }
+            .toggle-slider::before{
+                content: "";
+                position: absolute;
+                height: 27px;
+                width: 27px;
+                left: 2px;
+                top: 2px;
+                background: #fff;
+                border-radius: 50%;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                transition: transform 0.25s;
+            }
+            .toggle-switch input:checked + .toggle-slider{
+                background: #34c759;
+            }
+            .toggle-switch input:checked + .toggle-slider::before{
+                transform: translateX(20px);
+            }
             .setting-row{
                 display: flex;
                 align-items: center;

@@ -22,6 +22,9 @@ let launchers = [];
  * @property {(number|null)} MusicVolumePercent
  * @property {(number|null)} GameVolumePercent
  * @property {(string|null)} AudioOutputDevice
+ * @property {(number|null)} VoiceChatMusicVolumePercent
+ * @property {(number|null)} VoiceChatGameVolumePercent
+ * @property {(string|null)} VoiceChatAudioOutputDevice
  * @property {(string|null)} GameImage
  * @property {(boolean)} IsRemovedFromView
  * @property {(number)} LivelyWallpaperScreen

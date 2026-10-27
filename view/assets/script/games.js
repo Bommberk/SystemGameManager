@@ -1,3 +1,10 @@
+let isVoiceChatMode = false;
+function toggleVoiceChatMode(enabled)
+{
+    isVoiceChatMode = enabled;
+    createGameList();
+}
+
 function createGameList(gameArray = null)
 {
     const gameList = document.getElementById("gamelist");
@@ -47,10 +54,10 @@ function createGameList(gameArray = null)
                 <h3>${game.Name}</h3>
                 <p>Installationspfad:</p>
                 <span id="installPath">${game.InstallFolderPath}</span>
-                <p>Volume:</p>
-                <span id="volume">Game: ${game.GameVolumePercent ?? 0}% | Music: ${game.MusicVolumePercent ?? 0}%</span>
-                <p>Audio Output</p>
-                <span id="audioOutput">${game.AudioOutputDevice ?? "N/A"}</span>
+                <p>${isVoiceChatMode ? "Volume (VoiceChat):" : "Volume:"}</p>
+                <span id="volume">Game: ${(isVoiceChatMode ? game.VoiceChatGameVolumePercent : game.GameVolumePercent) ?? 0}% | Music: ${(isVoiceChatMode ? game.VoiceChatMusicVolumePercent : game.MusicVolumePercent) ?? 0}%</span>
+                <p>${isVoiceChatMode ? "Audio Output (VoiceChat)" : "Audio Output"}</p>
+                <span id="audioOutput">${(isVoiceChatMode ? game.VoiceChatAudioOutputDevice : game.AudioOutputDevice) ?? "N/A"}</span>
             </div>
         `;
         gameList.appendChild(gameCard);
@@ -151,13 +158,16 @@ function setGameAudio(gameName, gameVolume = null, musicVolume = null, audioOutp
     games.forEach(game => {
         if (game.SerializedGameName === gameName) {
             if (gameVolume !== null) {
-                game.GameVolumePercent = gameVolume;
+                if (isVoiceChatMode) game.VoiceChatGameVolumePercent = gameVolume;
+                else game.GameVolumePercent = gameVolume;
             }
             if (musicVolume !== null) {
-                game.MusicVolumePercent = musicVolume;
+                if (isVoiceChatMode) game.VoiceChatMusicVolumePercent = musicVolume;
+                else game.MusicVolumePercent = musicVolume;
             }
             if (audioOutputDevice !== null) {
-                game.AudioOutputDevice = audioOutputDevice;
+                if (isVoiceChatMode) game.VoiceChatAudioOutputDevice = audioOutputDevice;
+                else game.AudioOutputDevice = audioOutputDevice;
             }
         }
     });
@@ -181,7 +191,7 @@ function filterGames(searchTerm)
         } else if (filter === "installpath") {
             return game.InstallFolderPath.toLowerCase().includes(lowerCaseSearchTerm);
         } else if (filter === "audioDevice") {
-            return (game.AudioOutputDevice ?? "N/A").toLowerCase().includes(lowerCaseSearchTerm);
+            return ((isVoiceChatMode ? game.VoiceChatAudioOutputDevice : game.AudioOutputDevice) ?? "N/A").toLowerCase().includes(lowerCaseSearchTerm);
         }
         return false;
     });

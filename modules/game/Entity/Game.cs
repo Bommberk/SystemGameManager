@@ -17,6 +17,9 @@ class Game
     public int? MusicVolumePercent { get; set; } = MUSIC_VOLUME_PERCENT;
     public int? GameVolumePercent { get; set; } = GAME_VOLUME_PERCENT;
     public string? AudioOutputDevice { get; set; }
+    public int? VoiceChatMusicVolumePercent { get; set; }
+    public int? VoiceChatGameVolumePercent { get; set; }
+    public string? VoiceChatAudioOutputDevice { get; set; }
     public string? GameImage { get; set; }
     public bool IsRemovedFromView { get; set; } = false;
     public int? LivelyWallpaperScreen { get; set; }

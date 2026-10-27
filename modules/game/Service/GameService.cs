@@ -316,6 +316,15 @@ class GameService
             if(gameInDb.AudioOutputDevice != null)
                 game.AudioOutputDevice = gameInDb.AudioOutputDevice;
 
+            if(gameInDb.VoiceChatMusicVolumePercent != null)
+                game.VoiceChatMusicVolumePercent = gameInDb.VoiceChatMusicVolumePercent;
+
+            if(gameInDb.VoiceChatGameVolumePercent != null)
+                game.VoiceChatGameVolumePercent = gameInDb.VoiceChatGameVolumePercent;
+
+            if(gameInDb.VoiceChatAudioOutputDevice != null)
+                game.VoiceChatAudioOutputDevice = gameInDb.VoiceChatAudioOutputDevice;
+
             if(gameInDb.GameImage != null)
                 game.GameImage = gameInDb.GameImage;
 

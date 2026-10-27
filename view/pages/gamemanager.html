@@ -36,6 +36,13 @@
             </div>
             <div class="audiosettings-divider"></div>
             <div class="audio-settings">
+                <div class="voicechat-toggle-row">
+                    <h3>Audioeinstellung wenn in aktivem VoiceChat</h3>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="voiceChatToggle" onchange="toggleVoiceChatMode(this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
                 <form onsubmit="saveSelectedGamesAudioOutputDevice(); return false;" class="audio-setting-form">
                     <h3>Geräte auswählen</h3>
                     <div class="setting-row">
