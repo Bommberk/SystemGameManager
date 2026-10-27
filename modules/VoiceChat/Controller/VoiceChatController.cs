@@ -25,9 +25,11 @@ public class VoiceChatController
         foreach (var provider in providers)
         {
             var state = await provider.GetStateAsync(cancellationToken);
+            mlog($"VoiceChat: Provider '{provider.Name}' -> {(state is null ? "nicht erreichbar" : state.IsInVoiceChat ? "im Voicechat" : "nicht im Voicechat")}");
             if (state is { IsInVoiceChat: true })
                 return state;
         }
+        mlog("VoiceChat: In keiner unterstützten Anwendung im Voicechat.");
         return null;
     }
 
