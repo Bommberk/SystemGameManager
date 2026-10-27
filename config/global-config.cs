@@ -42,6 +42,14 @@ public class SpeechDetectionConfig
     public string AccessKey { get; set; } = "";
 }
 
+public class TeamSpeakConfig
+{
+    // ClientQuery-API-Key aus TeamSpeak (Extras > Optionen > Addons > ClientQuery > "Show API Key")
+    public string ApiKey { get; set; } = "";
+    public string Host { get; set; } = "127.0.0.1";
+    public int Port { get; set; } = 25639;
+}
+
 public class AppSettings
 {
     public AppConfig AppConfig { get; set; } = new();
@@ -49,6 +57,7 @@ public class AppSettings
     public GameManagerConfig GameManagerConfig { get; set; } = new();
     public SmarthomeApiConfig SmarthomeApiConfig { get; set; } = new();
     public SpeechDetectionConfig SpeechDetectionConfig { get; set; } = new();
+    public TeamSpeakConfig TeamSpeakConfig { get; set; } = new();
 }
 
 public static class GlobalConfig
