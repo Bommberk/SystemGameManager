@@ -8,7 +8,7 @@ function createGameList(gameArray = null)
         gameCard.className = "game card";
         gameCard.innerHTML = `
             <img src="${getGameImageUrl(game.GameImage)}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">
-            <input type="checkbox" name="select${game.SerializedGameName}" class="game-checkbox" data-game-name="${game.SerializedGameName}" onchange="selectGame('${game.SerializedGameName}')">
+            <input type="checkbox" name="select${game.SerializedGameName}" class="game-checkbox" data-game-name="${game.SerializedGameName}" onchange="selectGame('${game.SerializedGameName}')" ${selectedGames.has(game.SerializedGameName) ? "checked" : ""}>
             <div class="game-menu">
                 <i class="fa-solid fa-ellipsis-vertical" role="button" onclick="toggleGameMenuPopup('gameMenuPopup-${game.SerializedGameName}')"></i>
                 <div class="popup" id="gameMenuPopup-${game.SerializedGameName}">
@@ -124,7 +124,7 @@ function saveSelectedGamesAudioOutputDevice()
     });
 
     api.setGames(games);
-    resetSelectionAndRefreshGameList();
+    refreshGameList();
 }
 function saveSelectedGamesGameVolume()
 {
@@ -134,7 +134,7 @@ function saveSelectedGamesGameVolume()
     });
 
     api.setGames(games);
-    resetSelectionAndRefreshGameList();
+    refreshGameList();
 }
 function saveSelectedGamesMusicVolume()
 {
@@ -144,12 +144,11 @@ function saveSelectedGamesMusicVolume()
     });
 
     api.setGames(games);
-    resetSelectionAndRefreshGameList();
+    refreshGameList();
 }
-function resetSelectionAndRefreshGameList()
+function refreshGameList()
 {
-    selectedGames.clear();
-    document.getElementById("selectAllGamesButton").textContent = "Alle auswählen";
+    document.getElementById("selectAllGamesButton").textContent = selectedGames.size > 0 ? "Alle abwählen" : "Alle auswählen";
     filterGames(document.getElementById("searchGame").value);
 }
 function setGameAudio(gameName, gameVolume = null, musicVolume = null, audioOutputDevice = null) 
