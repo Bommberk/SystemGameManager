@@ -58,6 +58,13 @@ class Game
     {
         var databaseController = new DatabaseController();
         databaseController.GetDatabaseService().UpdateRecordByName(TABLE_NAME, game.Name, game);
+
+        var installedGame = InstalledGames?.FirstOrDefault(
+            installedGame => string.Equals(installedGame.Name, game.Name, StringComparison.OrdinalIgnoreCase));
+        if (installedGame is not null && !ReferenceEquals(installedGame, game))
+        {
+            installedGame.MusicVolumePercent = game.MusicVolumePercent;
+        }
     }
     public static Game[] GetGames()
     {
