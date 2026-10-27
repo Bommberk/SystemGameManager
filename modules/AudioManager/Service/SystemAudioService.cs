@@ -52,6 +52,7 @@ public class SystemAudioService
                 var processName = GetProcessName(session.GetProcessID);
                 if (!string.IsNullOrWhiteSpace(processName) && processName.Equals(musicAppName, StringComparison.OrdinalIgnoreCase))
                 {
+                    mlog("Setze Musiklautstärke auf " + musicVolumePercent + "%");
                     session.SimpleAudioVolume.Volume = musicVolumePercent / 100f;
                 }
             }
@@ -72,6 +73,8 @@ public class SystemAudioService
                 var processName = GetProcessName(session.GetProcessID);
                 if (!string.IsNullOrWhiteSpace(processName) && processName.Equals(gameName, StringComparison.OrdinalIgnoreCase))
                 {
+                    
+                    mlog("Setze Spiel-Lautstärke auf " + gameVolumePercent + "%");
                     session.SimpleAudioVolume.Volume = gameVolumePercent / 100f;
                 }
             }
