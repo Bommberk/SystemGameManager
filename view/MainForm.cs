@@ -4,6 +4,7 @@ using Microsoft.Web.WebView2.WinForms;
 using SystemGameManager.Games.Entity;
 using SystemGameManager.Handler;
 using SystemGameManager.Games.Controller;
+using SystemGameManager.Plugin.HotKeys;
 
 namespace SystemGameManager.View2;
 
@@ -25,6 +26,7 @@ public partial class MainForm : Form
 
         Load += async (_, _) =>
         {
+            HotKeyListener.Start();
             await web.EnsureCoreWebView2Async();
 
             WebApiHandler.Initialize(web);
@@ -49,7 +51,11 @@ public partial class MainForm : Form
             web.Source = new Uri("https://systemgamemanager/index.html");
         };
 
-        FormClosed += (_, _) => gameAudioController.Dispose();
+        FormClosed += (_, _) =>
+        {
+            HotKeyListener.Stop();
+            gameAudioController.Dispose();
+        };
     }
 
     private static void ConfigureLocalImageRequests(CoreWebView2 webView)

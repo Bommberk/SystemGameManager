@@ -29,6 +29,20 @@ let launchers = [];
 /** @type {Game[]} */
 let games = [];
 
+/**
+ * @typedef {Object} HotKey
+ * @property {string} Name
+ * @property {(string|null)} Description
+ * @property {(number|null)} MusicVolumePercent
+ * @property {(number|null)} GameVolumePercent
+ * @property {(string|null)} AudioOutputDevice
+ * @property {string} KeyCodes
+ * @property {(string|null)} GameSerializedName
+ * @property {string} KeyDisplay
+ */
+/** @type {HotKey[]} */
+let hotKeys = [];
+
 // API
 const api = {
     getGames() {
@@ -75,6 +89,28 @@ const api = {
             data: game
         });
     },
+    getHotKeys(){
+        window.chrome.webview.postMessage({
+            action: "getHotKeys"
+        });
+    },
+    startHotKeyCapture(){
+        window.chrome.webview.postMessage({
+            action: "startHotKeyCapture"
+        });
+    },
+    saveHotKey(hotKey){
+        window.chrome.webview.postMessage({
+            action: "saveHotKey",
+            data: hotKey
+        });
+    },
+    deleteHotKey(hotKey){
+        window.chrome.webview.postMessage({
+            action: "deleteHotKey",
+            data: hotKey
+        });
+    },
     setScreenForGame(game){
         window.chrome.webview.postMessage({
             action: "setScreenForGame",
@@ -108,6 +144,13 @@ window.apiResponse = function (response) {
             case "getScreenForGame":
                 openSelectWallpaperScreenModal(response.data);
                 break;
+            case "getHotKeys":
+                hotKeys = response.data;
+                handleHotKeys();
+                break;
+            case "hotKeyCaptured":
+                handleHotKeyCaptured(response.data);
+                break;
             default:
                 console.error(`Unknown action: ${response.action}`);
         }
@@ -126,3 +169,4 @@ api.getGames();
 api.getLaunchers();
 api.getAudioDevices();
 api.getScreens();
+api.getHotKeys();

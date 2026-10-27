@@ -29,6 +29,12 @@
 - Setzt während eines erkannten Spiels die Lautstärke der konfigurierten Musik-App und kann das Windows-Standardausgabegerät wechseln.
 - Stellt die zuvor gemerkte Musiklautstärke und das frühere Ausgabegerät wieder her, sobald kein konfiguriertes Spiel mehr aktiv ist.
 
+### HotKeys (Plugin)
+
+- Auf der Einstellungsseite lassen sich Audio-Modi mit Name, Musik-/Spiel-Lautstärke, Ausgabegerät, Beschreibung und Tastenkombination anlegen.
+- Tasten werden über ihre Hardware-ID (Scancode) gespeichert, dadurch funktionieren auch Makrotasten.
+- Hotkeys gelten global oder nur für ein ausgewähltes Spiel.
+
 ## Voraussetzungen
 
 - Windows 10 oder Windows 11

@@ -6,3 +6,26 @@
 <button onclick="changeTheme('red')">Red</button>
 <button onclick="changeTheme('pink')">Pink</button>
 <button onclick="changeTheme('yellow')">Yellow</button>
+
+<section class="hotkeys collapsable">
+<h2>HotKeys</h2>
+<div>
+<p>Create audio modes that can be activated with a keyboard shortcut. Keys are stored by hardware key id, so special macro keys work too.</p>
+<div id="hotkey-list"></div>
+<h3>New audio mode</h3>
+<form id="hotkey-form" onsubmit="saveHotKeyFromForm(event)">
+    <label>Name <input type="text" id="hotkey-name" required></label><br>
+    <label>Music volume <input type="number" id="hotkey-music" min="0" max="100"> %</label><br>
+    <label>Game volume <input type="number" id="hotkey-game" min="0" max="100"> %</label><br>
+    <label>Output device <select id="hotkey-device"></select></label><br>
+    <label>Game <select id="hotkey-game-select"></select></label><br>
+    <label>Description <input type="text" id="hotkey-description"></label><br>
+    <label>Key / key combination
+        <input type="text" id="hotkey-keys-display" readonly placeholder="Click capture, then press the keys">
+        <input type="hidden" id="hotkey-keys">
+    </label>
+    <button type="button" onclick="startHotKeyCapture()">Capture</button><br>
+    <button type="submit">Save</button>
+</form>
+</div>
+</section>

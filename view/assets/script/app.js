@@ -17,9 +17,12 @@ function handleLaunchers()
     document.getElementById("launcherAmount").textContent = launchers.length;
     createLauncherList();
 }
+let audioDevices = [];
 function handleAudioDevices(devices)
 {
+    audioDevices = devices;
     const audioDeviceSelection = document.getElementById("audioOutputDevice");
+    if (!audioDeviceSelection) return;
     // audioDeviceSelection.innerHTML = "";
     devices.forEach(device => {
         const option = document.createElement("option");

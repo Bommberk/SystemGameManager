@@ -13,6 +13,7 @@ async function loadPage(page)
     document.querySelector("#"+sidebarButton)?.classList.add("active");
     handleGames();
     handleLaunchers();
+    handleHotKeys();
 }
 
 async function loadSidebar()
