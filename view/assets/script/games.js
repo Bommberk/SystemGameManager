@@ -124,7 +124,7 @@ function saveSelectedGamesAudioOutputDevice()
     });
 
     api.setGames(games);
-    handleGames();
+    resetSelectionAndRefreshGameList();
 }
 function saveSelectedGamesGameVolume()
 {
@@ -134,7 +134,7 @@ function saveSelectedGamesGameVolume()
     });
 
     api.setGames(games);
-    createGameList();
+    resetSelectionAndRefreshGameList();
 }
 function saveSelectedGamesMusicVolume()
 {
@@ -144,7 +144,13 @@ function saveSelectedGamesMusicVolume()
     });
 
     api.setGames(games);
-    createGameList();
+    resetSelectionAndRefreshGameList();
+}
+function resetSelectionAndRefreshGameList()
+{
+    selectedGames.clear();
+    document.getElementById("selectAllGamesButton").textContent = "Alle auswählen";
+    filterGames(document.getElementById("searchGame").value);
 }
 function setGameAudio(gameName, gameVolume = null, musicVolume = null, audioOutputDevice = null) 
 {
