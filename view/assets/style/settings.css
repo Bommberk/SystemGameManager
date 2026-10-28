@@ -21,3 +21,10 @@ h2
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+.hotkey-table,
+.hotkey-table th,
+.hotkey-table td
+{
+    border: 1px solid var(--primary-text-color);
+}

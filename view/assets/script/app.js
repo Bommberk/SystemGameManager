@@ -8,13 +8,17 @@ loadPage("gamemanager");
 // Handle C# Responses
 function handleGames()
 {
-    document.getElementById("gameAmount").textContent = games.filter(game => !game.IsRemovedFromView).length;
+    const gameAmount = document.getElementById("gameAmount");
+    if (!gameAmount) return;
+    gameAmount.textContent = games.filter(game => !game.IsRemovedFromView).length;
     createGameList();
 }
 
 function handleLaunchers()
 {
-    document.getElementById("launcherAmount").textContent = launchers.length;
+    const launcherAmount = document.getElementById("launcherAmount");
+    if (!launcherAmount) return;
+    launcherAmount.textContent = launchers.length;
     createLauncherList();
 }
 let audioDevices = [];

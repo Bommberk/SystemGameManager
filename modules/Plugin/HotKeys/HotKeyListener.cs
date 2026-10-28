@@ -22,6 +22,11 @@ static class HotKeyListener
     private const uint LLKHF_EXTENDED = 0x01;
     private const int EXTENDED_FLAG = 0x100;
     private const int VIRTUAL_KEY_FLAG = 0x10000;
+    private const int HID_USAGE_FLAG = 0x20000;
+    private const int WM_INPUT = 0x00FF;
+    private const uint RID_INPUT = 0x10000003;
+    private const uint RIM_TYPEHID = 2;
+    private const uint RIDEV_INPUTSINK = 0x100;
 
     private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
@@ -46,6 +51,102 @@ static class HotKeyListener
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern int GetKeyNameText(int lParam, StringBuilder lpString, int nSize);
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RAWINPUTDEVICE
+    {
+        public ushort usUsagePage;
+        public ushort usUsage;
+        public uint dwFlags;
+        public IntPtr hwndTarget;
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool RegisterRawInputDevices(RAWINPUTDEVICE[] devices, uint count, uint size);
+    [DllImport("user32.dll")]
+    private static extern uint GetRawInputData(IntPtr hRawInput, uint command, IntPtr data, ref uint size, uint headerSize);
+
+    /// <summary>
+    /// Receives WM_INPUT for HID devices (consumer control / media keys), which macro keys often use
+    /// and which never show up in the low-level keyboard hook.
+    /// </summary>
+    private sealed class RawInputWindow : NativeWindow
+    {
+        private readonly Dictionary<IntPtr, int> lastUsage = new();
+
+        public RawInputWindow()
+        {
+            CreateHandle(new CreateParams());
+            var devices = new[]
+            {
+                new RAWINPUTDEVICE { usUsagePage = 0x0C, usUsage = 0x01, dwFlags = RIDEV_INPUTSINK, hwndTarget = Handle }
+            };
+            if (!RegisterRawInputDevices(devices, (uint)devices.Length, (uint)Marshal.SizeOf<RAWINPUTDEVICE>()))
+            {
+                mlog("HotKeys: raw input could not be registered.");
+            }
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_INPUT)
+            {
+                try { HandleRawInput(m.LParam); }
+                catch (Exception ex) { mlog("HotKeys: " + ex.Message); }
+            }
+            base.WndProc(ref m);
+        }
+
+        private void HandleRawInput(IntPtr rawInputHandle)
+        {
+            uint size = 0;
+            var headerSize = (uint)Marshal.SizeOf<RAWINPUTHEADER>();
+            GetRawInputData(rawInputHandle, RID_INPUT, IntPtr.Zero, ref size, headerSize);
+            if (size == 0) return;
+
+            var buffer = Marshal.AllocHGlobal((int)size);
+            try
+            {
+                if (GetRawInputData(rawInputHandle, RID_INPUT, buffer, ref size, headerSize) != size) return;
+
+                var header = Marshal.PtrToStructure<RAWINPUTHEADER>(buffer);
+                if (header.dwType != RIM_TYPEHID) return;
+
+                var hidSize = Marshal.ReadInt32(buffer, (int)headerSize);
+                var count = Marshal.ReadInt32(buffer, (int)headerSize + 4);
+                if (hidSize < 3 || count < 1) return;
+
+                // report = [report id, usage low, usage high]; all-zero usage means released
+                var dataOffset = (int)headerSize + 8;
+                var usage = Marshal.ReadByte(buffer, dataOffset + 1) | (Marshal.ReadByte(buffer, dataOffset + 2) << 8);
+
+                if (usage != 0)
+                {
+                    lastUsage[header.hDevice] = usage;
+                    mlog($"HotKeys: HID usage 0x{usage:X} pressed");
+                    OnKeyDown(HID_USAGE_FLAG | usage);
+                }
+                else if (lastUsage.Remove(header.hDevice, out var previous))
+                {
+                    OnKeyUp(HID_USAGE_FLAG | previous);
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RAWINPUTHEADER
+    {
+        public uint dwType;
+        public uint dwSize;
+        public IntPtr hDevice;
+        public IntPtr wParam;
+    }
+
+    private static RawInputWindow? rawInputWindow;
     private static readonly LowLevelKeyboardProc hookProc = HookCallback;
     private static readonly HashSet<int> pressedKeys = new();
     private static readonly HashSet<int> capturedKeys = new();
@@ -59,6 +160,7 @@ static class HotKeyListener
     {
         if (hookHandle != IntPtr.Zero) return;
 
+        rawInputWindow ??= new RawInputWindow();
         hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, GetModuleHandle(null), 0);
         if (hookHandle == IntPtr.Zero)
         {
@@ -68,6 +170,8 @@ static class HotKeyListener
 
     public static void Stop()
     {
+        rawInputWindow?.DestroyHandle();
+        rawInputWindow = null;
         if (hookHandle == IntPtr.Zero) return;
         UnhookWindowsHookEx(hookHandle);
         hookHandle = IntPtr.Zero;
@@ -88,6 +192,11 @@ static class HotKeyListener
 
     private static string GetKeyName(int id)
     {
+        if ((id & HID_USAGE_FLAG) != 0)
+        {
+            return $"Media/HID 0x{id & 0xFFFF:X}";
+        }
+
         if ((id & VIRTUAL_KEY_FLAG) != 0)
         {
             return $"Key 0x{id & 0xFFFF:X2}";
@@ -108,6 +217,7 @@ static class HotKeyListener
                                 // Macro keys are usually sent as injected events by the keyboard driver, so they must not be filtered out
                 var message = wParam.ToInt32();
                 var id = GetKeyId(info);
+                mlog($"HotKeys: key vk=0x{info.vkCode:X} scan=0x{info.scanCode:X} flags=0x{info.flags:X} msg=0x{message:X}");
                 if (message is WM_KEYDOWN or WM_SYSKEYDOWN) OnKeyDown(id);
                 else if (message is WM_KEYUP or WM_SYSKEYUP) OnKeyUp(id);
             }
