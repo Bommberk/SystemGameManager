@@ -22,9 +22,22 @@ h2
     text-overflow: ellipsis;
 }
 
-.hotkey-table,
+
+.hotkey-table
+{
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid color-mix(in srgb, var(--primary-text-color) 25%, transparent);
+    border-radius: 10px;
+    overflow: hidden;
+}
 .hotkey-table th,
 .hotkey-table td
 {
-    border: 1px solid var(--primary-text-color);
+    border: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--primary-text-color) 15%, transparent);
+}
+.hotkey-table tbody tr:last-child td
+{
+    border-bottom: none;
 }

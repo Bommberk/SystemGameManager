@@ -121,13 +121,14 @@ static class HotKeyListener
 
                 if (usage != 0)
                 {
+                    if (lastUsage.TryGetValue(header.hDevice, out var held) && held == usage) return;
                     lastUsage[header.hDevice] = usage;
                     mlog($"HotKeys: HID usage 0x{usage:X} pressed");
-                    OnKeyDown(HID_USAGE_FLAG | usage);
+                    OnMomentaryPress(HID_USAGE_FLAG | usage);
                 }
-                else if (lastUsage.Remove(header.hDevice, out var previous))
+                else
                 {
-                    OnKeyUp(HID_USAGE_FLAG | previous);
+                    lastUsage.Remove(header.hDevice);
                 }
             }
             finally
@@ -152,6 +153,8 @@ static class HotKeyListener
     private static readonly HashSet<int> capturedKeys = new();
     private static IntPtr hookHandle = IntPtr.Zero;
     private static bool isCapturing;
+    private static System.Threading.Timer? captureTimeout;
+    private static SynchronizationContext uiContext = new();
 
     /// <summary>Raised on the hook thread once a captured combination was released.</summary>
     public static event Action<string>? KeysCaptured;
@@ -160,6 +163,7 @@ static class HotKeyListener
     {
         if (hookHandle != IntPtr.Zero) return;
 
+        uiContext = SynchronizationContext.Current ?? uiContext;
         rawInputWindow ??= new RawInputWindow();
         hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, GetModuleHandle(null), 0);
         if (hookHandle == IntPtr.Zero)
@@ -247,6 +251,7 @@ static class HotKeyListener
         if (isCapturing)
         {
             capturedKeys.Add(id);
+            RestartCaptureTimeout();
             return;
         }
 
@@ -258,13 +263,48 @@ static class HotKeyListener
     {
         pressedKeys.Remove(id);
 
-        if (isCapturing && pressedKeys.Count == 0 && capturedKeys.Count > 0)
+        if (isCapturing && pressedKeys.Count == 0)
         {
-            isCapturing = false;
-            var keyCodes = string.Join("+", capturedKeys.OrderBy(key => key));
-            capturedKeys.Clear();
-            KeysCaptured?.Invoke(keyCodes);
+            FinishCapture();
         }
+    }
+
+    /// <summary>
+    /// HID/macro keys often report a press without a matching release, so they are handled as momentary presses
+    /// and never stay in the pressed-key set.
+    /// </summary>
+    private static void OnMomentaryPress(int id)
+    {
+        if (isCapturing)
+        {
+            capturedKeys.Add(id);
+            RestartCaptureTimeout();
+            return;
+        }
+
+        var pressed = new HashSet<int>(pressedKeys) { id };
+        Task.Run(() => TriggerMatchingHotKeys(pressed));
+    }
+
+    private static void RestartCaptureTimeout()
+    {
+        captureTimeout?.Dispose();
+        captureTimeout = new System.Threading.Timer(_ => uiContext.Post(__ =>
+        {
+            if (isCapturing) FinishCapture();
+        }, null), null, 1200, Timeout.Infinite);
+    }
+
+    private static void FinishCapture()
+    {
+        captureTimeout?.Dispose();
+        captureTimeout = null;
+        if (capturedKeys.Count == 0) return;
+
+        isCapturing = false;
+        var keyCodes = string.Join("+", capturedKeys.OrderBy(key => key));
+        capturedKeys.Clear();
+        KeysCaptured?.Invoke(keyCodes);
     }
 
     private static void TriggerMatchingHotKeys(HashSet<int> pressed)
