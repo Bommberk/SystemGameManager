@@ -42,6 +42,7 @@ public class SystemAudioService
     {
         using var enumerator = new MMDeviceEnumerator();
         var devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+        var logged = false;
 
         foreach (var device in devices)
         {
@@ -52,7 +53,8 @@ public class SystemAudioService
                 var processName = GetProcessName(session.GetProcessID);
                 if (!string.IsNullOrWhiteSpace(processName) && processName.Equals(musicAppName, StringComparison.OrdinalIgnoreCase))
                 {
-                    mlog("Setze Musiklautstärke auf " + musicVolumePercent + "%");
+                    if (!logged) mlog("Setze Musiklautstärke auf " + musicVolumePercent + "%");
+                    logged = true;
                     session.SimpleAudioVolume.Volume = musicVolumePercent / 100f;
                 }
             }
@@ -161,10 +163,24 @@ public class SystemAudioService
     {
         try
         {
+            var deviceName = deviceId;
+            try
+            {
+                using var enumerator = new MMDeviceEnumerator();
+                using var device = enumerator.GetDevice(deviceId);
+                deviceName = device.FriendlyName;
+            }
+            catch
+            {
+                // Fall back to the device ID if its friendly name cannot be retrieved.
+            }
+
             var policyConfig = (IPolicyConfig)new PolicyConfigClientImpl();
             policyConfig.SetDefaultEndpoint(deviceId, (uint)ERole.eConsole);
             policyConfig.SetDefaultEndpoint(deviceId, (uint)ERole.eMultimedia);
             policyConfig.SetDefaultEndpoint(deviceId, (uint)ERole.eCommunications);
+
+            mlog("Setze Audio-Ausgabegerät auf " + deviceName);
             return true;
         }
         catch

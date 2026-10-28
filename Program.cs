@@ -15,6 +15,7 @@ using SystemGameManager.Service;
 using SystemGameManager.View2;
 using System.Net.Http;
 using SystemGameManager.Plugin;
+using SystemGameManager.Plugin.HotKeys;
 using SystemGameManager.AudioManager.Controller;
 
 internal static class Program
@@ -80,18 +81,20 @@ internal static class Program
     {
         GetInfoAsync();
 
-        using var shutdownSignal = new ManualResetEventSlim(false);
-
         Console.WriteLine("Audio-Monitoring läuft. Mit Strg+C beenden.");
         var gameAudioController = new GameAudioController();
 
         Console.CancelKeyPress += (_, eventArgs) =>
         {
             eventArgs.Cancel = true;
-            shutdownSignal.Set();
+            Application.Exit();
         };
 
-        shutdownSignal.Wait();
+        // The hotkey hook and raw input window need a message loop on this thread
+        SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+        HotKeyListener.Start();
+        Application.Run();
+        HotKeyListener.Stop();
         gameAudioController.Dispose();
     }
 

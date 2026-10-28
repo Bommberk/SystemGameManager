@@ -35,11 +35,16 @@ class HotKey
         return keys;
     }
 
+    private static HotKey[]? cache;
+
     public static HotKey[] GetHotKeys()
     {
         var databaseController = new DatabaseController();
         return databaseController.GetDatabaseService().GetTableRecords<HotKey>(TABLE_NAME);
     }
+
+    /// <summary>In-memory copy used on key presses so the database is not queried for every key.</summary>
+    public static HotKey[] GetCachedHotKeys() => cache ??= GetHotKeys();
 
     public static void Save(HotKey hotKey)
     {
@@ -48,6 +53,7 @@ class HotKey
             .Append(hotKey)
             .ToArray();
         new DatabaseController().GetDatabaseService().RecordManager(hotKeys);
+        cache = null;
     }
 
     public static void Delete(string name)
@@ -56,5 +62,6 @@ class HotKey
             .Where(existing => !string.Equals(existing.Name, name, StringComparison.OrdinalIgnoreCase))
             .ToArray();
         new DatabaseController().GetDatabaseService().RecordManager(hotKeys);
+        cache = null;
     }
 }

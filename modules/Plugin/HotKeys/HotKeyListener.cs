@@ -27,6 +27,13 @@ static class HotKeyListener
     private const uint RID_INPUT = 0x10000003;
     private const uint RIM_TYPEHID = 2;
     private const uint RIDEV_INPUTSINK = 0x100;
+    private const uint RIDEV_PAGEONLY = 0x20;
+    private const uint RIDI_DEVICEINFO = 0x2000000B;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetRawInputDeviceList(IntPtr list, ref uint count, uint size);
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetRawInputDeviceInfo(IntPtr device, uint command, IntPtr data, ref uint size);
 
     private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
@@ -76,13 +83,87 @@ static class HotKeyListener
         public RawInputWindow()
         {
             CreateHandle(new CreateParams());
-            var devices = new[]
+            // Consumer control, system control and the vendor-defined pages (0xFF00+) used by many macro keyboards
+            var devices = new List<RAWINPUTDEVICE>
             {
-                new RAWINPUTDEVICE { usUsagePage = 0x0C, usUsage = 0x01, dwFlags = RIDEV_INPUTSINK, hwndTarget = Handle }
+                new() { usUsagePage = 0x0C, usUsage = 0, dwFlags = RIDEV_INPUTSINK | RIDEV_PAGEONLY, hwndTarget = Handle },
+                new() { usUsagePage = 0x01, usUsage = 0x06, dwFlags = RIDEV_INPUTSINK, hwndTarget = Handle },
+                new() { usUsagePage = 0x01, usUsage = 0x80, dwFlags = RIDEV_INPUTSINK, hwndTarget = Handle }
             };
-            if (!RegisterRawInputDevices(devices, (uint)devices.Length, (uint)Marshal.SizeOf<RAWINPUTDEVICE>()))
+            for (ushort page = 0xFF00; page <= 0xFF0F; page++)
             {
-                mlog("HotKeys: raw input could not be registered.");
+                devices.Add(new RAWINPUTDEVICE { usUsagePage = page, usUsage = 0, dwFlags = RIDEV_INPUTSINK | RIDEV_PAGEONLY, hwndTarget = Handle });
+            }
+            AddInstalledDevices(devices);
+
+            var size = (uint)Marshal.SizeOf<RAWINPUTDEVICE>();
+            if (!RegisterRawInputDevices(devices.ToArray(), (uint)devices.Count, size))
+            {
+                mlog("HotKeys: raw input could not be registered, registering individually.");
+                foreach (var device in devices)
+                {
+                    if (!RegisterRawInputDevices(new[] { device }, 1, size))
+                        mlog($"HotKeys: page 0x{device.usUsagePage:X} usage 0x{device.usUsage:X} failed.");
+                }
+            }
+        }
+
+        /// <summary>Registers every usage page/usage the connected devices announce (e.g. Razer macro interfaces).</summary>
+        private void AddInstalledDevices(List<RAWINPUTDEVICE> devices)
+        {
+            try
+            {
+                uint count = 0;
+                var listSize = (uint)(IntPtr.Size * 2);
+                GetRawInputDeviceList(IntPtr.Zero, ref count, listSize);
+                if (count == 0) return;
+
+                var list = Marshal.AllocHGlobal((int)(count * listSize));
+                try
+                {
+                    var found = GetRawInputDeviceList(list, ref count, listSize);
+                    for (var i = 0; i < found; i++)
+                    {
+                        var entry = list + (int)(i * listSize);
+                        var handle = Marshal.ReadIntPtr(entry);
+                        var type = Marshal.ReadInt32(entry, IntPtr.Size);
+                        if (type != 2) continue;
+
+                        uint infoSize = 32;
+                        var info = Marshal.AllocHGlobal((int)infoSize);
+                        try
+                        {
+                            Marshal.WriteInt32(info, 32);
+                            if (GetRawInputDeviceInfo(handle, RIDI_DEVICEINFO, info, ref infoSize) == uint.MaxValue) continue;
+
+                            var page = (ushort)Marshal.ReadInt16(info, 20);
+                            var usage = (ushort)Marshal.ReadInt16(info, 22);
+
+                            // Mouse (page 1, usage 2) would only flood the window with input
+                            if (page == 0x01 && usage == 0x02) continue;
+                            if (devices.Any(d => d.usUsagePage == page && (d.usUsage == usage || (d.dwFlags & RIDEV_PAGEONLY) != 0))) continue;
+                            devices.Add(new RAWINPUTDEVICE
+                            {
+                                usUsagePage = page,
+                                usUsage = usage,
+                                dwFlags = RIDEV_INPUTSINK | (usage == 0 ? RIDEV_PAGEONLY : 0),
+                                hwndTarget = Handle
+                            });
+                        }
+                        finally
+                        {
+                            Marshal.FreeHGlobal(info);
+                        }
+                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(list);
+                }
+            }
+            catch (Exception ex)
+            {
+                mlog("HotKeys: device enumeration failed: " + ex.Message);
             }
         }
 
@@ -109,21 +190,52 @@ static class HotKeyListener
                 if (GetRawInputData(rawInputHandle, RID_INPUT, buffer, ref size, headerSize) != size) return;
 
                 var header = Marshal.PtrToStructure<RAWINPUTHEADER>(buffer);
+                if (header.dwType == 1)
+                {
+                    var makeCode = Marshal.ReadInt16(buffer, (int)headerSize) & 0xFFFF;
+                    var keyFlags = Marshal.ReadInt16(buffer, (int)headerSize + 2) & 0xFFFF;
+                    var vKey = Marshal.ReadInt16(buffer, (int)headerSize + 6) & 0xFFFF;
+
+                    // Keys the low-level hook can't see (no scan code or the 0xFF placeholder vk) are treated as momentary presses
+                    if ((keyFlags & 1) == 0 && (makeCode == 0 || vKey is 0xFF or 0))
+                    {
+                        OnMomentaryPress(VIRTUAL_KEY_FLAG | 0x8000 | makeCode);
+                    }
+                    return;
+                }
                 if (header.dwType != RIM_TYPEHID) return;
 
                 var hidSize = Marshal.ReadInt32(buffer, (int)headerSize);
                 var count = Marshal.ReadInt32(buffer, (int)headerSize + 4);
-                if (hidSize < 3 || count < 1) return;
+                if (hidSize < 2 || count < 1) return;
 
-                // report = [report id, usage low, usage high]; all-zero usage means released
                 var dataOffset = (int)headerSize + 8;
-                var usage = Marshal.ReadByte(buffer, dataOffset + 1) | (Marshal.ReadByte(buffer, dataOffset + 2) << 8);
+                var report = new byte[hidSize];
+                Marshal.Copy(buffer + dataOffset, report, 0, hidSize);
+
+                // consumer report = [report id, usage low, usage high]; otherwise the payload is hashed into a stable id.
+                // An all-zero payload means released.
+                int usage;
+                if (hidSize == 3)
+                {
+                    usage = report[1] | (report[2] << 8);
+                }
+                else
+                {
+                    var hash = 17;
+                    var hasData = false;
+                    for (var i = 1; i < report.Length; i++)
+                    {
+                        if (report[i] != 0) hasData = true;
+                        hash = unchecked(hash * 31 + report[i]);
+                    }
+                    usage = hasData ? ((hash ^ (report[0] << 8)) & 0xFFFF) | 1 : 0;
+                }
 
                 if (usage != 0)
                 {
                     if (lastUsage.TryGetValue(header.hDevice, out var held) && held == usage) return;
                     lastUsage[header.hDevice] = usage;
-                    mlog($"HotKeys: HID usage 0x{usage:X} pressed");
                     OnMomentaryPress(HID_USAGE_FLAG | usage);
                 }
                 else
@@ -164,6 +276,7 @@ static class HotKeyListener
         if (hookHandle != IntPtr.Zero) return;
 
         uiContext = SynchronizationContext.Current ?? uiContext;
+        Task.Run(() => HotKey.GetCachedHotKeys());
         rawInputWindow ??= new RawInputWindow();
         hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, GetModuleHandle(null), 0);
         if (hookHandle == IntPtr.Zero)
@@ -221,7 +334,6 @@ static class HotKeyListener
                                 // Macro keys are usually sent as injected events by the keyboard driver, so they must not be filtered out
                 var message = wParam.ToInt32();
                 var id = GetKeyId(info);
-                mlog($"HotKeys: key vk=0x{info.vkCode:X} scan=0x{info.scanCode:X} flags=0x{info.flags:X} msg=0x{message:X}");
                 if (message is WM_KEYDOWN or WM_SYSKEYDOWN) OnKeyDown(id);
                 else if (message is WM_KEYUP or WM_SYSKEYUP) OnKeyUp(id);
             }
@@ -256,8 +368,13 @@ static class HotKeyListener
         }
 
         var pressed = pressedKeys.ToHashSet();
+        if (!IsRegisteredKey(id)) return;
         Task.Run(() => TriggerMatchingHotKeys(pressed));
     }
+
+    /// <summary>Quick in-memory check so ordinary typing never triggers any database or audio work.</summary>
+    private static bool IsRegisteredKey(int id) =>
+        HotKey.GetCachedHotKeys().Any(hotKey => hotKey.GetKeySet().Contains(id));
 
     private static void OnKeyUp(int id)
     {
@@ -283,6 +400,7 @@ static class HotKeyListener
         }
 
         var pressed = new HashSet<int>(pressedKeys) { id };
+        if (!IsRegisteredKey(id)) return;
         Task.Run(() => TriggerMatchingHotKeys(pressed));
     }
 
@@ -311,7 +429,7 @@ static class HotKeyListener
     {
         try
         {
-            var matches = HotKey.GetHotKeys()
+            var matches = HotKey.GetCachedHotKeys()
                 .Where(hotKey => hotKey.GetKeySet() is { Count: > 0 } keys && keys.SetEquals(pressed))
                 .ToArray();
             if (matches.Length == 0) return;
@@ -337,25 +455,90 @@ static class HotKeyListener
         }
     }
 
+    private sealed class AudioSnapshot
+    {
+        public int? MusicVolume;
+        public int? GameVolume;
+        public string? GameProcess;
+        public string? DeviceId;
+    }
+
+    // Original state from before the first hotkey; kept until the active hotkey is pressed again
+    private static AudioSnapshot? baseline;
+    private static string? activeHotKey;
+    private static readonly object toggleLock = new();
+    private static readonly Dictionary<string, long> lastActivation = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Pressing a hotkey applies it. Pressing the currently active hotkey again restores the state
+    /// from before the first hotkey, even if other hotkeys were used in between.
+    /// </summary>
     private static void Activate(HotKey hotKey, Game? game)
     {
-        mlog($"HotKey activated: {hotKey.Name}");
-        var audio = new SystemAudioService();
+        lock (toggleLock)
+        {
+            // The same physical key can be reported by several HID interfaces at once
+            var now = Environment.TickCount64;
+            if (lastActivation.TryGetValue(hotKey.Name, out var last) && now - last < 400) return;
+            lastActivation[hotKey.Name] = now;
 
-        if (hotKey.MusicVolumePercent is int musicVolume)
+            var audio = new SystemAudioService();
+
+            if (baseline is not null && string.Equals(activeHotKey, hotKey.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                Restore(audio, baseline);
+                baseline = null;
+                activeHotKey = null;
+                return;
+            }
+
+            // Only remember values that were not already saved by an earlier hotkey
+            var musicApp = GameAudioService.DEFAULT_MUSIC_APP_NAME;
+            baseline ??= new AudioSnapshot();
+            if (hotKey.MusicVolumePercent is not null && baseline.MusicVolume is null)
+                baseline.MusicVolume = audio.GetMusicAppVolume(musicApp);
+            if (hotKey.GameVolumePercent is not null && game is not null && baseline.GameVolume is null)
+            {
+                baseline.GameVolume = audio.GetMusicAppVolume(game.ProzessName);
+                baseline.GameProcess = game.ProzessName;
+            }
+            if (!string.IsNullOrWhiteSpace(hotKey.AudioOutputDevice) && baseline.DeviceId is null)
+                baseline.DeviceId = audio.GetDefaultAudioOutputDeviceId();
+            activeHotKey = hotKey.Name;
+
+            if (hotKey.MusicVolumePercent is int musicVolume)
+            {
+                audio.SetMusicAudio(musicApp, musicVolume);
+            }
+
+            if (hotKey.GameVolumePercent is int gameVolume && game is not null)
+            {
+                audio.SetGameAudio(game.ProzessName, gameVolume);
+            }
+
+            if (!string.IsNullOrWhiteSpace(hotKey.AudioOutputDevice))
+            {
+                var deviceId = audio.GetAudioOutputDeviceIdByName(hotKey.AudioOutputDevice);
+                if (deviceId is not null) audio.SetDefaultAudioOutputDevice(deviceId);
+            }
+        }
+    }
+
+    private static void Restore(SystemAudioService audio, AudioSnapshot snapshot)
+    {
+        if (snapshot.MusicVolume is int musicVolume)
         {
             audio.SetMusicAudio(GameAudioService.DEFAULT_MUSIC_APP_NAME, musicVolume);
         }
 
-        if (hotKey.GameVolumePercent is int gameVolume && game is not null)
+        if (snapshot.GameVolume is int gameVolume && snapshot.GameProcess is not null)
         {
-            audio.SetGameAudio(game.ProzessName, gameVolume);
+            audio.SetGameAudio(snapshot.GameProcess, gameVolume);
         }
 
-        if (!string.IsNullOrWhiteSpace(hotKey.AudioOutputDevice))
+        if (snapshot.DeviceId is not null)
         {
-            var deviceId = audio.GetAudioOutputDeviceIdByName(hotKey.AudioOutputDevice);
-            if (deviceId is not null) audio.SetDefaultAudioOutputDevice(deviceId);
+            audio.SetDefaultAudioOutputDevice(snapshot.DeviceId);
         }
     }
 }
