@@ -20,7 +20,6 @@ static class HotKeyListener
     private const int WM_SYSKEYDOWN = 0x0104;
     private const int WM_SYSKEYUP = 0x0105;
     private const uint LLKHF_EXTENDED = 0x01;
-    private const uint LLKHF_INJECTED = 0x10;
     private const int EXTENDED_FLAG = 0x100;
     private const int VIRTUAL_KEY_FLAG = 0x10000;
 
@@ -106,13 +105,11 @@ static class HotKeyListener
             try
             {
                 var info = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
-                if ((info.flags & LLKHF_INJECTED) == 0)
-                {
-                    var message = wParam.ToInt32();
-                    var id = GetKeyId(info);
-                    if (message is WM_KEYDOWN or WM_SYSKEYDOWN) OnKeyDown(id);
-                    else if (message is WM_KEYUP or WM_SYSKEYUP) OnKeyUp(id);
-                }
+                                // Macro keys are usually sent as injected events by the keyboard driver, so they must not be filtered out
+                var message = wParam.ToInt32();
+                var id = GetKeyId(info);
+                if (message is WM_KEYDOWN or WM_SYSKEYDOWN) OnKeyDown(id);
+                else if (message is WM_KEYUP or WM_SYSKEYUP) OnKeyUp(id);
             }
             catch (Exception ex)
             {

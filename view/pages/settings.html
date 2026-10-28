@@ -10,22 +10,30 @@
 <section class="hotkeys collapsable">
 <h2>HotKeys</h2>
 <div>
-<p>Create audio modes that can be activated with a keyboard shortcut. Keys are stored by hardware key id, so special macro keys work too.</p>
-<div id="hotkey-list"></div>
-<h3>New audio mode</h3>
-<form id="hotkey-form" onsubmit="saveHotKeyFromForm(event)">
-    <label>Name <input type="text" id="hotkey-name" required></label><br>
-    <label>Music volume <input type="number" id="hotkey-music" min="0" max="100"> %</label><br>
-    <label>Game volume <input type="number" id="hotkey-game" min="0" max="100"> %</label><br>
-    <label>Output device <select id="hotkey-device"></select></label><br>
-    <label>Game <select id="hotkey-game-select"></select></label><br>
-    <label>Description <input type="text" id="hotkey-description"></label><br>
-    <label>Key / key combination
-        <input type="text" id="hotkey-keys-display" readonly placeholder="Click capture, then press the keys">
-        <input type="hidden" id="hotkey-keys">
-    </label>
-    <button type="button" onclick="startHotKeyCapture()">Capture</button><br>
-    <button type="submit">Save</button>
-</form>
+<table class="hotkey-table">
+    <thead>
+        <tr><th>Name</th><th>Music volume (%)</th><th>Game volume (%)</th><th>Output device</th><th>Description</th><th>Key combination</th><th></th></tr>
+    </thead>
+    <tbody id="hotkey-list"></tbody>
+</table>
+<button type="button" onclick="openHotKeyModal()">Neuer Hotkey</button>
+
+<div class="modal hotkey-modal" id="hotkey-modal">
+    <i class="fa-solid fa-xmark close-modal" role="button" onclick="closeHotKeyModal()"></i>
+    <h3 class="modal-title">Neuer Hotkey</h3>
+    <form id="hotkey-form" onsubmit="saveHotKeyFromForm(event)">
+        <label>Name <input type="text" id="hotkey-name" required></label><br>
+        <label>Music volume <input type="number" id="hotkey-music" min="0" max="100" value="100"> %</label><br>
+        <label>Game volume <input type="number" id="hotkey-game" min="0" max="100" value="100"> %</label><br>
+        <label>Output device <select id="hotkey-device"></select></label><br>
+        <label>Description <input type="text" id="hotkey-description"></label><br>
+        <label>Key combination
+            <input type="text" id="hotkey-keys-display" readonly placeholder="Click capture, then press the keys">
+            <input type="hidden" id="hotkey-keys">
+        </label>
+        <button type="button" onclick="startHotKeyCapture()">Capture</button><br>
+        <button type="submit">Save</button>
+    </form>
+</div>
 </div>
 </section>

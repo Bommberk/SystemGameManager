@@ -5,12 +5,12 @@ function escapeHtml(text)
     return div.innerHTML;
 }
 
-function handleHotKeys()
+function fillHotKeyDevices()
 {
-    const list = document.getElementById("hotkey-list");
-    if (!list) return;
-
     const deviceSelect = document.getElementById("hotkey-device");
+    if (!deviceSelect) return;
+
+    const selected = deviceSelect.value;
     deviceSelect.innerHTML = '<option value="">(unchanged)</option>';
     audioDevices.forEach(device => {
         const option = document.createElement("option");
@@ -18,30 +18,43 @@ function handleHotKeys()
         option.textContent = device;
         deviceSelect.appendChild(option);
     });
+    deviceSelect.value = selected;
+}
 
-    const gameSelect = document.getElementById("hotkey-game-select");
-    gameSelect.innerHTML = '<option value="">All games (global)</option>';
-    games.forEach(game => {
-        const option = document.createElement("option");
-        option.value = game.SerializedGameName;
-        option.textContent = game.Name;
-        gameSelect.appendChild(option);
-    });
+function handleHotKeys()
+{
+    const list = document.getElementById("hotkey-list");
+    if (!list) return;
+
+    fillHotKeyDevices();
 
     list.innerHTML = "";
     hotKeys.forEach((hotKey, index) => {
-        const entry = document.createElement("div");
-        entry.className = "hotkey-entry";
-        const game = games.find(g => g.SerializedGameName === hotKey.GameSerializedName);
-        entry.innerHTML = `
-            <strong>${escapeHtml(hotKey.Name)}</strong> [${escapeHtml(hotKey.KeyDisplay)}]
-            - ${game ? escapeHtml(game.Name) : "global"}
-            - music: ${hotKey.MusicVolumePercent ?? "-"}%, game: ${hotKey.GameVolumePercent ?? "-"}%,
-            device: ${escapeHtml(hotKey.AudioOutputDevice ?? "-")}
-            ${hotKey.Description ? `<br><em>${escapeHtml(hotKey.Description)}</em>` : ""}
-            <button type="button" onclick="deleteHotKey(${index})">Delete</button>`;
-        list.appendChild(entry);
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${escapeHtml(hotKey.Name)}</td>
+            <td>${hotKey.MusicVolumePercent ?? "-"}</td>
+            <td>${hotKey.GameVolumePercent ?? "-"}</td>
+            <td>${escapeHtml(hotKey.AudioOutputDevice ?? "-")}</td>
+            <td class="hotkey-description" title="${escapeHtml(hotKey.Description ?? "")}">${escapeHtml(hotKey.Description ?? "")}</td>
+            <td>${escapeHtml(hotKey.KeyDisplay)}</td>
+            <td><button type="button" onclick="deleteHotKey(${index})">Delete</button></td>`;
+        list.appendChild(row);
     });
+}
+
+function openHotKeyModal()
+{
+    document.getElementById("hotkey-form").reset();
+    document.getElementById("hotkey-keys").value = "";
+    document.getElementById("hotkey-modal").classList.add("active");
+    fillHotKeyDevices();
+    api.getAudioDevices();
+}
+
+function closeHotKeyModal()
+{
+    document.getElementById("hotkey-modal").classList.remove("active");
 }
 
 function startHotKeyCapture()
@@ -78,10 +91,9 @@ function saveHotKeyFromForm(event)
         AudioOutputDevice: document.getElementById("hotkey-device").value || null,
         Description: document.getElementById("hotkey-description").value || null,
         KeyCodes: keyCodes,
-        GameSerializedName: document.getElementById("hotkey-game-select").value || null
+        GameSerializedName: null
     });
-    document.getElementById("hotkey-form").reset();
-    document.getElementById("hotkey-keys").value = "";
+    closeHotKeyModal();
 }
 
 function deleteHotKey(index)

@@ -21,6 +21,7 @@ let audioDevices = [];
 function handleAudioDevices(devices)
 {
     audioDevices = devices;
+    fillHotKeyDevices();
     const audioDeviceSelection = document.getElementById("audioOutputDevice");
     if (!audioDeviceSelection) return;
     // audioDeviceSelection.innerHTML = "";

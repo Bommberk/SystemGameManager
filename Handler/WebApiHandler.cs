@@ -189,16 +189,21 @@ public static class WebApiHandler
         await Send(web, "getHotKeys", hotKeys);
     }
 
+    private static Action<string>? hotKeyCaptureHandler;
+
     private static void StartHotKeyCapture(WebView2 web)
     {
-        Action<string>? handler = null;
-        handler = keyCodes =>
+        if (hotKeyCaptureHandler is not null)
         {
-            HotKeyListener.KeysCaptured -= handler;
+            HotKeyListener.KeysCaptured -= hotKeyCaptureHandler;
+        }
+
+        hotKeyCaptureHandler = keyCodes =>
+        {
             // the hook runs on the UI thread, so the web view can be used directly
             _ = Send(web, "hotKeyCaptured", new { KeyCodes = keyCodes, KeyDisplay = HotKeyListener.GetKeyDisplayName(keyCodes) });
         };
-        HotKeyListener.KeysCaptured += handler;
+        HotKeyListener.KeysCaptured += hotKeyCaptureHandler;
         HotKeyListener.StartCapture();
     }
 
