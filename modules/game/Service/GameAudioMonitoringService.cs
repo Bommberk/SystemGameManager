@@ -40,7 +40,11 @@ class GameAudioMonitoringService
                 // und Aufnahme-/Sprecherkennungs-Überwachung konsistent für dasselbe Spiel laufen
                 // (kein hartkodiertes Programm, sondern immer das aktuell aktive Spiel).
                 Game? runningGame = GetGameProcess.GetRunningOpenGame();
-                SetAudioWhenGameStarts(runningGame);
+                // Ein aktiver Hotkey hat Vorrang vor der Spiel-Erkennung
+                if (!SystemGameManager.Plugin.HotKeys.HotKeyListener.IsHotKeyActive)
+                {
+                    SetAudioWhenGameStarts(runningGame);
+                }
                 livelyWallpaper.SetWallpaperForRunningGame(runningGame, runningGame?.GameImage);
                 audioManagerController.StartCaptureMonitoring(runningGame?.ProzessName);
             }

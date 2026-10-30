@@ -466,6 +466,10 @@ static class HotKeyListener
     // Original state from before the first hotkey; kept until the active hotkey is pressed again
     private static AudioSnapshot? baseline;
     private static string? activeHotKey;
+
+    /// <summary>true while a hotkey is toggled on; game monitoring must not override its audio then.</summary>
+    public static bool IsHotKeyActive => activeHotKey is not null;
+
     private static readonly object toggleLock = new();
     private static readonly Dictionary<string, long> lastActivation = new(StringComparer.OrdinalIgnoreCase);
 
