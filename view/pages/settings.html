@@ -22,16 +22,32 @@
     <i class="fa-solid fa-xmark close-modal" role="button" onclick="closeHotKeyModal()"></i>
     <h3 class="modal-title">Neuer Hotkey</h3>
     <form id="hotkey-form" onsubmit="saveHotKeyFromForm(event)">
-        <label>Name <input type="text" id="hotkey-name" required></label><br>
-        <label>Music volume <input type="number" id="hotkey-music" min="0" max="100" value="100"> %</label><br>
-        <label>Game volume <input type="number" id="hotkey-game" min="0" max="100" value="100"> %</label><br>
-        <label>Output device <select id="hotkey-device"></select></label><br>
-        <label>Description <input type="text" id="hotkey-description"></label><br>
-        <label>Key combination
+        <div class="form-element">
+            <label>Name</label>
+            <input type="text" id="hotkey-name" required>
+        </div>
+        <div class="form-element">
+            <label>Music volume (%)</label>
+            <input type="number" id="hotkey-music" min="0" max="100" value="100">
+        </div>
+        <div class="form-element">
+            <label>Game volume (%)</label>
+            <input type="number" id="hotkey-game" min="0" max="100" value="100">
+        </div>
+        <div class="form-element">
+            <label>Output device</label>
+            <select id="hotkey-device"></select>
+        </div>
+        <div class="form-element">
+            <label>Description</label>
+            <input type="text" id="hotkey-description">
+        </div>
+        <div class="form-element">
+            <label>Key combination</label>
             <input type="text" id="hotkey-keys-display" readonly placeholder="Click capture, then press the keys">
             <input type="hidden" id="hotkey-keys">
-        </label>
-        <button type="button" onclick="startHotKeyCapture()">Capture</button><br>
+            <button type="button" onclick="startHotKeyCapture()">Capture</button>
+        </div>
         <button type="submit">Save</button>
     </form>
 </div>

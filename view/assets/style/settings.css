@@ -41,3 +41,28 @@ h2
 {
     border-bottom: none;
 }
+
+.hotkey-modal
+{
+    form
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        .form-element
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        button[type="submit"]
+        {
+            margin-top: 10px;
+        }
+    }
+    .modal-title
+    {
+        margin-bottom: 15px;
+    }
+}
