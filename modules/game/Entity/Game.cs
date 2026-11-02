@@ -64,6 +64,11 @@ class Game
         if (installedGame is not null && !ReferenceEquals(installedGame, game))
         {
             installedGame.MusicVolumePercent = game.MusicVolumePercent;
+            installedGame.GameVolumePercent = game.GameVolumePercent;
+            installedGame.AudioOutputDevice = game.AudioOutputDevice;
+            installedGame.GameImage = game.GameImage;
+            installedGame.IsRemovedFromView = game.IsRemovedFromView;
+            installedGame.LivelyWallpaperScreen = game.LivelyWallpaperScreen;
         }
     }
     public static Game[] GetGames()
