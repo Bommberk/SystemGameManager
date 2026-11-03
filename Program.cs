@@ -17,6 +17,7 @@ using System.Net.Http;
 using SystemGameManager.Plugin;
 using SystemGameManager.Plugin.HotKeys;
 using SystemGameManager.AudioManager.Controller;
+using UserEntity = SystemGameManager.User.Entity.User;
 
 internal static class Program
 {
@@ -38,7 +39,6 @@ internal static class Program
 
         ErrorHandler.Register();
 
-        Form? startupForm = null;
         try
         {
             var isConsole = args.Length > 0 && args[0] == "--console";
@@ -46,15 +46,14 @@ internal static class Program
             if (!isConsole)
             {
                 ApplicationConfiguration.Initialize();
-                if (!startInBackground)
-                {
-                    startupForm = CreateStartupForm();
-                    startupForm.Show();
-                    startupForm.Refresh();
-                }
             }
 
-            // Update abschließen, ohne Main vom STA-Thread wegzuführen
+            if (!isConsole && !startInBackground)
+            {
+                RunWithStartupWindow(args);
+                return;
+            }
+
             new Updater().AutoUpdate().GetAwaiter().GetResult();
 
             if (isConsole)
@@ -63,34 +62,13 @@ internal static class Program
             }
             else
             {
-                if (GlobalConfig.Settings.AppConfig.Environment != "dev")
-                {
-                    GetInfoAsync();
-                    // API Smarthome aufrufen
-                    try
-                    {
-                        var smarthomeApi = new SmarthomeApi();
-                        smarthomeApi.SendDeviceInfoAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorHandler.Handle(ex, ErrorSeverity.Warning);
-                    }
-                }else if(args.Length > 0 && args[0] == "--infos")
-                {
-                    GetInfoAsync();
-                }
-
-                RunForm(startInBackground, startupForm);
+                PrepareApplication(args);
+                RunForm(startInBackground);
             }
         }
         catch (Exception ex)
         {
             ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
-        }
-        finally
-        {
-            startupForm?.Close();
         }
 
     }
@@ -116,11 +94,61 @@ internal static class Program
         gameAudioController.Dispose();
     }
 
-    private static void RunForm(bool startInBackground, Form? startupForm)
+    private static void RunForm(bool startInBackground)
     {
-        var mainForm = new MainForm(startInBackground);
-        startupForm?.Close();
-        Application.Run(mainForm);
+        Application.Run(new MainForm(startInBackground));
+    }
+
+    private static void RunWithStartupWindow(string[] args)
+    {
+        var startupForm = CreateStartupForm();
+        using var context = new ApplicationContext(startupForm);
+
+        startupForm.Shown += async (_, _) =>
+        {
+            try
+            {
+                await new Updater().AutoUpdate();
+                await Task.Run(() => PrepareApplication(args));
+
+                var userSettings = await Task.Run(UserEntity.GetUser);
+                var mainForm = new MainForm(userSettings: userSettings);
+                mainForm.Opacity = 0;
+                mainForm.Show();
+                await mainForm.Initialization;
+
+                mainForm.Opacity = 1;
+                context.MainForm = mainForm;
+                startupForm.Close();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
+            }
+        };
+
+        Application.Run(context);
+    }
+
+    private static void PrepareApplication(string[] args)
+    {
+        if (GlobalConfig.Settings.AppConfig.Environment != "dev")
+        {
+            GetInfoAsync();
+            try
+            {
+                var smarthomeApi = new SmarthomeApi();
+                smarthomeApi.SendDeviceInfoAsync();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.Handle(ex, ErrorSeverity.Warning);
+            }
+        }
+        else if (args.Length > 0 && args[0] == "--infos")
+        {
+            GetInfoAsync();
+        }
     }
 
     private static Form CreateStartupForm()
