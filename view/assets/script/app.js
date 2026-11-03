@@ -110,7 +110,27 @@ function changeValue(element, valueType)
 // ********* Settings ********** //
 // ***************************** //
 
+let userSettings = null;
+
+function handleUserSettings(settings) {
+    if (!settings) return;
+    userSettings = settings;
+    const nameInput = document.getElementById("user-name");
+    if (nameInput) nameInput.value = settings.Name ?? "";
+
+    if (settings.Theme) {
+        document.body.className = settings.Theme;
+        localStorage.setItem("theme", settings.Theme);
+    }
+}
+
+function saveUserName() {
+    const nameInput = document.getElementById("user-name");
+    if (nameInput) api.setUserName(nameInput.value);
+}
+
 function changeTheme(theme) {
     document.body.className = theme;
     localStorage.setItem('theme', theme);
+    api.setUserTheme(theme);
 }

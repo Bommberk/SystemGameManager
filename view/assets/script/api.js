@@ -94,6 +94,23 @@ const api = {
             action: "getHotKeys"
         });
     },
+    getUserSettings(){
+        window.chrome.webview.postMessage({
+            action: "getUserSettings"
+        });
+    },
+    setUserName(name){
+        window.chrome.webview.postMessage({
+            action: "setUserName",
+            data: { Name: name }
+        });
+    },
+    setUserTheme(theme){
+        window.chrome.webview.postMessage({
+            action: "setUserTheme",
+            data: { Theme: theme }
+        });
+    },
     startHotKeyCapture(){
         window.chrome.webview.postMessage({
             action: "startHotKeyCapture"
@@ -148,6 +165,9 @@ window.apiResponse = function (response) {
                 hotKeys = response.data;
                 handleHotKeys();
                 break;
+            case "getUserSettings":
+                handleUserSettings(response.data);
+                break;
             case "hotKeyCaptured":
                 handleHotKeyCaptured(response.data);
                 break;
@@ -170,3 +190,4 @@ api.getLaunchers();
 api.getAudioDevices();
 api.getScreens();
 api.getHotKeys();
+api.getUserSettings();

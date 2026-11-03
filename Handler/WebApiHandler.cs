@@ -6,6 +6,7 @@ using Microsoft.Web.WebView2.WinForms;
 using SystemGameManager.Games.Entity;
 using SystemGameManager.AudioManager.Service;
 using SystemGameManager.Plugin.HotKeys;
+using SystemGameManager.User.Service;
 public static class WebApiHandler
 {
     public static void Initialize(WebView2 web)
@@ -66,6 +67,12 @@ public static class WebApiHandler
             case "setScreenForGame":
                 await SetScreenForGame(request);
                 break;
+            case "setUserName":
+                await SetUserName(request);
+                break;
+            case "setUserTheme":
+                await SetUserTheme(request);
+                break;
             default:
                 MessageBox.Show($"Unknown set action: {request.Action}");
                 break;
@@ -92,6 +99,9 @@ public static class WebApiHandler
                 break;
             case "getHotKeys":
                 await GetHotKeys(web);
+                break;
+            case "getUserSettings":
+                await GetUserSettings(web);
                 break;
             default:
                 MessageBox.Show($"Unknown get action: {request.Action}");
@@ -189,6 +199,23 @@ public static class WebApiHandler
         await Send(web, "getHotKeys", hotKeys);
     }
 
+    private static async Task GetUserSettings(WebView2 web)
+    {
+        await Send(web, "getUserSettings", new UserService().GetUser());
+    }
+
+    private static async Task SetUserName(ApiRequest request)
+    {
+        var settings = JsonSerializer.Deserialize<UserSettingsRequest>(request.Data?.ToString() ?? "{}");
+        new UserService().UpdateName(settings?.Name);
+    }
+
+    private static async Task SetUserTheme(ApiRequest request)
+    {
+        var settings = JsonSerializer.Deserialize<UserSettingsRequest>(request.Data?.ToString() ?? "{}");
+        new UserService().UpdateTheme(settings?.Theme);
+    }
+
     private static Action<string>? hotKeyCaptureHandler;
 
     private static void StartHotKeyCapture(WebView2 web)
@@ -244,5 +271,11 @@ public static class WebApiHandler
         public string? Action { get; set; }
         [JsonPropertyName("data")]
         public object? Data { get; set; }
+    }
+
+    private sealed class UserSettingsRequest
+    {
+        public string? Name { get; set; }
+        public string? Theme { get; set; }
     }
 }

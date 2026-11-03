@@ -14,6 +14,7 @@ async function loadPage(page)
     handleGames();
     handleLaunchers();
     handleHotKeys();
+    handleUserSettings(userSettings);
 }
 
 async function loadSidebar()
