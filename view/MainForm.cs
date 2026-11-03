@@ -13,13 +13,16 @@ namespace SystemGameManager.View2;
 public partial class MainForm : Form
 {
     private readonly GameAudioController gameAudioController = new ();
+    private readonly TaskCompletionSource<bool> initializationCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private NotifyIcon? notifyIcon;
     private bool isExiting;
     private readonly bool startInBackground;
 
-    public MainForm(bool startInBackground = false)
+    public Task Initialization => initializationCompletion.Task;
+
+    public MainForm(bool startInBackground = false, UserEntity? userSettings = null)
     {
-        var userSettings = UserEntity.GetUser();
+        userSettings ??= UserEntity.GetUser();
         UserStartupService.Update(userSettings);
         this.startInBackground = startInBackground && userSettings.EnableBackgroundRunning;
         UpdateTrayIcon(userSettings.EnableBackgroundRunning);
@@ -38,29 +41,37 @@ public partial class MainForm : Form
 
         Load += async (_, _) =>
         {
-            HotKeyListener.Start();
-            await web.EnsureCoreWebView2Async();
-
-            WebApiHandler.Initialize(web, updatedUser => UpdateTrayIcon(updatedUser.EnableBackgroundRunning));
-
-            var viewRoot = Path.Combine(AppContext.BaseDirectory, "view");
-
-            if(GlobalConfig.Settings.AppConfig.Environment == "dev")
+            try
             {
-                viewRoot = Path.GetFullPath(Path.Combine(
-                    AppContext.BaseDirectory,
-                    "..","..", "..","view"
-                ));
+                HotKeyListener.Start();
+                await web.EnsureCoreWebView2Async();
+
+                WebApiHandler.Initialize(web, updatedUser => UpdateTrayIcon(updatedUser.EnableBackgroundRunning));
+
+                var viewRoot = Path.Combine(AppContext.BaseDirectory, "view");
+
+                if(GlobalConfig.Settings.AppConfig.Environment == "dev")
+                {
+                    viewRoot = Path.GetFullPath(Path.Combine(
+                        AppContext.BaseDirectory,
+                        "..","..", "..","view"
+                    ));
+                }
+
+                web.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                    "systemgamemanager",
+                    viewRoot,
+                    CoreWebView2HostResourceAccessKind.Allow);
+
+                ConfigureLocalImageRequests(web.CoreWebView2);
+                web.Source = new Uri("https://systemgamemanager/index.html");
+                initializationCompletion.TrySetResult(true);
             }
-
-            web.CoreWebView2.SetVirtualHostNameToFolderMapping(
-                "systemgamemanager",
-                viewRoot,
-                CoreWebView2HostResourceAccessKind.Allow);
-
-            ConfigureLocalImageRequests(web.CoreWebView2);
-            
-            web.Source = new Uri("https://systemgamemanager/index.html");
+            catch (Exception ex)
+            {
+                initializationCompletion.TrySetException(ex);
+                ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
+            }
         };
 
         Shown += (_, _) =>

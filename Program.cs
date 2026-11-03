@@ -17,6 +17,7 @@ using System.Net.Http;
 using SystemGameManager.Plugin;
 using SystemGameManager.Plugin.HotKeys;
 using SystemGameManager.AudioManager.Controller;
+using UserEntity = SystemGameManager.User.Entity.User;
 
 internal static class Program
 {
@@ -40,34 +41,29 @@ internal static class Program
 
         try
         {
-            // Update abschließen, ohne Main vom STA-Thread wegzuführen
+            var isConsole = args.Length > 0 && args[0] == "--console";
+            var startInBackground = args.Any(arg => string.Equals(arg, "--background", StringComparison.OrdinalIgnoreCase));
+            if (!isConsole)
+            {
+                ApplicationConfiguration.Initialize();
+            }
+
+            if (!isConsole && !startInBackground)
+            {
+                RunWithStartupWindow(args);
+                return;
+            }
+
             new Updater().AutoUpdate().GetAwaiter().GetResult();
 
-            if (args.Length > 0 && args[0] == "--console")
+            if (isConsole)
             {
                 RunConsole();
             }
             else
             {
-                if (GlobalConfig.Settings.AppConfig.Environment != "dev")
-                {
-                    GetInfoAsync();
-                    // API Smarthome aufrufen
-                    try
-                    {
-                        var smarthomeApi = new SmarthomeApi();
-                        smarthomeApi.SendDeviceInfoAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorHandler.Handle(ex, ErrorSeverity.Warning);
-                    }
-                }else if(args.Length > 0 && args[0] == "--infos")
-                {
-                    GetInfoAsync();
-                }
-
-                RunForm(args.Any(arg => string.Equals(arg, "--background", StringComparison.OrdinalIgnoreCase)));
+                PrepareApplication(args);
+                RunForm(startInBackground);
             }
         }
         catch (Exception ex)
@@ -100,8 +96,79 @@ internal static class Program
 
     private static void RunForm(bool startInBackground)
     {
-        ApplicationConfiguration.Initialize();
         Application.Run(new MainForm(startInBackground));
+    }
+
+    private static void RunWithStartupWindow(string[] args)
+    {
+        var startupForm = CreateStartupForm();
+        using var context = new ApplicationContext(startupForm);
+
+        startupForm.Shown += async (_, _) =>
+        {
+            try
+            {
+                await new Updater().AutoUpdate();
+                await Task.Run(() => PrepareApplication(args));
+
+                var userSettings = await Task.Run(UserEntity.GetUser);
+                var mainForm = new MainForm(userSettings: userSettings);
+                mainForm.Opacity = 0;
+                mainForm.Show();
+                await mainForm.Initialization;
+
+                mainForm.Opacity = 1;
+                context.MainForm = mainForm;
+                startupForm.Close();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
+            }
+        };
+
+        Application.Run(context);
+    }
+
+    private static void PrepareApplication(string[] args)
+    {
+        if (GlobalConfig.Settings.AppConfig.Environment != "dev")
+        {
+            GetInfoAsync();
+            try
+            {
+                var smarthomeApi = new SmarthomeApi();
+                smarthomeApi.SendDeviceInfoAsync();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.Handle(ex, ErrorSeverity.Warning);
+            }
+        }
+        else if (args.Length > 0 && args[0] == "--infos")
+        {
+            GetInfoAsync();
+        }
+    }
+
+    private static Form CreateStartupForm()
+    {
+        var form = new Form
+        {
+            Text = "System Game Manager",
+            StartPosition = FormStartPosition.CenterScreen,
+            FormBorderStyle = FormBorderStyle.FixedDialog,
+            ControlBox = false,
+            ShowInTaskbar = false,
+            ClientSize = new Size(320, 80)
+        };
+        form.Controls.Add(new Label
+        {
+            Text = "Starting System Game Manager...",
+            AutoSize = true,
+            Location = new Point(20, 30)
+        });
+        return form;
     }
 
     private static void WriteHeadline()
