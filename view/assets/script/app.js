@@ -132,5 +132,6 @@ function saveUserName() {
 function changeTheme(theme) {
     document.body.className = theme;
     localStorage.setItem('theme', theme);
+    userSettings = { ...(userSettings ?? {}), Theme: theme };
     api.setUserTheme(theme);
 }

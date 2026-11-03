@@ -57,6 +57,11 @@ class DatabaseService
                 continue;
             }
 
+            if (existingRecord.TryGetValue(keyProperty.Name, out var existingKey))
+            {
+                currentRecordKey = existingKey?.ToString() ?? currentRecordKey;
+            }
+
             if (HasDifferentValues(existingRecord, entry, properties))
             {
                 UpdateRecord(tableName);
