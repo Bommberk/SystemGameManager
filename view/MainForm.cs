@@ -20,6 +20,8 @@ public partial class MainForm : Form
         };
 
         Text = "System Game Manager v" + GlobalConfig.Settings.AppConfig.Version;
+        if(!GlobalConfig.Settings.AppConfig.State.Equals("stable", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(GlobalConfig.Settings.AppConfig.State))
+            Text += " - " + GlobalConfig.Settings.AppConfig.State;
         WindowState = FormWindowState.Maximized;
 
         Controls.Add(web);

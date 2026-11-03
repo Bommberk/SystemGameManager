@@ -13,7 +13,9 @@ public class Updater
         try
         {
             var repoUrl = GlobalConfig.Settings.AppConfig.RepositoryUrl;
-            var source = new GithubSource(repoUrl, null, true);
+            var state = GlobalConfig.Settings.AppConfig.State;
+            var isStable = string.IsNullOrWhiteSpace(state) || state.Equals("stable", StringComparison.OrdinalIgnoreCase);
+            var source = new GithubSource(repoUrl, null, !isStable);
             var mgr = new UpdateManager(source);
 
             if (!mgr.IsInstalled)
