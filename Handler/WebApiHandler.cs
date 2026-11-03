@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Web.WebView2.WinForms;
 using SystemGameManager.Games.Entity;
 using SystemGameManager.AudioManager.Service;
+using SystemGameManager.Plugin;
 using SystemGameManager.Plugin.HotKeys;
 using SystemGameManager.User.Entity;
 using SystemGameManager.User.Service;
@@ -47,6 +48,14 @@ public static class WebApiHandler
                 {
                     await DeleteHotKey(request, web);
                 }
+                else if(request.Action == "selectDefaultWallpaper")
+                {
+                    await SelectDefaultWallpaper(web);
+                }
+                else if(request.Action == "selectLivelyExe")
+                {
+                    await SelectLivelyExe(web);
+                }
                 else
                 {
                     MessageBox.Show($"Unknown action: {request.Action}");
@@ -77,6 +86,9 @@ public static class WebApiHandler
             case "setUserBackgroundSettings":
                 SetUserBackgroundSettings(request, onUserSettingsUpdated);
                 break;
+            case "setUserWallpaperSettings":
+                SetUserWallpaperSettings(request);
+                break;
             default:
                 MessageBox.Show($"Unknown set action: {request.Action}");
                 break;
@@ -106,6 +118,9 @@ public static class WebApiHandler
                 break;
             case "getUserSettings":
                 await GetUserSettings(web);
+                break;
+            case "getDetectedWallpaperInfo":
+                await GetDetectedWallpaperInfo(web);
                 break;
             default:
                 MessageBox.Show($"Unknown get action: {request.Action}");
@@ -150,6 +165,7 @@ public static class WebApiHandler
     {
         Game game = JsonSerializer.Deserialize<Game>(request.Data?.ToString() ?? "{}");
         Game.UpdateGame(game);
+        _ = Task.Run(() => LivelyWallpaper.Instance.ApplyNow(game));
         msgbox("Screen for game set successfully.");
     }
 
@@ -172,6 +188,7 @@ public static class WebApiHandler
                 Game game = JsonSerializer.Deserialize<Game>(request.Data?.ToString() ?? "{}");
                 game.GameImage = path;
                 Game.UpdateGame(game);
+                _ = Task.Run(() => LivelyWallpaper.Instance.ApplyNow(game));
                 await Send(web, "gameImageChanged", new { SerializedGameName = game.SerializedGameName, GameImage = game.GameImage });
             }
         }
@@ -241,6 +258,54 @@ public static class WebApiHandler
         onUserSettingsUpdated?.Invoke(user);
     }
 
+    private static void SetUserWallpaperSettings(ApiRequest request)
+    {
+        var settings = JsonSerializer.Deserialize<UserWallpaperSettingsRequest>(request.Data?.ToString() ?? "{}");
+        User.UpdateWallpaperSettings(settings?.DefaultWallpaperPath, settings?.LivelyExePath);
+    }
+
+    private static async Task SelectDefaultWallpaper(WebView2 web)
+    {
+        using var dialog = new OpenFileDialog
+        {
+            Filter = "Bilder|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp|Alle Dateien|*.*"
+        };
+
+        if (dialog.ShowDialog() != DialogResult.OK)
+            return;
+
+        var user = User.GetUser();
+        User.UpdateWallpaperSettings(dialog.FileName, user.LivelyExePath);
+        await GetUserSettings(web);
+        await GetDetectedWallpaperInfo(web);
+    }
+
+    private static async Task SelectLivelyExe(WebView2 web)
+    {
+        using var dialog = new OpenFileDialog
+        {
+            Filter = "Lively CLI|livelycu.exe|Programme|*.exe"
+        };
+
+        if (dialog.ShowDialog() != DialogResult.OK)
+            return;
+
+        var user = User.GetUser();
+        User.UpdateWallpaperSettings(user.DefaultWallpaperPath, dialog.FileName);
+        await GetUserSettings(web);
+        await GetDetectedWallpaperInfo(web);
+    }
+
+    private static async Task GetDetectedWallpaperInfo(WebView2 web)
+    {
+        var user = User.GetUser();
+        await Send(web, "getDetectedWallpaperInfo", new
+        {
+            WindowsWallpaperPath = WindowsWallpaperService.StartupWallpaperPath,
+            LivelyExePath = LivelyLocator.FindLivelyExe(user.LivelyExePath)
+        });
+    }
+
     private static Action<string>? hotKeyCaptureHandler;
 
     private static void StartHotKeyCapture(WebView2 web)
@@ -302,6 +367,12 @@ public static class WebApiHandler
     {
         public string? Name { get; set; }
         public string? Theme { get; set; }
+    }
+
+    private sealed class UserWallpaperSettingsRequest
+    {
+        public string? DefaultWallpaperPath { get; set; }
+        public string? LivelyExePath { get; set; }
     }
 
     private sealed class UserBackgroundSettingsRequest

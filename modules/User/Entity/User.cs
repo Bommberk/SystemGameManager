@@ -2,6 +2,7 @@ namespace SystemGameManager.User.Entity;
 
 using System.ComponentModel.DataAnnotations;
 using SystemGameManager.Database.Controller;
+using SystemGameManager.Plugin;
 
 public sealed class User
 {
@@ -15,6 +16,8 @@ public sealed class User
     public bool CloseToBackground { get; set; }
     public bool StartWithWindows { get; set; }
     public bool StartInBackground { get; set; }
+    public string? DefaultWallpaperPath { get; set; }
+    public string? LivelyExePath { get; set; }
 
     public static User GetUser()
     {
@@ -69,6 +72,21 @@ public sealed class User
         user.StartWithWindows = enableBackgroundRunning && startWithWindows;
         user.StartInBackground = user.StartWithWindows && startInBackground;
         SaveUser(user);
+        return user;
+    }
+
+    public static User UpdateWallpaperSettings(string? defaultWallpaperPath, string? livelyExePath)
+    {
+        var wallpaper = defaultWallpaperPath?.Trim().Trim('"');
+        var livelyPath = livelyExePath?.Trim().Trim('"');
+
+        var user = GetUser();
+        user.DefaultWallpaperPath = WallpaperCropper.IsSupportedImage(wallpaper) && File.Exists(wallpaper)
+            ? wallpaper
+            : null;
+        user.LivelyExePath = LivelyLocator.IsLivelyExe(livelyPath) ? livelyPath : null;
+        SaveUser(user);
+        LivelyWallpaper.NotifySettingsChanged();
         return user;
     }
 

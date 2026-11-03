@@ -133,6 +133,45 @@ function handleUserSettings(settings) {
         document.body.className = settings.Theme;
         localStorage.setItem("theme", settings.Theme);
     }
+
+    const defaultWallpaperPath = document.getElementById("default-wallpaper-path");
+    if (defaultWallpaperPath) defaultWallpaperPath.textContent = settings.DefaultWallpaperPath ?? "Windows wallpaper (automatic)";
+    const defaultWallpaperPreview = document.getElementById("default-wallpaper-preview");
+    if (defaultWallpaperPreview) {
+        const previewPath = settings.DefaultWallpaperPath ?? detectedWallpaperInfo?.WindowsWallpaperPath;
+        defaultWallpaperPreview.src = previewPath ? `https://local-image/${encodeURIComponent(previewPath)}` : "";
+        defaultWallpaperPreview.hidden = !previewPath;
+    }
+    const livelyExePath = document.getElementById("lively-exe-path");
+    if (livelyExePath) livelyExePath.textContent = settings.LivelyExePath ?? "Automatic detection";
+}
+
+let detectedWallpaperInfo = null;
+
+function handleDetectedWallpaperInfo(info) {
+    if (!info) return;
+    const livelyStatus = document.getElementById("lively-status");
+    if (livelyStatus) {
+        livelyStatus.textContent = info.LivelyExePath
+            ? `Lively found: ${info.LivelyExePath}`
+            : "Lively not found. Select livelycu.exe manually.";
+    }
+    const windowsWallpaper = document.getElementById("windows-wallpaper-path");
+    if (windowsWallpaper) windowsWallpaper.textContent = info.WindowsWallpaperPath ?? "not detected";
+    handleUserSettings(userSettings);
+}
+
+function resetDefaultWallpaper() {
+    api.setUserWallpaperSettings({ DefaultWallpaperPath: null, LivelyExePath: userSettings?.LivelyExePath ?? null });
+    userSettings = { ...(userSettings ?? {}), DefaultWallpaperPath: null };
+    handleUserSettings(userSettings);
+}
+
+function resetLivelyExe() {
+    api.setUserWallpaperSettings({ DefaultWallpaperPath: userSettings?.DefaultWallpaperPath ?? null, LivelyExePath: null });
+    userSettings = { ...(userSettings ?? {}), LivelyExePath: null };
+    api.getDetectedWallpaperInfo();
+    handleUserSettings(userSettings);
 }
 
 function saveUserName() {

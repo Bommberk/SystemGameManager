@@ -19,7 +19,7 @@ class GameAudioMonitoringService
     private string? previousAudioOutputDeviceId;
     private string? lastAppliedAudioOutputDeviceId;
     private readonly AudioManagerController audioManagerController = new();
-    private readonly LivelyWallpaper livelyWallpaper = new();
+    private readonly LivelyWallpaper livelyWallpaper = LivelyWallpaper.Instance;
 
     /// <summary>
     /// true, sobald im Audio des aktuell laufenden Spiels Sprache erkannt wird. Läuft pro Spiel,

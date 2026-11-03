@@ -15,6 +15,7 @@ async function loadPage(page)
     handleLaunchers();
     handleHotKeys();
     handleUserSettings(userSettings);
+    handleDetectedWallpaperInfo(detectedWallpaperInfo);
 }
 
 async function loadSidebar()

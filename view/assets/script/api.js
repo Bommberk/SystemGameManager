@@ -117,6 +117,27 @@ const api = {
             data: settings
         });
     },
+    getDetectedWallpaperInfo(){
+        window.chrome.webview.postMessage({
+            action: "getDetectedWallpaperInfo"
+        });
+    },
+    setUserWallpaperSettings(settings){
+        window.chrome.webview.postMessage({
+            action: "setUserWallpaperSettings",
+            data: settings
+        });
+    },
+    selectDefaultWallpaper(){
+        window.chrome.webview.postMessage({
+            action: "selectDefaultWallpaper"
+        });
+    },
+    selectLivelyExe(){
+        window.chrome.webview.postMessage({
+            action: "selectLivelyExe"
+        });
+    },
     startHotKeyCapture(){
         window.chrome.webview.postMessage({
             action: "startHotKeyCapture"
@@ -174,6 +195,10 @@ window.apiResponse = function (response) {
             case "getUserSettings":
                 handleUserSettings(response.data);
                 break;
+            case "getDetectedWallpaperInfo":
+                detectedWallpaperInfo = response.data;
+                handleDetectedWallpaperInfo(detectedWallpaperInfo);
+                break;
             case "hotKeyCaptured":
                 handleHotKeyCaptured(response.data);
                 break;
@@ -197,3 +222,4 @@ api.getAudioDevices();
 api.getScreens();
 api.getHotKeys();
 api.getUserSettings();
+api.getDetectedWallpaperInfo();

@@ -22,6 +22,19 @@
     <label><input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()"> Start in the background</label>
 </section>
 
+<section class="user-settings">
+    <h2>Wallpaper</h2>
+    <p>Default wallpaper (restored when no game is running): <span id="default-wallpaper-path"></span></p>
+    <img id="default-wallpaper-preview" alt="Default wallpaper preview" style="max-width: 320px;" hidden>
+    <p>Detected Windows wallpaper: <span id="windows-wallpaper-path"></span></p>
+    <button type="button" onclick="api.selectDefaultWallpaper()">Choose default wallpaper</button>
+    <button type="button" onclick="resetDefaultWallpaper()">Use Windows wallpaper</button>
+    <p>Lively executable: <span id="lively-exe-path"></span></p>
+    <p id="lively-status"></p>
+    <button type="button" onclick="api.selectLivelyExe()">Choose livelycu.exe</button>
+    <button type="button" onclick="resetLivelyExe()">Detect automatically</button>
+</section>
+
 <section class="hotkeys collapsable">
 <h2>HotKeys</h2>
 <div>
