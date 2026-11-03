@@ -3,6 +3,7 @@ namespace SystemGameManager.Database.Service;
 using SystemGameManager.Database.Controller;
 using Microsoft.Data.Sqlite;
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text.Json;
 
@@ -11,7 +12,8 @@ class DatabaseService
 {
     private object? currentRecord;
     private PropertyInfo[] currentRecordProperties = [];
-    private string currentRecordName = string.Empty;
+    private string currentRecordKeyColumn = "Name";
+    private string currentRecordKey = string.Empty;
 
     public void SaveNewRecord(object? record)
     {
@@ -28,25 +30,28 @@ class DatabaseService
 
         var properties = GetPersistedProperties(recordType);
         if (properties.Length == 0) return;
+        var keyProperty = GetRecordKeyProperty(recordType);
+        if (keyProperty is null) return;
 
-        CreateTable(tableName, BuildColumnDefinitions(properties));
+        CreateTable(tableName, BuildColumnDefinitions(properties, keyProperty));
         AddMissingColumns(tableName, properties);
 
         var incomingRecords = NormalizeToRecordList(record);
-        var incomingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var existingRecords = GetExistingRecords(tableName);
+        var incomingKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var existingRecords = GetExistingRecords(tableName, keyProperty.Name);
 
         foreach (var entry in incomingRecords)
         {
-            var name = GetRecordName(entry);
-            if (string.IsNullOrWhiteSpace(name)) continue;
+            var key = GetRecordKey(entry, keyProperty);
+            if (string.IsNullOrWhiteSpace(key)) continue;
 
             currentRecord = entry;
             currentRecordProperties = properties;
-            currentRecordName = name;
-            incomingNames.Add(name);
+            currentRecordKeyColumn = keyProperty.Name;
+            currentRecordKey = key;
+            incomingKeys.Add(key);
 
-            if (!existingRecords.TryGetValue(name, out var existingRecord))
+            if (!existingRecords.TryGetValue(key, out var existingRecord))
             {
                 CreateRecord(tableName);
                 continue;
@@ -58,11 +63,12 @@ class DatabaseService
             }
         }
 
-        foreach (var dbName in existingRecords.Keys.Where(dbName => !incomingNames.Contains(dbName)))
+        foreach (var dbKey in existingRecords.Keys.Where(dbKey => !incomingKeys.Contains(dbKey)))
         {
             currentRecord = null;
             currentRecordProperties = properties;
-            currentRecordName = dbName;
+            currentRecordKeyColumn = keyProperty.Name;
+            currentRecordKey = dbKey;
             DeleteRecord(tableName);
         }
     }
@@ -82,18 +88,18 @@ class DatabaseService
 
     private void UpdateRecord(string tableName)
     {
-        if (currentRecord is null || currentRecordProperties.Length == 0 || string.IsNullOrWhiteSpace(currentRecordName)) return;
+        if (currentRecord is null || currentRecordProperties.Length == 0 || string.IsNullOrWhiteSpace(currentRecordKey)) return;
 
         using var command = dbConnection.CreateCommand();
         var setClause = string.Join(", ", currentRecordProperties
-            .Where(property => !property.Name.Equals("Name", StringComparison.OrdinalIgnoreCase))
+            .Where(property => !property.Name.Equals(currentRecordKeyColumn, StringComparison.OrdinalIgnoreCase))
             .Select(property => $"[{property.Name}] = @{property.Name}"));
 
         if (string.IsNullOrWhiteSpace(setClause)) return;
 
-        command.CommandText = $"UPDATE [{tableName}] SET {setClause} WHERE [Name] = @OriginalName;";
-        AddParametersFromCurrentRecord(command, skipName: true);
-        command.Parameters.AddWithValue("@OriginalName", currentRecordName);
+        command.CommandText = $"UPDATE [{tableName}] SET {setClause} WHERE [{currentRecordKeyColumn}] = @OriginalKey;";
+        AddParametersFromCurrentRecord(command, skipKey: true);
+        command.Parameters.AddWithValue("@OriginalKey", currentRecordKey);
         command.ExecuteNonQuery();
     }
 
@@ -110,18 +116,19 @@ class DatabaseService
 
         currentRecord = updatedRecord;
         currentRecordProperties = properties;
-        currentRecordName = recordName;
+        currentRecordKeyColumn = "Name";
+        currentRecordKey = recordName;
 
         UpdateRecord(tableName);
     }
 
     private void DeleteRecord(string tableName)
     {
-        if (string.IsNullOrWhiteSpace(currentRecordName)) return;
+        if (string.IsNullOrWhiteSpace(currentRecordKey)) return;
 
         using var command = dbConnection.CreateCommand();
-        command.CommandText = $"DELETE FROM [{tableName}] WHERE [Name] = @Name;";
-        command.Parameters.AddWithValue("@Name", currentRecordName);
+        command.CommandText = $"DELETE FROM [{tableName}] WHERE [{currentRecordKeyColumn}] = @Key;";
+        command.Parameters.AddWithValue("@Key", currentRecordKey);
         command.ExecuteNonQuery();
     }
 
@@ -197,13 +204,13 @@ class DatabaseService
         return [.. records];
     }
 
-    private void AddParametersFromCurrentRecord(SqliteCommand command, bool skipName = false)
+    private void AddParametersFromCurrentRecord(SqliteCommand command, bool skipKey = false)
     {
         if (currentRecord is null) return;
 
         foreach (var property in currentRecordProperties)
         {
-            if (skipName && property.Name.Equals("Name", StringComparison.OrdinalIgnoreCase))
+            if (skipKey && property.Name.Equals(currentRecordKeyColumn, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             command.Parameters.AddWithValue($"@{property.Name}", SerializeForStorage(property.GetValue(currentRecord)));
@@ -222,7 +229,7 @@ class DatabaseService
             : value;
     }
 
-    private Dictionary<string, Dictionary<string, object?>> GetExistingRecords(string tableName)
+    private Dictionary<string, Dictionary<string, object?>> GetExistingRecords(string tableName, string keyColumn)
     {
         var existingRecords = new Dictionary<string, Dictionary<string, object?>>(StringComparer.OrdinalIgnoreCase);
 
@@ -238,10 +245,10 @@ class DatabaseService
                 values[reader.GetName(i)] = reader.IsDBNull(i) ? null : reader.GetValue(i);
             }
 
-            var name = values.TryGetValue("Name", out var rawName) ? rawName?.ToString() : null;
-            if (!string.IsNullOrWhiteSpace(name))
+            var key = values.TryGetValue(keyColumn, out var rawKey) ? rawKey?.ToString() : null;
+            if (!string.IsNullOrWhiteSpace(key))
             {
-                existingRecords[name] = values;
+                existingRecords[key] = values;
             }
         }
 
@@ -342,6 +349,11 @@ class DatabaseService
             return value.ToString() ?? string.Empty;
         }
 
+        if (effectiveType == typeof(Guid))
+        {
+            return Guid.Parse(value.ToString()!);
+        }
+
         if (effectiveType == typeof(bool))
         {
             return value switch
@@ -397,7 +409,7 @@ class DatabaseService
         };
     }
 
-    private static string[] BuildColumnDefinitions(PropertyInfo[] properties)
+    private static string[] BuildColumnDefinitions(PropertyInfo[] properties, PropertyInfo keyProperty)
     {
         var columns = new List<string>
         {
@@ -407,9 +419,11 @@ class DatabaseService
         foreach (var property in properties)
         {
             var columnType = GetSqlType(property.PropertyType);
-            var columnDefinition = property.Name.Equals("Name", StringComparison.OrdinalIgnoreCase)
+            var columnDefinition = property.Name.Equals(keyProperty.Name, StringComparison.OrdinalIgnoreCase)
                 ? $"[{property.Name}] {columnType} NOT NULL UNIQUE"
-                : $"[{property.Name}] {columnType}";
+                : property.Name.Equals("Name", StringComparison.OrdinalIgnoreCase) && !IsNullable(property)
+                    ? $"[{property.Name}] {columnType} NOT NULL UNIQUE"
+                    : $"[{property.Name}] {columnType}";
 
             columns.Add(columnDefinition);
         }
@@ -450,6 +464,29 @@ class DatabaseService
             .OrderBy(property => property.MetadataToken)];
     }
 
+    private static PropertyInfo? GetRecordKeyProperty(Type recordType)
+    {
+        return recordType
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .FirstOrDefault(property => property.GetCustomAttribute<KeyAttribute>() is not null)
+            ?? recordType.GetProperty("Name", BindingFlags.Public | BindingFlags.Instance);
+    }
+
+    private static string? GetRecordKey(object record, PropertyInfo keyProperty)
+    {
+        return keyProperty.GetValue(record) switch
+        {
+            Guid guid => guid.ToString("D").ToUpperInvariant(),
+            var value => value?.ToString()
+        };
+    }
+
+    private static bool IsNullable(PropertyInfo property)
+    {
+        return Nullable.GetUnderlyingType(property.PropertyType) is not null
+            || new NullabilityInfoContext().Create(property).WriteState == NullabilityState.Nullable;
+    }
+
     private static List<object> NormalizeToRecordList(object record)
     {
         if (record is IEnumerable enumerable && record is not string)
@@ -484,14 +521,6 @@ class DatabaseService
         }
 
         return recordType;
-    }
-
-    private static string? GetRecordName(object record)
-    {
-        return record.GetType()
-            .GetProperty("Name", BindingFlags.Public | BindingFlags.Instance)
-            ?.GetValue(record)
-            ?.ToString();
     }
 
     private string? GetTableName(object record)

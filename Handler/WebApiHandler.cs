@@ -6,7 +6,7 @@ using Microsoft.Web.WebView2.WinForms;
 using SystemGameManager.Games.Entity;
 using SystemGameManager.AudioManager.Service;
 using SystemGameManager.Plugin.HotKeys;
-using SystemGameManager.User.Service;
+using SystemGameManager.User.Entity;
 public static class WebApiHandler
 {
     public static void Initialize(WebView2 web)
@@ -201,19 +201,19 @@ public static class WebApiHandler
 
     private static async Task GetUserSettings(WebView2 web)
     {
-        await Send(web, "getUserSettings", new UserService().GetUser());
+        await Send(web, "getUserSettings", User.GetUser());
     }
 
     private static async Task SetUserName(ApiRequest request)
     {
         var settings = JsonSerializer.Deserialize<UserSettingsRequest>(request.Data?.ToString() ?? "{}");
-        new UserService().UpdateName(settings?.Name);
+        User.UpdateName(settings?.Name);
     }
 
     private static async Task SetUserTheme(ApiRequest request)
     {
         var settings = JsonSerializer.Deserialize<UserSettingsRequest>(request.Data?.ToString() ?? "{}");
-        new UserService().UpdateTheme(settings?.Theme);
+        User.UpdateTheme(settings?.Theme);
     }
 
     private static Action<string>? hotKeyCaptureHandler;
