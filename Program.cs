@@ -38,12 +38,26 @@ internal static class Program
 
         ErrorHandler.Register();
 
+        Form? startupForm = null;
         try
         {
+            var isConsole = args.Length > 0 && args[0] == "--console";
+            var startInBackground = args.Any(arg => string.Equals(arg, "--background", StringComparison.OrdinalIgnoreCase));
+            if (!isConsole)
+            {
+                ApplicationConfiguration.Initialize();
+                if (!startInBackground)
+                {
+                    startupForm = CreateStartupForm();
+                    startupForm.Show();
+                    startupForm.Refresh();
+                }
+            }
+
             // Update abschließen, ohne Main vom STA-Thread wegzuführen
             new Updater().AutoUpdate().GetAwaiter().GetResult();
 
-            if (args.Length > 0 && args[0] == "--console")
+            if (isConsole)
             {
                 RunConsole();
             }
@@ -67,12 +81,16 @@ internal static class Program
                     GetInfoAsync();
                 }
 
-                RunForm(args.Any(arg => string.Equals(arg, "--background", StringComparison.OrdinalIgnoreCase)));
+                RunForm(startInBackground, startupForm);
             }
         }
         catch (Exception ex)
         {
             ErrorHandler.Handle(ex, ErrorSeverity.Fatal);
+        }
+        finally
+        {
+            startupForm?.Close();
         }
 
     }
@@ -98,10 +116,31 @@ internal static class Program
         gameAudioController.Dispose();
     }
 
-    private static void RunForm(bool startInBackground)
+    private static void RunForm(bool startInBackground, Form? startupForm)
     {
-        ApplicationConfiguration.Initialize();
-        Application.Run(new MainForm(startInBackground));
+        var mainForm = new MainForm(startInBackground);
+        startupForm?.Close();
+        Application.Run(mainForm);
+    }
+
+    private static Form CreateStartupForm()
+    {
+        var form = new Form
+        {
+            Text = "System Game Manager",
+            StartPosition = FormStartPosition.CenterScreen,
+            FormBorderStyle = FormBorderStyle.FixedDialog,
+            ControlBox = false,
+            ShowInTaskbar = false,
+            ClientSize = new Size(320, 80)
+        };
+        form.Controls.Add(new Label
+        {
+            Text = "Starting System Game Manager...",
+            AutoSize = true,
+            Location = new Point(20, 30)
+        });
+        return form;
     }
 
     private static void WriteHeadline()
