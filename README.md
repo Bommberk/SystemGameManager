@@ -26,6 +26,7 @@ System & Game Manager is a Windows desktop app for managing installed games, gam
 
 ### 5) Set user preferences
 - Change the app theme using the existing Dark, Light, Red, Pink, and Yellow settings.
+- Enable background running, choose whether closing the window keeps the app in the system tray, and optionally start with Windows either minimized to the tray or fully open.
 - Optionally save a user name. User preferences are stored locally in the SQLite database; login and registration are not implemented.
 
 ## Preview
@@ -38,7 +39,7 @@ There are currently no screenshots in `assets/screenshots`. Add screenshots ther
 2. Download and run `setup.exe`.
 3. Install and launch System & Game Manager.
 4. Review the detected library, select games, and save their audio settings.
-5. Set a theme or optional name under **Settings**. Keep the app open for game detection and audio automation.
+5. Set a theme or optional name under **Settings**. Enable background running, then choose whether closing the window keeps the app in the system tray and whether it starts with Windows.
 
 ## How to use (Dev)
 
@@ -61,6 +62,7 @@ dotnet publish -c Release -r win-x64 --self-contained false
 
 - On startup, the app checks known registry locations and launcher folders, reads Steam library folders when available, and combines matching game paths.
 - Game and user settings are persisted in a local SQLite database. The user row has a generated UUID and optional name and theme.
+- When background running and close-to-background are enabled, closing the window hides the app to its system-tray icon; optional Windows startup behavior is registered for the current user.
 - While the GUI is open, the app checks the foreground process path to recognize a configured game and applies the supported music-volume and output-device settings.
 - When no configured game is active, it restores the previous music volume and output device.
 - The interface is an HTML/CSS/JavaScript app displayed in WebView2; its JavaScript API sends requests to the C# backend.

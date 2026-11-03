@@ -14,6 +14,14 @@
     <button type="button" onclick="saveUserName()">Save</button>
 </section>
 
+<section class="user-settings">
+    <h2>Background and Startup</h2>
+    <label><input type="checkbox" id="enable-background-running" onchange="saveBackgroundSettings()"> Allow the app to run in the background</label>
+    <label><input type="checkbox" id="close-to-background" onchange="saveBackgroundSettings()"> Keep running when closed with the X button</label>
+    <label><input type="checkbox" id="start-with-windows" onchange="saveBackgroundSettings()"> Start the app when Windows starts</label>
+    <label><input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()"> Start in the background</label>
+</section>
+
 <section class="hotkeys collapsable">
 <h2>HotKeys</h2>
 <div>

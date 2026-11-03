@@ -117,6 +117,17 @@ function handleUserSettings(settings) {
     userSettings = settings;
     const nameInput = document.getElementById("user-name");
     if (nameInput) nameInput.value = settings.Name ?? "";
+    const enableBackgroundRunning = document.getElementById("enable-background-running");
+    const closeToBackground = document.getElementById("close-to-background");
+    const startWithWindows = document.getElementById("start-with-windows");
+    const startInBackground = document.getElementById("start-in-background");
+    if (enableBackgroundRunning && closeToBackground && startWithWindows && startInBackground) {
+        enableBackgroundRunning.checked = settings.EnableBackgroundRunning ?? false;
+        closeToBackground.checked = settings.CloseToBackground ?? false;
+        startWithWindows.checked = settings.StartWithWindows ?? false;
+        startInBackground.checked = settings.StartInBackground ?? false;
+        updateBackgroundSettingsAvailability();
+    }
 
     if (settings.Theme) {
         document.body.className = settings.Theme;
@@ -134,4 +145,41 @@ function changeTheme(theme) {
     localStorage.setItem('theme', theme);
     userSettings = { ...(userSettings ?? {}), Theme: theme };
     api.setUserTheme(theme);
+}
+
+function updateBackgroundSettingsAvailability() {
+    const enableBackgroundRunning = document.getElementById("enable-background-running");
+    const closeToBackground = document.getElementById("close-to-background");
+    const startWithWindows = document.getElementById("start-with-windows");
+    const startInBackground = document.getElementById("start-in-background");
+    if (!enableBackgroundRunning || !closeToBackground || !startWithWindows || !startInBackground) return;
+
+    const enabled = enableBackgroundRunning.checked;
+    closeToBackground.disabled = !enabled;
+    startWithWindows.disabled = !enabled;
+    startInBackground.disabled = !enabled || !startWithWindows.checked;
+
+    if (!enabled) {
+        closeToBackground.checked = false;
+        startWithWindows.checked = false;
+        startInBackground.checked = false;
+    } else if (!startWithWindows.checked) {
+        startInBackground.checked = false;
+    }
+}
+
+function saveBackgroundSettings() {
+    updateBackgroundSettingsAvailability();
+    const enableBackgroundRunning = document.getElementById("enable-background-running");
+    const closeToBackground = document.getElementById("close-to-background");
+    const startWithWindows = document.getElementById("start-with-windows");
+    const startInBackground = document.getElementById("start-in-background");
+    if (!enableBackgroundRunning || !closeToBackground || !startWithWindows || !startInBackground) return;
+
+    api.setUserBackgroundSettings({
+        EnableBackgroundRunning: enableBackgroundRunning.checked,
+        CloseToBackground: closeToBackground.checked,
+        StartWithWindows: startWithWindows.checked,
+        StartInBackground: startInBackground.checked
+    });
 }

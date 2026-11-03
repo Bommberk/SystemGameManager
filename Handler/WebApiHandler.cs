@@ -7,9 +7,10 @@ using SystemGameManager.Games.Entity;
 using SystemGameManager.AudioManager.Service;
 using SystemGameManager.Plugin.HotKeys;
 using SystemGameManager.User.Entity;
+using SystemGameManager.User.Service;
 public static class WebApiHandler
 {
-    public static void Initialize(WebView2 web)
+    public static void Initialize(WebView2 web, Action<User>? onUserSettingsUpdated = null)
     {
         web.CoreWebView2.WebMessageReceived += async (_, e) =>
         {
@@ -24,7 +25,7 @@ public static class WebApiHandler
             }
             else if (request.Action.StartsWith("set"))
             {
-                await setMethod(request);
+                await setMethod(request, onUserSettingsUpdated);
             }else
             {
                 if(request.Action == "changeGameImage")
@@ -54,7 +55,7 @@ public static class WebApiHandler
         };
     }
 
-    private static async Task setMethod(ApiRequest request)
+    private static async Task setMethod(ApiRequest request, Action<User>? onUserSettingsUpdated)
     {
         switch (request.Action)
         {
@@ -72,6 +73,9 @@ public static class WebApiHandler
                 break;
             case "setUserTheme":
                 await SetUserTheme(request);
+                break;
+            case "setUserBackgroundSettings":
+                SetUserBackgroundSettings(request, onUserSettingsUpdated);
                 break;
             default:
                 MessageBox.Show($"Unknown set action: {request.Action}");
@@ -216,6 +220,27 @@ public static class WebApiHandler
         User.UpdateTheme(settings?.Theme);
     }
 
+    private static void SetUserBackgroundSettings(ApiRequest request, Action<User>? onUserSettingsUpdated)
+    {
+        var settings = JsonSerializer.Deserialize<UserBackgroundSettingsRequest>(request.Data?.ToString() ?? "{}");
+        var user = User.UpdateBackgroundSettings(
+            settings?.EnableBackgroundRunning ?? false,
+            settings?.CloseToBackground ?? false,
+            settings?.StartWithWindows ?? false,
+            settings?.StartInBackground ?? false);
+
+        try
+        {
+            UserStartupService.Update(user);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.Handle(ex, ErrorSeverity.Warning);
+        }
+
+        onUserSettingsUpdated?.Invoke(user);
+    }
+
     private static Action<string>? hotKeyCaptureHandler;
 
     private static void StartHotKeyCapture(WebView2 web)
@@ -277,5 +302,13 @@ public static class WebApiHandler
     {
         public string? Name { get; set; }
         public string? Theme { get; set; }
+    }
+
+    private sealed class UserBackgroundSettingsRequest
+    {
+        public bool EnableBackgroundRunning { get; set; }
+        public bool CloseToBackground { get; set; }
+        public bool StartWithWindows { get; set; }
+        public bool StartInBackground { get; set; }
     }
 }

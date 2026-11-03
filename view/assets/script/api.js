@@ -111,6 +111,12 @@ const api = {
             data: { Theme: theme }
         });
     },
+    setUserBackgroundSettings(settings){
+        window.chrome.webview.postMessage({
+            action: "setUserBackgroundSettings",
+            data: settings
+        });
+    },
     startHotKeyCapture(){
         window.chrome.webview.postMessage({
             action: "startHotKeyCapture"

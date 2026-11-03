@@ -5,15 +5,25 @@ using SystemGameManager.Games.Entity;
 using SystemGameManager.Handler;
 using SystemGameManager.Games.Controller;
 using SystemGameManager.Plugin.HotKeys;
+using SystemGameManager.User.Service;
+using UserEntity = SystemGameManager.User.Entity.User;
 
 namespace SystemGameManager.View2;
 
 public partial class MainForm : Form
 {
     private readonly GameAudioController gameAudioController = new ();
+    private NotifyIcon? notifyIcon;
+    private bool isExiting;
+    private readonly bool startInBackground;
 
-    public MainForm()
+    public MainForm(bool startInBackground = false)
     {
+        var userSettings = UserEntity.GetUser();
+        UserStartupService.Update(userSettings);
+        this.startInBackground = startInBackground && userSettings.EnableBackgroundRunning;
+        UpdateTrayIcon(userSettings.EnableBackgroundRunning);
+
         var web = new WebView2
         {
             Dock = DockStyle.Fill
@@ -31,7 +41,7 @@ public partial class MainForm : Form
             HotKeyListener.Start();
             await web.EnsureCoreWebView2Async();
 
-            WebApiHandler.Initialize(web);
+            WebApiHandler.Initialize(web, updatedUser => UpdateTrayIcon(updatedUser.EnableBackgroundRunning));
 
             var viewRoot = Path.Combine(AppContext.BaseDirectory, "view");
 
@@ -53,11 +63,65 @@ public partial class MainForm : Form
             web.Source = new Uri("https://systemgamemanager/index.html");
         };
 
+        Shown += (_, _) =>
+        {
+            if (this.startInBackground)
+            {
+                Hide();
+            }
+        };
+
+        FormClosing += (_, e) =>
+        {
+            var settings = UserEntity.GetUser();
+            if (!isExiting && settings.EnableBackgroundRunning && settings.CloseToBackground)
+            {
+                e.Cancel = true;
+                Hide();
+            }
+        };
+
         FormClosed += (_, _) =>
         {
             HotKeyListener.Stop();
             gameAudioController.Dispose();
+            if (notifyIcon is not null)
+            {
+                notifyIcon.ContextMenuStrip?.Dispose();
+                notifyIcon.Dispose();
+            }
         };
+    }
+
+    private void UpdateTrayIcon(bool enabled)
+    {
+        if (notifyIcon is null)
+        {
+            var menu = new ContextMenuStrip();
+            menu.Items.Add("Open", null, (_, _) => RestoreFromTray());
+            menu.Items.Add("Exit", null, (_, _) =>
+            {
+                isExiting = true;
+                Close();
+            });
+
+            notifyIcon = new NotifyIcon
+            {
+                Icon = SystemIcons.Application,
+                Text = "System Game Manager",
+                ContextMenuStrip = menu
+            };
+            notifyIcon.DoubleClick += (_, _) => RestoreFromTray();
+        }
+
+        notifyIcon.Visible = enabled;
+    }
+
+    private void RestoreFromTray()
+    {
+        Show();
+        WindowState = FormWindowState.Maximized;
+        Activate();
     }
 
     private static void ConfigureLocalImageRequests(CoreWebView2 webView)

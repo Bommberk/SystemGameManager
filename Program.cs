@@ -67,7 +67,7 @@ internal static class Program
                     GetInfoAsync();
                 }
 
-                RunForm();
+                RunForm(args.Any(arg => string.Equals(arg, "--background", StringComparison.OrdinalIgnoreCase)));
             }
         }
         catch (Exception ex)
@@ -98,10 +98,10 @@ internal static class Program
         gameAudioController.Dispose();
     }
 
-    private static void RunForm()
+    private static void RunForm(bool startInBackground)
     {
         ApplicationConfiguration.Initialize();
-        Application.Run(new MainForm());
+        Application.Run(new MainForm(startInBackground));
     }
 
     private static void WriteHeadline()

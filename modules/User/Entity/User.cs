@@ -11,6 +11,10 @@ public sealed class User
     public Guid UserId { get; set; } = Guid.NewGuid();
     public string? Name { get; set; }
     public string? Theme { get; set; }
+    public bool EnableBackgroundRunning { get; set; }
+    public bool CloseToBackground { get; set; }
+    public bool StartWithWindows { get; set; }
+    public bool StartInBackground { get; set; }
 
     public static User GetUser()
     {
@@ -49,6 +53,21 @@ public sealed class User
         var user = GetUser();
         user.Theme = SupportedThemes.First(supportedTheme =>
             string.Equals(supportedTheme, theme, StringComparison.OrdinalIgnoreCase));
+        SaveUser(user);
+        return user;
+    }
+
+    public static User UpdateBackgroundSettings(
+        bool enableBackgroundRunning,
+        bool closeToBackground,
+        bool startWithWindows,
+        bool startInBackground)
+    {
+        var user = GetUser();
+        user.EnableBackgroundRunning = enableBackgroundRunning;
+        user.CloseToBackground = enableBackgroundRunning && closeToBackground;
+        user.StartWithWindows = enableBackgroundRunning && startWithWindows;
+        user.StartInBackground = user.StartWithWindows && startInBackground;
         SaveUser(user);
         return user;
     }
