@@ -26,6 +26,9 @@ internal static class Program
     {
         #if DEBUG
         new GlobalDevConfig();
+        #else
+        // Autostart launches with System32 as working directory
+        Directory.SetCurrentDirectory(AppContext.BaseDirectory);
         #endif
 
         try

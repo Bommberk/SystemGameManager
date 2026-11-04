@@ -8,7 +8,7 @@ class LauncherService
 {
     public void SetKnownLaunchers()
     {
-        string path = "assets/game/knownLaunchers.json";
+        string path = Path.Combine(AppContext.BaseDirectory, "assets", "game", "knownLaunchers.json");
         string json = File.ReadAllText(path);
         Launcher.KnownLaunchers = JsonSerializer.Deserialize<Launcher[]>(json);
     }
