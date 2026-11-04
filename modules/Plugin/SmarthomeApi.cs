@@ -14,15 +14,15 @@ class SmarthomeApi
     public async Task<string> SendDeviceInfoAsync()
     {
         var pcInfo = new PcInfoController();
-        var deviceId = pcInfo.DeviceID;
-        if(string.IsNullOrEmpty(deviceId))
+        var publisherUuid = pcInfo.PublisherUUID;
+        if(string.IsNullOrEmpty(publisherUuid))
         {
-            throw new InvalidOperationException("Device ID is null or empty.");
+            throw new InvalidOperationException("Publisher UUID is null or empty.");
         }
         HttpClient client = new HttpClient();
         HttpRequestMessage request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"{_apiUrl}/receiveSystemGameManagerData?device_id={deviceId}"
+            $"{_apiUrl}/receiveSystemGameManagerData?device_id={publisherUuid}"
         );
         request.Headers.Add("Api-Key", _apiKey);
         var response = await client.SendAsync(request);
