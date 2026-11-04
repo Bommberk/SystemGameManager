@@ -25,7 +25,7 @@ public class PcInfoController
     public string? GPU { get; } = GetGpuInfo();
     public string? Battery { get; } = GetBatteryStatus();
     public StorageInfo Storage { get; } = GetStorageInfo();
-    public string? DeviceID { get; } = GetDeviceId();
+    public string? PublisherUUID { get; } = GetPublisherUuid();
 
     public void Write()
     {
@@ -375,7 +375,7 @@ public class PcInfoController
 
         return $"{charge}% - {statusText}";
     }
-    private static string? GetDeviceId()
+    private static string? GetPublisherUuid()
     {
         using var searcher = new ManagementObjectSearcher("SELECT UUID FROM Win32_ComputerSystemProduct");
         foreach (ManagementObject obj in searcher.Get())
