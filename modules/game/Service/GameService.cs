@@ -3,10 +3,16 @@ namespace SystemGameManager.Games.Service;
 using SystemGameManager.Games.Entity;
 using Microsoft.Win32;
 using System.Text.Json;
+using System.Drawing;
+using System.Text.RegularExpressions;
 using Windows.Management.Deployment;
 
 class GameService
 {
+    private static readonly Regex SteamInstallDirectoryPattern = new(
+        "\"installdir\"\\s+\"(?<installDirectory>[^\"]+)\"",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     public void SetInstalledGames()
     {
         var gamesFromFolders = GetGamesWithGameFolder();
@@ -246,21 +252,15 @@ class GameService
     {
         string userName = Environment.UserName;
         string imagesFolder = Path.Combine(@"C:\Users", userName, "Pictures");
-        if (!Directory.Exists(imagesFolder))
-            return;
 
-        // Search recursively for image files in the Pictures folder
         foreach (Game game in Game.InstalledGames ?? Array.Empty<Game>())
         {
-            // Skip if the game already has an image
             if (!string.IsNullOrEmpty(game.GameImage) && File.Exists(game.GameImage))
                 continue;
 
-            // Entfernt alle Sonderzeichen aus einem String (behält nur Buchstaben, Ziffern, Leerzeichen, Bindestrich, Unterstrich)
             static string StripSpecialChars(string s) =>
                 new string(s.Where(c => char.IsLetterOrDigit(c) || c == ' ' || c == '-' || c == '_').ToArray());
 
-            // Erzeuge verschiedene Varianten des Spielnamens (ohne Sonderzeichen)
             var cleanName = StripSpecialChars(game.Name);
             var nameVariants = new[]
             {
@@ -269,25 +269,114 @@ class GameService
                 cleanName.Replace(" ", "_")
             };
 
-            // Suche alle Bilddateien im Pictures-Ordner (rekursiv)
-            var imageFiles = Directory.GetFiles(imagesFolder, "*.*", SearchOption.AllDirectories)
-                .Where(file => file.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
-                            || file.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
-                            || file.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase));
+            string? foundImage = FindPictureImage(imagesFolder, nameVariants, StripSpecialChars);
+            if (foundImage is not null)
+                game.GameImage = foundImage;
 
-            // Vergleiche Dateinamen (ohne Erweiterung, ohne Sonderzeichen) mit den Varianten, case-insensitive
-            var foundImage = imageFiles.FirstOrDefault(file =>
-                nameVariants.Any(variant =>
+            if (string.IsNullOrEmpty(game.GameImage))
+                game.GameImage = FindGameFolderImage(game.InstallFolderPath);
+
+            if (string.IsNullOrEmpty(game.GameImage))
+                game.GameImage = FindSteamLibraryImage(game);
+        }
+    }
+
+    private static string? FindPictureImage(string imagesFolder, string[] nameVariants, Func<string, string> stripSpecialChars)
+    {
+        if (!Directory.Exists(imagesFolder))
+            return null;
+
+        try
+        {
+            return Directory.EnumerateFiles(imagesFolder, "*.*", SearchOption.AllDirectories)
+                .Where(IsSupportedImage)
+                .FirstOrDefault(file => nameVariants.Any(variant =>
                     string.Equals(
-                        StripSpecialChars(Path.GetFileNameWithoutExtension(file)),
+                        stripSpecialChars(Path.GetFileNameWithoutExtension(file)),
                         variant,
                         StringComparison.OrdinalIgnoreCase)));
+        }
+        catch (UnauthorizedAccessException) { return null; }
+        catch (IOException) { return null; }
+    }
 
-            if (foundImage != null)
+    private static string? FindGameFolderImage(string gameFolder)
+    {
+        if (!Directory.Exists(gameFolder))
+            return null;
+
+        try
+        {
+            return Directory.EnumerateFiles(gameFolder, "*.*", SearchOption.AllDirectories)
+                .Where(IsSupportedImage)
+                .FirstOrDefault(IsApproximately16By9);
+        }
+        catch (UnauthorizedAccessException) { return null; }
+        catch (IOException) { return null; }
+    }
+
+    private static string? FindSteamLibraryImage(Game game)
+    {
+        var steam = Launcher.InstalledLaunchers?.FirstOrDefault(launcher =>
+            string.Equals(launcher.Name, "Steam", StringComparison.OrdinalIgnoreCase)
+            && Directory.Exists(launcher.InstallPath));
+        if (steam?.GameFolderPath is null)
+            return null;
+
+        string gameFolderName = Path.GetFileName(game.InstallFolderPath);
+        try
+        {
+            foreach (string steamGamesFolder in steam.GameFolderPath)
             {
-                game.GameImage = foundImage;
+                string normalizedSteamGamesFolder = Path.TrimEndingDirectorySeparator(steamGamesFolder);
+                if (!game.InstallFolderPath.StartsWith(normalizedSteamGamesFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                string? steamAppsFolder = Directory.GetParent(steamGamesFolder)?.FullName;
+                if (steamAppsFolder is null)
+                    continue;
+
+                foreach (string manifestPath in Directory.EnumerateFiles(steamAppsFolder, "appmanifest_*.acf"))
+                {
+                    string manifest = File.ReadAllText(manifestPath);
+                    var manifestMatch = SteamInstallDirectoryPattern.Match(manifest);
+                    if (!manifestMatch.Success
+                        || !string.Equals(manifestMatch.Groups["installDirectory"].Value, gameFolderName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    string appId = Path.GetFileNameWithoutExtension(manifestPath)["appmanifest_".Length..];
+                    string libraryCache = Path.Combine(steam.InstallPath, "appcache", "librarycache");
+                    foreach (string imageName in new[] { $"{appId}_library_hero.jpg", $"{appId}_header.jpg", $"{appId}_library_600x900.jpg" })
+                    {
+                        string imagePath = Path.Combine(libraryCache, imageName);
+                        if (File.Exists(imagePath))
+                            return imagePath;
+                    }
+                }
             }
         }
+        catch (UnauthorizedAccessException) { return null; }
+        catch (IOException) { return null; }
+
+        return null;
+    }
+
+    private static bool IsSupportedImage(string file) =>
+        file.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+        || file.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
+        || file.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsApproximately16By9(string imagePath)
+    {
+        try
+        {
+            using var image = Image.FromFile(imagePath);
+            return Math.Abs((double)image.Width / image.Height - 16d / 9d) < 0.05;
+        }
+        catch (ArgumentException) { return false; }
+        catch (OutOfMemoryException) { return false; }
     }
 
     
