@@ -3,6 +3,9 @@
     .head
     {
         margin: 10px;
+        .content h2{
+            margin-left: 0!important;
+        }
     }
     .game-manager-image
     {    
