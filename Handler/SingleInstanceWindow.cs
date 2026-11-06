@@ -7,6 +7,8 @@ internal sealed class SingleInstanceWindow : NativeWindow, IDisposable
 {
     private static readonly uint ActivationMessage = RegisterWindowMessage("SystemGameManager.ActivateExistingInstance");
     private static readonly IntPtr Broadcast = new(0xffff);
+    private bool ready;
+    private bool pendingActivation;
 
     public SingleInstanceWindow()
     {
@@ -23,31 +25,47 @@ internal sealed class SingleInstanceWindow : NativeWindow, IDisposable
     {
         if (message.Msg == ActivationMessage)
         {
-            var form = Application.OpenForms.OfType<MainForm>().FirstOrDefault(f => f.Opacity > 0)
-                ?? Application.OpenForms.Cast<Form>().FirstOrDefault(f => f.Visible);
-            if (form is MainForm mainForm)
-            {
-                mainForm.RestoreFromTray();
-            }
-            else if (form is not null)
-            {
-                if (form.WindowState == FormWindowState.Minimized)
-                    form.WindowState = FormWindowState.Normal;
-                form.Show();
-                form.Activate();
-            }
-            else
-            {
-                var console = GetConsoleWindow();
-                if (console != IntPtr.Zero)
-                {
-                    ShowWindow(console, 9);
-                    SetForegroundWindow(console);
-                }
-            }
+            pendingActivation = true;
+            ActivatePending();
         }
 
         base.WndProc(ref message);
+    }
+
+    public void Ready()
+    {
+        ready = true;
+        ActivatePending();
+    }
+
+    private void ActivatePending()
+    {
+        if (!ready || !pendingActivation)
+            return;
+
+        pendingActivation = false;
+        var form = Application.OpenForms.OfType<MainForm>().FirstOrDefault(f => f.Opacity > 0)
+            ?? Application.OpenForms.Cast<Form>().FirstOrDefault(f => f.Visible);
+        if (form is MainForm mainForm)
+        {
+            mainForm.RestoreFromTray();
+        }
+        else if (form is not null)
+        {
+            if (form.WindowState == FormWindowState.Minimized)
+                form.WindowState = FormWindowState.Normal;
+            form.Show();
+            form.Activate();
+        }
+        else
+        {
+            var console = GetConsoleWindow();
+            if (console != IntPtr.Zero)
+            {
+                ShowWindow(console, 9);
+                SetForegroundWindow(console);
+            }
+        }
     }
 
     public void Dispose() => DestroyHandle();

@@ -44,6 +44,7 @@ internal static class Program
 
         try
         {
+            ApplicationConfiguration.Initialize();
             using var activationWindow = new SingleInstanceWindow();
             using var mutex = new Mutex(true, @"Local\SystemGameManager.SingleInstance", out var isFirstInstance);
             if (!isFirstInstance)
@@ -54,14 +55,9 @@ internal static class Program
 
             var isConsole = args.Length > 0 && args[0] == "--console";
             var startInBackground = args.Any(arg => string.Equals(arg, "--background", StringComparison.OrdinalIgnoreCase));
-            if (!isConsole)
-            {
-                ApplicationConfiguration.Initialize();
-            }
-
             if (!isConsole && !startInBackground)
             {
-                RunWithStartupWindow(args);
+                RunWithStartupWindow(args, activationWindow);
                 return;
             }
 
@@ -69,12 +65,12 @@ internal static class Program
 
             if (isConsole)
             {
-                RunConsole();
+                RunConsole(activationWindow);
             }
             else
             {
                 PrepareApplication(args);
-                RunForm(startInBackground);
+                RunForm(startInBackground, activationWindow);
             }
         }
         catch (Exception ex)
@@ -84,7 +80,7 @@ internal static class Program
 
     }
 
-    private static void RunConsole()
+    private static void RunConsole(SingleInstanceWindow activationWindow)
     {
         GetInfoAsync();
 
@@ -100,21 +96,25 @@ internal static class Program
         // The hotkey hook and raw input window need a message loop on this thread
         SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
         HotKeyListener.Start();
+        activationWindow.Ready();
         Application.Run();
         HotKeyListener.Stop();
         gameAudioController.Dispose();
     }
 
-    private static void RunForm(bool startInBackground)
+    private static void RunForm(bool startInBackground, SingleInstanceWindow activationWindow)
     {
-        Application.Run(new MainForm(startInBackground));
+        var form = new MainForm(startInBackground);
+        form.Shown += (_, _) => activationWindow.Ready();
+        Application.Run(form);
     }
 
-    private static void RunWithStartupWindow(string[] args)
+    private static void RunWithStartupWindow(string[] args, SingleInstanceWindow activationWindow)
     {
         var startupForm = CreateStartupForm();
         using var context = new ApplicationContext(startupForm);
 
+        startupForm.Shown += (_, _) => activationWindow.Ready();
         startupForm.Shown += async (_, _) =>
         {
             try
