@@ -27,6 +27,7 @@ System & Game Manager is a Windows desktop app for managing installed games, gam
 ### 5) Set user preferences
 - Change the app theme using the existing Dark, Light, Red, Pink, and Yellow settings.
 - Enable background running, choose whether closing the window keeps the app in the system tray, and optionally start with Windows either minimized to the tray or fully open.
+- Launching the app again opens the existing window, including when it is running in the system tray.
 - Optionally save a user name. User preferences are stored locally in the SQLite database; login and registration are not implemented.
 
 ## Preview
