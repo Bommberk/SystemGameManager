@@ -44,6 +44,14 @@ internal static class Program
 
         try
         {
+            using var activationWindow = new SingleInstanceWindow();
+            using var mutex = new Mutex(true, @"Local\SystemGameManager.SingleInstance", out var isFirstInstance);
+            if (!isFirstInstance)
+            {
+                SingleInstanceWindow.ActivateExisting();
+                return;
+            }
+
             var isConsole = args.Length > 0 && args[0] == "--console";
             var startInBackground = args.Any(arg => string.Equals(arg, "--background", StringComparison.OrdinalIgnoreCase));
             if (!isConsole)

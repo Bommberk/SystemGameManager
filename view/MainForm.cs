@@ -128,7 +128,7 @@ public partial class MainForm : Form
         notifyIcon.Visible = enabled;
     }
 
-    private void RestoreFromTray()
+    internal void RestoreFromTray()
     {
         Show();
         WindowState = FormWindowState.Maximized;
