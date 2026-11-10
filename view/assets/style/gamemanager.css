@@ -1,11 +1,8 @@
 .gamemanager.container
 {
-    .head
+    .head .section-headline
     {
-        margin: 10px;
-        .content h2{
-            margin-left: 0!important;
-        }
+        text-indent: 0;
     }
     .game-manager-image
     {    
@@ -23,7 +20,6 @@
             flex-wrap: wrap;
             max-height: 200px;
             overflow: initial;
-            padding: 10px;
             padding-bottom: 15px;
             .launcher{
                 width: fit-content;
@@ -39,7 +35,6 @@
     {
         margin-top: 20px;
         .audiosettings-form{
-            margin-left: 10px;
             margin-top: 10px;
             display: flex;
             align-items: stretch;
@@ -98,7 +93,6 @@
             display: grid;
             gap: 15px;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            padding: 10px;
             padding-top: 0;
             .game{
                 display: flex;

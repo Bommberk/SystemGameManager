@@ -4,7 +4,7 @@
     <section class="head card">
         <img id="gameManagerImage" src="../assets/images/logos/sysgamemanager_logo.png" alt="Game Manager" class="game-manager-image">
         <div class="content">
-            <h2>Game Manager</h2>
+            <h2 class="section-headline">Game Manager</h2>
             <p><span id="gameAmount">0</span> Spiele - <span id="launcherAmount">0</span> Launcher</p>
             <p>Launcher, Spiele und schnelle Aktionen auf einen Blick.</p>
         </div>
@@ -14,7 +14,7 @@
         <div class="launcherlist content" id="launcherlist"></div>
     </section>
     <section class="audiomanagement collapsable">
-        <h2>Audio Einstellungen</h2>
+        <h2 class="section-headline">Audio Einstellungen</h2>
         <div class="audiosettings-form card content">
             <div class="select-game">
                 <div class="search">
@@ -80,7 +80,7 @@
         </div>
     </section>
     <section class="games">
-        <h2>Spiele <span id="gameAmountAfterFilter"></span></h2>
+        <h2 class="section-headline">Spiele <span id="gameAmountAfterFilter"></span></h2>
         <div class="gamelist" id="gamelist">
             <div class="game card content">
                 <img src="${getGameImageUrl(game.GameImage)}" alt="${game.Name} image" onerror="this.src='../assets/images/bild.jpg';" onclick="selectGame('${game.SerializedGameName}')">

@@ -82,7 +82,7 @@
 {
     --page-offset: var(--sidebar-width);
     margin-left: var(--sidebar-width);
-    padding: 15px;
+    padding: 25px;
     transition: 0.2s ease-out;
 }
 #sidebar.collapsed + #page
