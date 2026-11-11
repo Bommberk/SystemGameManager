@@ -1,37 +1,76 @@
 <link rel="stylesheet" href="assets/style/settings.css">
 <div class="settings container">
-    <div class="head card">
+    <section class="head">
         <i class="fa-solid fa-gear"></i>
-        <h2>Settings</h2>
-    </div>
-
-    <div class="section">
-        <h2>Change Theme</h2>
-        <div class="card">
-            <button onclick="changeTheme('dark')">Dark</button>
-            <button onclick="changeTheme('light')">Light</button>
-            <button onclick="changeTheme('red')">Red</button>
-            <button onclick="changeTheme('pink')">Pink</button>
-            <button onclick="changeTheme('yellow')">Yellow</button>
+        <div class="content">
+            <h2 class="head-title">Settings</h2>
+            <p>Configure your application settings</p>
         </div>
+    </section>
+
+    <section class="theme">
+        <div class="content card">
+            <div class="discription">
+                <i class="fa-solid fa-palette"></i>
+                <div class="discription-text">
+                    <h2>Theme</h2>
+                    <p>Select your preferred color-theme for the application.</p>
+                </div>
+            </div>
+            <div class="theme-options">
+                <button id="theme-button-dark" onclick="changeTheme('dark')">Dark</button>
+                <button id="theme-button-light" onclick="changeTheme('light')">Light</button>
+                <button id="theme-button-red" onclick="changeTheme('red')">Red</button>
+                <button id="theme-button-pink" onclick="changeTheme('pink')">Pink</button>
+                <button id="theme-button-yellow" onclick="changeTheme('yellow')">Yellow</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- usersection and startup settings -->
+    
+    <div class="section-1-2">
+        <section class="user-settings card">
+            <div class="content">
+                <div class="discription">
+                    <i class="fa-solid fa-user"></i>
+                    <div class="discription-text">
+                        <h2>User Settings</h2>
+                        <p>Configure your user settings for the application.</p>
+                    </div>
+                </div>
+                <div class="form-element">
+                    <label for="user-name">Name:</label>
+                    <input type="text" id="user-name">
+                    <button type="submit" onclick="saveUserName()" class="save-btn">
+                        <i class="fa-solid fa-floppy-disk save-icon"></i>
+                        <i class="fa-solid fa-check check-icon"></i>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="app-behavior card">
+            <div class="content">
+                <div class="discription">
+                    <i class="fa-solid fa-rocket"></i>
+                    <div class="discription-text">
+                        <h2>Background and Startup</h2>
+                        <p>Control how and when the app starts.</p>
+                    </div>
+                </div>
+                <div class="behavior-options">
+                    <label><input type="checkbox" id="enable-background-running" onchange="saveBackgroundSettings()"> Allow the app to run in the background</label>
+                    <label><input type="checkbox" id="close-to-background" onchange="saveBackgroundSettings()"> Keep running when closed with the X button</label>
+                    <label><input type="checkbox" id="start-with-windows" onchange="saveBackgroundSettings()"> Start the app when Windows starts</label>
+                    <label><input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()"> Start in the background</label>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <section class="user-settings card">
-        <h2>User Settings</h2>
-        <label for="user-name">Name</label>
-        <input type="text" id="user-name">
-        <button type="button" onclick="saveUserName()">Save</button>
-    </section>
-
-    <section class="user-settings">
-        <h2>Background and Startup</h2>
-        <label><input type="checkbox" id="enable-background-running" onchange="saveBackgroundSettings()"> Allow the app to run in the background</label>
-        <label><input type="checkbox" id="close-to-background" onchange="saveBackgroundSettings()"> Keep running when closed with the X button</label>
-        <label><input type="checkbox" id="start-with-windows" onchange="saveBackgroundSettings()"> Start the app when Windows starts</label>
-        <label><input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()"> Start in the background</label>
-    </section>
-
-    <section class="user-settings">
+    <section class="">
         <h2>Wallpaper</h2>
         <p>Default wallpaper (restored when no game is running): <span id="default-wallpaper-path"></span></p>
         <img id="default-wallpaper-preview" alt="Default wallpaper preview" style="max-width: 320px;" hidden>

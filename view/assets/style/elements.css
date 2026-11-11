@@ -67,9 +67,13 @@ option
 .save-btn
 {
     display: flex;
+    justify-content: center;
     gap: 5px;
     &:hover{
         border-color: var(--secondary-text-color) !important;
+    }
+    i{
+        margin: 0;
     }
     i.save-icon{
         transform: translateY(2px);
@@ -141,9 +145,14 @@ select{
     border-radius: 5px;
 }
 
-section .section-headline
+section .section-title
 {
     text-indent: 8px;
+}
+
+.head.head-title
+{
+    text-indent: 0px;
 }
 
 .close-modal{

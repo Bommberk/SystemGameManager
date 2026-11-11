@@ -132,6 +132,7 @@ function handleUserSettings(settings) {
     if (settings.Theme) {
         document.body.className = settings.Theme;
         localStorage.setItem("theme", settings.Theme);
+        updateActiveThemeButton();
     }
 
     const defaultWallpaperPath = document.getElementById("default-wallpaper-path");
@@ -179,8 +180,16 @@ function saveUserName() {
     if (nameInput) api.setUserName(nameInput.value);
 }
 
+function updateActiveThemeButton() {
+    const activeTheme = document.body.className || "dark";
+    document.querySelectorAll(".theme-options button").forEach(button => {
+        button.classList.toggle("active", button.id === `theme-button-${activeTheme}`);
+    });
+}
+
 function changeTheme(theme) {
     document.body.className = theme;
+    updateActiveThemeButton();
     localStorage.setItem('theme', theme);
     userSettings = { ...(userSettings ?? {}), Theme: theme };
     api.setUserTheme(theme);

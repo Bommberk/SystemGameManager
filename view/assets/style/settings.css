@@ -1,13 +1,90 @@
 .settings.container
 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     .head
     {
-        margin: 10px;
+        display: flex;
+        align-items: center;
         i{
-            font-size: 1.3em;
+            font-size: 1.4em;
         }
-        h2{
-            margin-left: 10px;
+        .content
+        {
+            display: flex;
+            flex-direction: column;
+            margin-left: 16px;
+        }
+    }
+
+    /* section discription */
+    .discription
+    {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        i{
+            font-size: 1.4em;
+        }
+        .discription-text
+        {
+            margin-left: 16px;
+        }
+    }
+
+    /* Theme section */
+    section.theme .content
+    {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .theme-options
+        {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            button{
+                font-size: 1em;
+                &.active
+                {
+                    background-color: var(--secondary-text-color);
+                    color: var(--primary-text-color);
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+
+    /* usersettings */
+    section.user-settings .content
+    {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        .form-element
+        {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            input{
+                width: 70%;
+            }
+            button{
+                width: 15%;
+            }
+        }
+    }
+
+    /* app behavior */
+    section.app-behavior .content
+    {
+
+        .behavior-options
+        {
+            margin-top: 10px;
+            
         }
     }
 
