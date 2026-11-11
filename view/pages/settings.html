@@ -61,16 +61,30 @@
                     </div>
                 </div>
                 <div class="behavior-options">
-                    <label><input type="checkbox" id="enable-background-running" onchange="saveBackgroundSettings()"> Allow the app to run in the background</label>
-                    <label><input type="checkbox" id="close-to-background" onchange="saveBackgroundSettings()"> Keep running when closed with the X button</label>
-                    <label><input type="checkbox" id="start-with-windows" onchange="saveBackgroundSettings()"> Start the app when Windows starts</label>
-                    <label><input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()"> Start in the background</label>
+                    <label class="checkbox-label main-option">
+                        <input type="checkbox" id="enable-background-running" onchange="saveBackgroundSettings()">
+                        <span>Allow the app to run in the background</span>
+                    </label>
+                    <label class="checkbox-label main-option">
+                        <input type="checkbox" id="start-with-windows" onchange="saveBackgroundSettings()">
+                        <span>Start the app when Windows starts</span>
+                    </label>
+                    <div class="sub-options">
+                        <label class="checkbox-label sub-option">
+                            <input type="checkbox" id="close-to-background" onchange="saveBackgroundSettings()" disabled>
+                            <span>Keep running when closed with the X button</span>
+                        </label>
+                        <label class="checkbox-label sub-option">
+                            <input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()" disabled>
+                            <span>Start in the background</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <section class="">
+    <section class="select-wallpaper card">
         <h2>Wallpaper</h2>
         <p>Default wallpaper (restored when no game is running): <span id="default-wallpaper-path"></span></p>
         <img id="default-wallpaper-preview" alt="Default wallpaper preview" style="max-width: 320px;" hidden>
@@ -83,7 +97,7 @@
         <button type="button" onclick="resetLivelyExe()">Detect automatically</button>
     </section>
 
-    <section class="hotkeys collapsable">
+    <section class="hotkeys card">
         <h2>HotKeys</h2>
         <div>
             <table class="hotkey-table">

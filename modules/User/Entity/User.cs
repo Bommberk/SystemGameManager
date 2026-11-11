@@ -69,8 +69,8 @@ public sealed class User
         var user = GetUser();
         user.EnableBackgroundRunning = enableBackgroundRunning;
         user.CloseToBackground = enableBackgroundRunning && closeToBackground;
-        user.StartWithWindows = enableBackgroundRunning && startWithWindows;
-        user.StartInBackground = user.StartWithWindows && startInBackground;
+        user.StartWithWindows = startWithWindows;
+        user.StartInBackground = enableBackgroundRunning && startWithWindows && startInBackground;
         SaveUser(user);
         return user;
     }

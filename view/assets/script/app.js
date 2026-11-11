@@ -202,16 +202,14 @@ function updateBackgroundSettingsAvailability() {
     const startInBackground = document.getElementById("start-in-background");
     if (!enableBackgroundRunning || !closeToBackground || !startWithWindows || !startInBackground) return;
 
-    const enabled = enableBackgroundRunning.checked;
-    closeToBackground.disabled = !enabled;
-    startWithWindows.disabled = !enabled;
-    startInBackground.disabled = !enabled || !startWithWindows.checked;
+    const backgroundEnabled = enableBackgroundRunning.checked;
+    closeToBackground.disabled = !backgroundEnabled;
+    startInBackground.disabled = !backgroundEnabled || !startWithWindows.checked;
 
-    if (!enabled) {
+    if (closeToBackground.disabled) {
         closeToBackground.checked = false;
-        startWithWindows.checked = false;
-        startInBackground.checked = false;
-    } else if (!startWithWindows.checked) {
+    }
+    if (startInBackground.disabled) {
         startInBackground.checked = false;
     }
 }
