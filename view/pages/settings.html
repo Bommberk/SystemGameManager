@@ -28,7 +28,6 @@
     </section>
 
     <!-- usersection and startup settings -->
-    
     <div class="section-1-2">
         <section class="user-settings card">
             <div class="content">
@@ -85,29 +84,70 @@
     </div>
 
     <section class="select-wallpaper card">
-        <h2>Wallpaper</h2>
-        <p>Default wallpaper (restored when no game is running): <span id="default-wallpaper-path"></span></p>
-        <img id="default-wallpaper-preview" alt="Default wallpaper preview" style="max-width: 320px;" hidden>
-        <p>Detected Windows wallpaper: <span id="windows-wallpaper-path"></span></p>
-        <button type="button" onclick="api.selectDefaultWallpaper()">Choose default wallpaper</button>
-        <button type="button" onclick="resetDefaultWallpaper()">Use Windows wallpaper</button>
-        <p>Lively executable: <span id="lively-exe-path"></span></p>
-        <p id="lively-status"></p>
-        <button type="button" onclick="api.selectLivelyExe()">Choose livelycu.exe</button>
-        <button type="button" onclick="resetLivelyExe()">Detect automatically</button>
+        <div class="content">
+            <div class="discription">
+                <i class="fa-solid fa-image"></i>
+                <div class="discription-text">
+                    <h2>Wallpaper</h2>
+                    <p>Control the wallpaper settings for the app.</p>
+                </div>
+            </div>
+            <div class="wallpaper-options">
+                <img id="default-wallpaper-preview" alt="Default wallpaper preview" style="max-width: 320px;" hidden>
+                <hr>
+                <div class="wallpaper-infos">
+                    <div class="discription">
+                        <i class="fa-solid fa-desktop"></i>
+                        <div class="discription-text">
+                            <h3>Default Wallpaper <span> (restored when no game is running)</span></h3>
+                            <p id="default-wallpaper-path"></p>
+                        </div>
+                    </div>
+                    <div class="discription">
+                        <i class="fa-solid fa-desktop"></i>
+                        <div class="discription-text">
+                            <h3>Detected Windows wallpaper</h3>
+                            <p id="windows-wallpaper-path"></p>
+                        </div>
+                    </div>
+                    <div class="choose-image" style="margin-top: 20px;">
+                        <button type="button" onclick="api.selectDefaultWallpaper()">Choose default wallpaper</button>
+                        <button type="button" onclick="resetDefaultWallpaper()">Use Windows wallpaper</button>
+                    </div>
+                    <div class="discription" style="margin: 10px 0;">
+                        <i class="fa-solid fa-window-maximize"></i>
+                        <div class="discription-text">
+                            <h3>Lively Wallpaper</h3>
+                            <p id="lively-wallpaper-path"></p>
+                        </div>
+                    </div>
+                    <div class="detect-lively">
+                        <button type="button" onclick="api.selectLivelyExe()">Choose livelycu.exe</button>
+                        <button type="button" onclick="resetLivelyExe()">Detect automatically</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section class="hotkeys card">
-        <h2>HotKeys</h2>
-        <div>
+        <div class="content">
+            <div class="discription">
+                <i class="fa-solid fa-keyboard"></i>
+                <div class="discription-text">
+                    <h2>HotKeys</h2>
+                    <p>Manage custom key combinations for in-app actions.</p>
+                </div>
+            </div>
+            <div class="new-hotkey">
+                <button type="button" onclick="openHotKeyModal()" class="new-hotkey-btn">Neuer Hotkey</button>
+            </div>
             <table class="hotkey-table">
                 <thead>
                     <tr><th>Name</th><th>Music volume (%)</th><th>Game volume (%)</th><th>Output device</th><th>Description</th><th>Key combination</th><th></th></tr>
                 </thead>
                 <tbody id="hotkey-list"></tbody>
             </table>
-            <button type="button" onclick="openHotKeyModal()">Neuer Hotkey</button>
-
             <div class="modal hotkey-modal" id="hotkey-modal">
                 <i class="fa-solid fa-xmark close-modal" role="button" onclick="closeHotKeyModal()"></i>
                 <h3 class="modal-title">Neuer Hotkey</h3>

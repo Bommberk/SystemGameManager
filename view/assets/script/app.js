@@ -145,6 +145,7 @@ function handleUserSettings(settings) {
     }
     const livelyExePath = document.getElementById("lively-exe-path");
     if (livelyExePath) livelyExePath.textContent = settings.LivelyExePath ?? "Automatic detection";
+    updateWallpaperButtonStates(settings);
 }
 
 let detectedWallpaperInfo = null;
@@ -159,12 +160,15 @@ function handleDetectedWallpaperInfo(info) {
     }
     const windowsWallpaper = document.getElementById("windows-wallpaper-path");
     if (windowsWallpaper) windowsWallpaper.textContent = info.WindowsWallpaperPath ?? "not detected";
+    const livelyWallpaper = document.getElementById("lively-wallpaper-path");
+    if (livelyWallpaper) livelyWallpaper.textContent = info.LivelyExePath ?? "not detected";
     handleUserSettings(userSettings);
 }
 
 function resetDefaultWallpaper() {
     api.setUserWallpaperSettings({ DefaultWallpaperPath: null, LivelyExePath: userSettings?.LivelyExePath ?? null });
     userSettings = { ...(userSettings ?? {}), DefaultWallpaperPath: null };
+    updateWallpaperButtonStates(userSettings);
     handleUserSettings(userSettings);
 }
 
@@ -228,4 +232,19 @@ function saveBackgroundSettings() {
         StartWithWindows: startWithWindows.checked,
         StartInBackground: startInBackground.checked
     });
+}
+
+function updateWallpaperButtonStates(settings) {
+    const chooseDefaultBtn = document.querySelector('.choose-image button:first-child');
+    const useWindowsBtn = document.querySelector('.choose-image button:nth-child(2)');
+    
+    if (chooseDefaultBtn && useWindowsBtn) {
+        if (settings.DefaultWallpaperPath) {
+            chooseDefaultBtn.classList.add("active");
+            useWindowsBtn.classList.remove("active");
+        } else {
+            chooseDefaultBtn.classList.remove("active");
+            useWindowsBtn.classList.add("active");
+        }
+    }
 }
