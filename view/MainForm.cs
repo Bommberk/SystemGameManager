@@ -17,6 +17,7 @@ public partial class MainForm : Form
     private NotifyIcon? notifyIcon;
     private bool isExiting;
     private readonly bool startInBackground;
+    private readonly System.Windows.Forms.Timer windowSettingsTimer = new() { Interval = 500 };
 
     public Task Initialization => initializationCompletion.Task;
 
@@ -35,9 +36,17 @@ public partial class MainForm : Form
         Text = "System Game Manager v" + GlobalConfig.Settings.AppConfig.Version;
         if(!GlobalConfig.Settings.AppConfig.State.Equals("stable", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(GlobalConfig.Settings.AppConfig.State))
             Text += " - " + GlobalConfig.Settings.AppConfig.State;
-        WindowState = FormWindowState.Maximized;
+        RestoreWindowSettings(userSettings);
 
         Controls.Add(web);
+
+        Move += (_, _) => ScheduleWindowSettingsSave();
+        Resize += (_, _) => ScheduleWindowSettingsSave();
+        windowSettingsTimer.Tick += (_, _) =>
+        {
+            windowSettingsTimer.Stop();
+            SaveWindowSettings();
+        };
 
         Load += async (_, _) =>
         {
@@ -85,6 +94,7 @@ public partial class MainForm : Form
         FormClosing += (_, e) =>
         {
             var settings = UserEntity.GetUser();
+            SaveWindowSettings(settings);
             if (!isExiting && settings.EnableBackgroundRunning && settings.CloseToBackground)
             {
                 e.Cancel = true;
@@ -96,6 +106,7 @@ public partial class MainForm : Form
         {
             HotKeyListener.Stop();
             gameAudioController.Dispose();
+            windowSettingsTimer.Dispose();
             if (notifyIcon is not null)
             {
                 notifyIcon.ContextMenuStrip?.Dispose();
@@ -131,8 +142,68 @@ public partial class MainForm : Form
     internal void RestoreFromTray()
     {
         Show();
-        WindowState = FormWindowState.Maximized;
         Activate();
+    }
+
+    private void RestoreWindowSettings(UserEntity settings)
+    {
+        if (settings.WindowX is int x
+            && settings.WindowY is int y
+            && settings.WindowWidth is > 0 and int width
+            && settings.WindowHeight is > 0 and int height)
+        {
+            var bounds = new Rectangle(x, y, width, height);
+            if (!Screen.AllScreens.Any(screen => screen.WorkingArea.IntersectsWith(bounds)))
+            {
+                var area = Screen.PrimaryScreen?.WorkingArea ?? Screen.AllScreens[0].WorkingArea;
+                width = Math.Min(width, area.Width);
+                height = Math.Min(height, area.Height);
+                bounds = new Rectangle(
+                    Math.Clamp(x, area.Left, area.Right - width),
+                    Math.Clamp(y, area.Top, area.Bottom - height),
+                    width,
+                    height);
+            }
+
+            StartPosition = FormStartPosition.Manual;
+            Bounds = bounds;
+            WindowState = settings.IsWindowMaximized == true
+                ? FormWindowState.Maximized
+                : FormWindowState.Normal;
+            return;
+        }
+
+        WindowState = FormWindowState.Maximized;
+    }
+
+    private void ScheduleWindowSettingsSave()
+    {
+        if (WindowState != FormWindowState.Minimized)
+        {
+            windowSettingsTimer.Stop();
+            windowSettingsTimer.Start();
+        }
+    }
+
+    private void SaveWindowSettings()
+    {
+        SaveWindowSettings(UserEntity.GetUser());
+    }
+
+    private void SaveWindowSettings(UserEntity settings)
+    {
+        if (WindowState == FormWindowState.Minimized)
+        {
+            return;
+        }
+
+        var bounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
+        settings.WindowX = bounds.X;
+        settings.WindowY = bounds.Y;
+        settings.WindowWidth = bounds.Width;
+        settings.WindowHeight = bounds.Height;
+        settings.IsWindowMaximized = WindowState == FormWindowState.Maximized;
+        UserEntity.SaveUser(settings);
     }
 
     private static void ConfigureLocalImageRequests(CoreWebView2 webView)
