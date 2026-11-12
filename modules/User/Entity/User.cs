@@ -16,6 +16,11 @@ public sealed class User
     public bool CloseToBackground { get; set; }
     public bool StartWithWindows { get; set; }
     public bool StartInBackground { get; set; }
+    public int? WindowX { get; set; }
+    public int? WindowY { get; set; }
+    public int? WindowWidth { get; set; }
+    public int? WindowHeight { get; set; }
+    public bool? IsWindowMaximized { get; set; }
     public string? DefaultWallpaperPath { get; set; }
     public string? LivelyExePath { get; set; }
 
