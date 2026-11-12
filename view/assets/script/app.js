@@ -1,5 +1,5 @@
 loadSidebar();
-loadPage("settings");
+loadPage("gamemanager");
 
 
 // ***************************** //
