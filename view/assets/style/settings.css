@@ -1,68 +1,255 @@
-h2
+.settings.container
 {
-    margin-bottom: 20px;
-}
-
-.hotkey-table
-{
-    border-collapse: collapse;
-    margin-bottom: 15px;
-}
-.hotkey-table th,
-.hotkey-table td
-{
-    padding: 6px 12px;
-    text-align: left;
-}
-.hotkey-table .hotkey-description
-{
-    max-width: 180px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-
-.hotkey-table
-{
-    border-collapse: separate;
-    border-spacing: 0;
-    border: 1px solid color-mix(in srgb, var(--primary-text-color) 25%, transparent);
-    border-radius: 10px;
-    overflow: hidden;
-}
-.hotkey-table th,
-.hotkey-table td
-{
-    border: none;
-    border-bottom: 1px solid color-mix(in srgb, var(--primary-text-color) 15%, transparent);
-}
-.hotkey-table tbody tr:last-child td
-{
-    border-bottom: none;
-}
-
-.hotkey-modal
-{
-    form
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    section
+    {
+        align-items: flex-start;
+    }
+    .head
     {
         display: flex;
-        flex-direction: column;
-        gap: 10px;
-        .form-element
+        align-items: center;
+        i{
+            font-size: 1.4em;
+        }
+        .content
         {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            margin-left: 16px;
+        }
+    }
+
+    /* section discription */
+    .content > .discription
+    {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 30px;
+        i{
+            font-size: 1.4em;
+        }
+        .discription-text
+        {
+            margin-left: 16px;
+        }
+    }
+
+    /* Theme section */
+    section.theme .content
+    {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .theme-options
+        {
+            display: flex;
             align-items: center;
             gap: 10px;
-        }
-        button[type="submit"]
-        {
-            margin-top: 10px;
+            button{
+                font-size: 1em;
+            }
         }
     }
-    .modal-title
+
+    /* usersettings */
+    section.user-settings
     {
-        margin-bottom: 15px;
+        .content
+        {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            .form-element
+            {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                input{
+                    width: 70%;
+                }
+                button{
+                    width: 15%;
+                }
+            }
+        }
     }
+
+    /* app behavior */
+    section.app-behavior .content
+    {
+        .behavior-options
+        {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            .checkbox-label
+            {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                input[type="checkbox"]
+                {
+                    cursor: pointer;
+                    accent-color: var(--secondary-text-color);
+                }
+                input[type="checkbox"]:checked + span
+                {
+                    color: var(--secondary-text-color);
+                }
+                input[type="checkbox"]:disabled
+                {
+                    cursor: not-allowed;
+                }
+
+                &:has(input[type="checkbox"]:disabled)
+                {
+                    cursor: not-allowed;
+                    opacity: 0.5;
+                }
+                &.main-option
+                {
+                    font-weight: 500;
+                }
+                &.sub-option
+                {
+                    margin-left: 24px;
+                    font-size: 0.95em;
+                }
+            }
+            .sub-options
+            {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    }
+
+    /* Wallpaper */
+    section.select-wallpaper .content
+    {
+        img
+        {
+            object-fit: contain;
+        }
+        .wallpaper-options
+        {
+            display: flex;
+            gap: 16px;
+            .wallpaper-infos
+            {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                .discription
+                {
+                    i{
+                        font-size: 1.2em;
+                    }
+                    display: flex;
+                    align-items: center;
+                    .discription-text
+                    {
+                        display: flex;
+                        flex-direction: column;
+                        margin-left: 12px;
+                        span{
+                            font-size: 0.8em;
+                            color: var(--additional-text-color);
+                        }
+                    }
+                }
+                .choose-image,
+                .detect-lively
+                {
+                    display: flex;
+                    width: 50%;
+                    gap: 5px;
+                    button
+                    {
+                        flex: 1;
+                    }
+                }
+            }
+        }
+    }
+
+    section.hotkeys .content
+    {
+        width: 100%;
+        position: relative;
+        .new-hotkey-btn
+        {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .hotkey-table
+        {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid color-mix(in srgb, var(--primary-text-color) 25%, transparent);
+            border-radius: 10px;
+            overflow: hidden;
+            th, td
+            {
+                padding: 6px 12px;
+                text-align: left;
+                border: none;
+                border-bottom: 1px solid color-mix(in srgb, var(--primary-text-color) 15%, transparent);
+            }
+            td:nth-child(2),
+            td:nth-child(3)
+            {
+                width: 160px;
+                text-align: center;
+            }
+            td:nth-child(7)
+            {
+                text-align: right;
+            }
+            .hotkey-description
+            {
+                max-width: 180px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            tbody tr:last-child td
+            {
+                border-bottom: none;
+            }
+        }
+        .hotkey-modal
+        {
+            form
+            {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                .form-element
+                {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 10px;
+                }
+                button[type="submit"]
+                {
+                    margin-top: 10px;
+                }
+            }
+            .modal-title
+            {
+                margin-bottom: 15px;
+            }
+        }
+    }
+
 }

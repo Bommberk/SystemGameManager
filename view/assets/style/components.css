@@ -82,7 +82,7 @@
 {
     --page-offset: var(--sidebar-width);
     margin-left: var(--sidebar-width);
-    padding: 15px;
+    padding: 25px;
     transition: 0.2s ease-out;
 }
 #sidebar.collapsed + #page
@@ -109,4 +109,13 @@
 }
 .modal.active{
     display: block;
+}
+
+.section-1-2
+{
+    display: flex;
+    gap: 15px;
+    section{
+        flex: 1;
+    }
 }

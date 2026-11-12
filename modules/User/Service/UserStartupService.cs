@@ -21,7 +21,7 @@ public static class UserStartupService
             return;
         }
 
-        if (!user.EnableBackgroundRunning || !user.StartWithWindows)
+        if (!user.StartWithWindows)
         {
             runKey.DeleteValue(RunValueName, throwOnMissingValue: false);
             return;
@@ -33,7 +33,7 @@ public static class UserStartupService
             return;
         }
 
-        var arguments = user.StartInBackground ? " --background" : string.Empty;
+        var arguments = user.EnableBackgroundRunning && user.StartInBackground ? " --background" : string.Empty;
         runKey.SetValue(RunValueName, $"\"{executablePath}\"{arguments}");
     }
 }

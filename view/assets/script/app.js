@@ -1,5 +1,5 @@
 loadSidebar();
-loadPage("gamemanager");
+loadPage("settings");
 
 
 // ***************************** //
@@ -132,6 +132,7 @@ function handleUserSettings(settings) {
     if (settings.Theme) {
         document.body.className = settings.Theme;
         localStorage.setItem("theme", settings.Theme);
+        updateActiveThemeButton();
     }
 
     const defaultWallpaperPath = document.getElementById("default-wallpaper-path");
@@ -144,6 +145,7 @@ function handleUserSettings(settings) {
     }
     const livelyExePath = document.getElementById("lively-exe-path");
     if (livelyExePath) livelyExePath.textContent = settings.LivelyExePath ?? "Automatic detection";
+    updateWallpaperButtonStates(settings);
 }
 
 let detectedWallpaperInfo = null;
@@ -158,12 +160,15 @@ function handleDetectedWallpaperInfo(info) {
     }
     const windowsWallpaper = document.getElementById("windows-wallpaper-path");
     if (windowsWallpaper) windowsWallpaper.textContent = info.WindowsWallpaperPath ?? "not detected";
+    const livelyWallpaper = document.getElementById("lively-wallpaper-path");
+    if (livelyWallpaper) livelyWallpaper.textContent = info.LivelyExePath ?? "not detected";
     handleUserSettings(userSettings);
 }
 
 function resetDefaultWallpaper() {
     api.setUserWallpaperSettings({ DefaultWallpaperPath: null, LivelyExePath: userSettings?.LivelyExePath ?? null });
     userSettings = { ...(userSettings ?? {}), DefaultWallpaperPath: null };
+    updateWallpaperButtonStates(userSettings);
     handleUserSettings(userSettings);
 }
 
@@ -179,8 +184,16 @@ function saveUserName() {
     if (nameInput) api.setUserName(nameInput.value);
 }
 
+function updateActiveThemeButton() {
+    const activeTheme = document.body.className || "dark";
+    document.querySelectorAll(".theme-options button").forEach(button => {
+        button.classList.toggle("active", button.id === `theme-button-${activeTheme}`);
+    });
+}
+
 function changeTheme(theme) {
     document.body.className = theme;
+    updateActiveThemeButton();
     localStorage.setItem('theme', theme);
     userSettings = { ...(userSettings ?? {}), Theme: theme };
     api.setUserTheme(theme);
@@ -193,16 +206,14 @@ function updateBackgroundSettingsAvailability() {
     const startInBackground = document.getElementById("start-in-background");
     if (!enableBackgroundRunning || !closeToBackground || !startWithWindows || !startInBackground) return;
 
-    const enabled = enableBackgroundRunning.checked;
-    closeToBackground.disabled = !enabled;
-    startWithWindows.disabled = !enabled;
-    startInBackground.disabled = !enabled || !startWithWindows.checked;
+    const backgroundEnabled = enableBackgroundRunning.checked;
+    closeToBackground.disabled = !backgroundEnabled;
+    startInBackground.disabled = !backgroundEnabled || !startWithWindows.checked;
 
-    if (!enabled) {
+    if (closeToBackground.disabled) {
         closeToBackground.checked = false;
-        startWithWindows.checked = false;
-        startInBackground.checked = false;
-    } else if (!startWithWindows.checked) {
+    }
+    if (startInBackground.disabled) {
         startInBackground.checked = false;
     }
 }
@@ -221,4 +232,19 @@ function saveBackgroundSettings() {
         StartWithWindows: startWithWindows.checked,
         StartInBackground: startInBackground.checked
     });
+}
+
+function updateWallpaperButtonStates(settings) {
+    const chooseDefaultBtn = document.querySelector('.choose-image button:first-child');
+    const useWindowsBtn = document.querySelector('.choose-image button:nth-child(2)');
+    
+    if (chooseDefaultBtn && useWindowsBtn) {
+        if (settings.DefaultWallpaperPath) {
+            chooseDefaultBtn.classList.add("active");
+            useWindowsBtn.classList.remove("active");
+        } else {
+            chooseDefaultBtn.classList.remove("active");
+            useWindowsBtn.classList.add("active");
+        }
+    }
 }

@@ -1,83 +1,187 @@
-<h1>Settings</h1>
-
-<h2>Change Theme</h2>
-<button onclick="changeTheme('dark')">Dark</button>
-<button onclick="changeTheme('light')">Light</button>
-<button onclick="changeTheme('red')">Red</button>
-<button onclick="changeTheme('pink')">Pink</button>
-<button onclick="changeTheme('yellow')">Yellow</button>
-
-<section class="user-settings">
-    <h2>User Settings</h2>
-    <label for="user-name">Name</label>
-    <input type="text" id="user-name">
-    <button type="button" onclick="saveUserName()">Save</button>
-</section>
-
-<section class="user-settings">
-    <h2>Background and Startup</h2>
-    <label><input type="checkbox" id="enable-background-running" onchange="saveBackgroundSettings()"> Allow the app to run in the background</label>
-    <label><input type="checkbox" id="close-to-background" onchange="saveBackgroundSettings()"> Keep running when closed with the X button</label>
-    <label><input type="checkbox" id="start-with-windows" onchange="saveBackgroundSettings()"> Start the app when Windows starts</label>
-    <label><input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()"> Start in the background</label>
-</section>
-
-<section class="user-settings">
-    <h2>Wallpaper</h2>
-    <p>Default wallpaper (restored when no game is running): <span id="default-wallpaper-path"></span></p>
-    <img id="default-wallpaper-preview" alt="Default wallpaper preview" style="max-width: 320px;" hidden>
-    <p>Detected Windows wallpaper: <span id="windows-wallpaper-path"></span></p>
-    <button type="button" onclick="api.selectDefaultWallpaper()">Choose default wallpaper</button>
-    <button type="button" onclick="resetDefaultWallpaper()">Use Windows wallpaper</button>
-    <p>Lively executable: <span id="lively-exe-path"></span></p>
-    <p id="lively-status"></p>
-    <button type="button" onclick="api.selectLivelyExe()">Choose livelycu.exe</button>
-    <button type="button" onclick="resetLivelyExe()">Detect automatically</button>
-</section>
-
-<section class="hotkeys collapsable">
-<h2>HotKeys</h2>
-<div>
-<table class="hotkey-table">
-    <thead>
-        <tr><th>Name</th><th>Music volume (%)</th><th>Game volume (%)</th><th>Output device</th><th>Description</th><th>Key combination</th><th></th></tr>
-    </thead>
-    <tbody id="hotkey-list"></tbody>
-</table>
-<button type="button" onclick="openHotKeyModal()">Neuer Hotkey</button>
-
-<div class="modal hotkey-modal" id="hotkey-modal">
-    <i class="fa-solid fa-xmark close-modal" role="button" onclick="closeHotKeyModal()"></i>
-    <h3 class="modal-title">Neuer Hotkey</h3>
-    <form id="hotkey-form" onsubmit="saveHotKeyFromForm(event)">
-        <div class="form-element">
-            <label>Name</label>
-            <input type="text" id="hotkey-name" required>
+<link rel="stylesheet" href="assets/style/settings.css">
+<div class="settings container">
+    <section class="head">
+        <i class="fa-solid fa-gear"></i>
+        <div class="content">
+            <h2 class="head-title">Settings</h2>
+            <p>Configure your application settings</p>
         </div>
-        <div class="form-element">
-            <label>Music volume (%)</label>
-            <input type="number" id="hotkey-music" min="0" max="100" value="100">
+    </section>
+
+    <section class="theme">
+        <div class="content card">
+            <div class="discription">
+                <i class="fa-solid fa-palette"></i>
+                <div class="discription-text">
+                    <h2>Theme</h2>
+                    <p>Select your preferred color-theme for the application.</p>
+                </div>
+            </div>
+            <div class="theme-options">
+                <button id="theme-button-dark" onclick="changeTheme('dark')">Dark</button>
+                <button id="theme-button-light" onclick="changeTheme('light')">Light</button>
+                <button id="theme-button-red" onclick="changeTheme('red')">Red</button>
+                <button id="theme-button-pink" onclick="changeTheme('pink')">Pink</button>
+                <button id="theme-button-yellow" onclick="changeTheme('yellow')">Yellow</button>
+            </div>
         </div>
-        <div class="form-element">
-            <label>Game volume (%)</label>
-            <input type="number" id="hotkey-game" min="0" max="100" value="100">
+    </section>
+
+    <!-- usersection and startup settings -->
+    <div class="section-1-2">
+        <section class="user-settings card">
+            <div class="content">
+                <div class="discription">
+                    <i class="fa-solid fa-user"></i>
+                    <div class="discription-text">
+                        <h2>User Settings</h2>
+                        <p>Configure your user settings for the application.</p>
+                    </div>
+                </div>
+                <div class="form-element">
+                    <label for="user-name">Name:</label>
+                    <input type="text" id="user-name">
+                    <button type="submit" onclick="saveUserName()" class="save-btn">
+                        <i class="fa-solid fa-floppy-disk save-icon"></i>
+                        <i class="fa-solid fa-check check-icon"></i>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="app-behavior card">
+            <div class="content">
+                <div class="discription">
+                    <i class="fa-solid fa-rocket"></i>
+                    <div class="discription-text">
+                        <h2>Background and Startup</h2>
+                        <p>Control how and when the app starts.</p>
+                    </div>
+                </div>
+                <div class="behavior-options">
+                    <label class="checkbox-label main-option">
+                        <input type="checkbox" id="enable-background-running" onchange="saveBackgroundSettings()">
+                        <span>Allow the app to run in the background</span>
+                    </label>
+                    <label class="checkbox-label main-option">
+                        <input type="checkbox" id="start-with-windows" onchange="saveBackgroundSettings()">
+                        <span>Start the app when Windows starts</span>
+                    </label>
+                    <div class="sub-options">
+                        <label class="checkbox-label sub-option">
+                            <input type="checkbox" id="close-to-background" onchange="saveBackgroundSettings()" disabled>
+                            <span>Keep running when closed with the X button</span>
+                        </label>
+                        <label class="checkbox-label sub-option">
+                            <input type="checkbox" id="start-in-background" onchange="saveBackgroundSettings()" disabled>
+                            <span>Start in the background</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section class="select-wallpaper card">
+        <div class="content">
+            <div class="discription">
+                <i class="fa-solid fa-image"></i>
+                <div class="discription-text">
+                    <h2>Wallpaper</h2>
+                    <p>Control the wallpaper settings for the app.</p>
+                </div>
+            </div>
+            <div class="wallpaper-options">
+                <img id="default-wallpaper-preview" alt="Default wallpaper preview" style="max-width: 320px;" hidden>
+                <hr>
+                <div class="wallpaper-infos">
+                    <div class="discription">
+                        <i class="fa-solid fa-desktop"></i>
+                        <div class="discription-text">
+                            <h3>Default Wallpaper <span> (restored when no game is running)</span></h3>
+                            <p id="default-wallpaper-path"></p>
+                        </div>
+                    </div>
+                    <div class="discription">
+                        <i class="fa-solid fa-desktop"></i>
+                        <div class="discription-text">
+                            <h3>Detected Windows wallpaper</h3>
+                            <p id="windows-wallpaper-path"></p>
+                        </div>
+                    </div>
+                    <div class="choose-image" style="margin-top: 20px;">
+                        <button type="button" onclick="api.selectDefaultWallpaper()">Choose default wallpaper</button>
+                        <button type="button" onclick="resetDefaultWallpaper()">Use Windows wallpaper</button>
+                    </div>
+                    <div class="discription" style="margin: 10px 0;">
+                        <i class="fa-solid fa-window-maximize"></i>
+                        <div class="discription-text">
+                            <h3>Lively Wallpaper</h3>
+                            <p id="lively-wallpaper-path"></p>
+                        </div>
+                    </div>
+                    <div class="detect-lively">
+                        <button type="button" onclick="api.selectLivelyExe()">Choose livelycu.exe</button>
+                        <button type="button" onclick="resetLivelyExe()">Detect automatically</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-element">
-            <label>Output device</label>
-            <select id="hotkey-device"></select>
+    </section>
+
+    <section class="hotkeys card">
+        <div class="content">
+            <div class="discription">
+                <i class="fa-solid fa-keyboard"></i>
+                <div class="discription-text">
+                    <h2>HotKeys</h2>
+                    <p>Manage custom key combinations for in-app actions.</p>
+                </div>
+            </div>
+            <div class="new-hotkey">
+                <button type="button" onclick="openHotKeyModal()" class="new-hotkey-btn">Neuer Hotkey</button>
+            </div>
+            <table class="hotkey-table">
+                <thead>
+                    <tr><th>Name</th><th>Music volume (%)</th><th>Game volume (%)</th><th>Output device</th><th>Description</th><th>Key combination</th><th></th></tr>
+                </thead>
+                <tbody id="hotkey-list"></tbody>
+            </table>
+            <div class="modal hotkey-modal" id="hotkey-modal">
+                <i class="fa-solid fa-xmark close-modal" role="button" onclick="closeHotKeyModal()"></i>
+                <h3 class="modal-title">Neuer Hotkey</h3>
+                <form id="hotkey-form" onsubmit="saveHotKeyFromForm(event)">
+                    <div class="form-element">
+                        <label>Name</label>
+                        <input type="text" id="hotkey-name" required>
+                    </div>
+                    <div class="form-element">
+                        <label>Music volume (%)</label>
+                        <input type="number" id="hotkey-music" min="0" max="100" value="100">
+                    </div>
+                    <div class="form-element">
+                        <label>Game volume (%)</label>
+                        <input type="number" id="hotkey-game" min="0" max="100" value="100">
+                    </div>
+                    <div class="form-element">
+                        <label>Output device</label>
+                        <select id="hotkey-device"></select>
+                    </div>
+                    <div class="form-element">
+                        <label>Description</label>
+                        <input type="text" id="hotkey-description">
+                    </div>
+                    <div class="form-element">
+                        <label>Key combination</label>
+                        <input type="text" id="hotkey-keys-display" readonly placeholder="Click capture, then press the keys">
+                        <input type="hidden" id="hotkey-keys">
+                        <button type="button" onclick="startHotKeyCapture()">Capture</button>
+                    </div>
+                    <button type="submit">Save</button>
+                </form>
+            </div>
         </div>
-        <div class="form-element">
-            <label>Description</label>
-            <input type="text" id="hotkey-description">
-        </div>
-        <div class="form-element">
-            <label>Key combination</label>
-            <input type="text" id="hotkey-keys-display" readonly placeholder="Click capture, then press the keys">
-            <input type="hidden" id="hotkey-keys">
-            <button type="button" onclick="startHotKeyCapture()">Capture</button>
-        </div>
-        <button type="submit">Save</button>
-    </form>
+    </section>
+
 </div>
-</div>
-</section>

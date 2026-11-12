@@ -24,16 +24,22 @@ body
     --secondary-background-color-hover: #262B20;
     --tertiary-background-color: #0F0F0F;
     --quaternary-background-color: #98B164;
+
     --card-background-color: #232424;
     --card-boxshadow-color: rgba(0, 0, 0, 0.3);
     --secondary-card-background-color: #545959;
+
     --primary-text-color: #E9EBEC;
     --secondary-text-color: #98B164;
     --tertiary-text-color: #badf6b;
     --text-shadow-color: #fff;
+    --additional-text-color: #ffffff85;
+
     --error-background-color: #C32038;
+
     --primary-border-color: #e9ebec2b;
     --secondary-border-color: #e9ebec77;
+
     --scrollbar-thumb-color: #545959;
     --scrollbar-track-color: #7d8181;
     --accent-color: #98B164;
@@ -56,6 +62,8 @@ body
     --primary-text-color: #222;
     --secondary-text-color: #98B164;
     --tertiary-text-color: #badf6b;
+    --text-shadow-color: #fff;
+    --additional-text-color: #22222285;
     --error-background-color: #C32038;
     --primary-border-color: #2222222b;
     --scrollbar-thumb-color: #C8C8C8;
@@ -76,6 +84,8 @@ body
     --primary-text-color: #E9EBEC;
     --secondary-text-color: #C32038;
     --tertiary-text-color: #ff6b6b;
+    --text-shadow-color: #fff;
+    --additional-text-color: #ffffff85;
     --error-background-color: #C32038;
     --accent-color: #C32038;
 }
@@ -93,6 +103,8 @@ body
     --primary-text-color: #E9EBEC;
     --secondary-text-color: #e91e63;
     --tertiary-text-color: #ff69b4;
+    --text-shadow-color: #fff;
+    --additional-text-color: #ffffff85;
     --error-background-color: #C32038;
     --accent-color: #e91e63;
 }
@@ -110,6 +122,8 @@ body
     --primary-text-color: #E9EBEC;
     --secondary-text-color: #ffeb3b;
     --tertiary-text-color: #ffff66;
+    --text-shadow-color: #fff;
+    --additional-text-color: #ffffff85;
     --error-background-color: #C32038;
     --accent-color: #ffeb3b;
 }
